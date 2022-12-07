@@ -35,13 +35,13 @@ let make_user firstname lastname age activated email =
   &lt;*&gt; optional_field string &quot;email&quot; obj
 ;;</code></pre><h3 id="queries-over-associatives-lists"><a href="#queries-over-associatives-lists" class="anchor"></a>Queries over associatives lists</h3><p>In our previous example, we saw how to use queries on objects. Although this approach works, each validation requires the object to be deconstructed at each stage. Fortunately, it is possible, using associative lists, to deconstruct only once.</p><p>let's take our previous type and function (<code>user</code> and <code>make_user</code>):</p><pre><code>let validate_with_assoc =
   object_and (fun assoc -&gt;
-      let open Validate.Applicative in
-      make_user
-      &lt;$&gt; required_assoc string &quot;firstname&quot; assoc
-      &lt;*&gt; required_assoc string &quot;lastname&quot; assoc
-      &lt;*&gt; required_assoc integer &quot;age&quot; assoc
-      &lt;*&gt; optional_assoc_or ~default:false boolean &quot;activated&quot; assoc
-      &lt;*&gt; optional_assoc string &quot;email&quot; assoc)
+    let open Validate.Applicative in
+    make_user
+    &lt;$&gt; required_assoc string &quot;firstname&quot; assoc
+    &lt;*&gt; required_assoc string &quot;lastname&quot; assoc
+    &lt;*&gt; required_assoc integer &quot;age&quot; assoc
+    &lt;*&gt; optional_assoc_or ~default:false boolean &quot;activated&quot; assoc
+    &lt;*&gt; optional_assoc string &quot;email&quot; assoc)
 ;;</code></pre><p>The result is identical to the previous one except that this time the object is only deconstructed once.</p><div class="odoc-spec"><div class="spec value" id="val-optional_assoc" class="anchored"><a href="#val-optional_assoc" class="anchor"></a><code><span><span class="keyword">val</span> optional_assoc : 
   <span>?case_sensitive:bool <span class="arrow">&#45;&gt;</span></span>
   <span><span>( <span><a href="#type-t">t</a> <span class="arrow">&#45;&gt;</span></span> <span><span class="type-var">'a</span> <a href="../../Validate/index.html#type-t">Validate.t</a></span> )</span> <span class="arrow">&#45;&gt;</span></span>
