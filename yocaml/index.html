@@ -24,27 +24,12 @@ bin/</code></pre><p>In <code>templates/</code> we will place our templates. For 
     &lt;hr&gt;
     copyright &lt;strong&gt;Myself&lt;/strong&gt;
   &lt;/body&gt;
-&lt;/html&gt;</code></pre><p>You can now create several pages, for example, <code>index.html</code>, <code>project.html</code> and <code>about.html</code> with arbitrary content.</p><h4 id="defining-the-generator"><a href="#defining-the-generator" class="anchor"></a>Defining the generator</h4><p>Let's go back to our <code>my_site.ml</code> file to create our generator!</p><pre class="language-ocaml"><code>open YOCaml
+&lt;/html&gt;</code></pre><p>You can now create several pages, for example, <code>index.html</code>, <code>project.html</code> and <code>about.html</code> with arbitrary content.</p><h4 id="defining-the-generator"><a href="#defining-the-generator" class="anchor"></a>Defining the generator</h4><p>Let's go back to our <code>my_site.ml</code> file to create our generator!</p><pre class="language-ocaml"><code>open Yocaml
 
 let destination = &quot;_build&quot;
 
 let () =
-  print_endline &quot;Hello&quot;</code></pre><p>First, let's define where we want to generate our site. I chose the <code>_build</code> directory, so I don't have to modify the <code>.gitignore</code> of the project.</p><p>To create a page, the process is quite simple. We will browse all the files in the <code>pages</code> directory and for each file, we will create a file with the same name in our destination directory which will read the <code>header.html</code> template, piping its content with the file we are reading and piping it with the <code>footer.html</code> template.</p><p>Most of the functions we will use are in the <a href="Yocaml/Build/index.html"><code>Yocaml.Build</code></a> module.</p><pre class="language-ocaml"><code>open YOCaml
-
-let destination = &quot;_build&quot;
-
-let task =
-  process_files [&quot;pages/&quot;] (with_extension &quot;html&quot;) (fun file -&gt;
-      let target = basename file |&gt; into destination in
-      let open Build in
-      create_file target (
-        read_file &quot;templates/header.html&quot;
-        &gt;&gt;&gt; pipe_content file
-        &gt;&gt;&gt; pipe_content &quot;templates/footer.html&quot;)
-    )
-
-let () =
-  print_endline &quot;Hello&quot;</code></pre><p>The API tries to be as clear as possible. The <code>process_files</code> function takes a list of directories as an argument and filters the entries with a predicate. Here, the files must end in <code>.html</code>. Then, for each file, we will create an image in our destination, read the header, read the browsed file and pipe it with the header content, read the footer and pipe it with the previous content.</p><p>Now you have to run the program described above. Nothing could be easier, we can use <code>Yocaml_unix</code>.execute. (It is possible to provide its own execution function, for that I refer you to <a href="https://github.com/xvw/preface/blob/master/guides/freer_effect_handling.md">the guide on the Preface effect handlers</a>).</p><pre class="language-ocaml"><code>open YOCaml
+  print_endline &quot;Hello&quot;</code></pre><p>First, let's define where we want to generate our site. I chose the <code>_build</code> directory, so I don't have to modify the <code>.gitignore</code> of the project.</p><p>To create a page, the process is quite simple. We will browse all the files in the <code>pages</code> directory and for each file, we will create a file with the same name in our destination directory which will read the <code>header.html</code> template, piping its content with the file we are reading and piping it with the <code>footer.html</code> template.</p><p>Most of the functions we will use are in the <a href="Yocaml/Build/index.html"><code>Yocaml.Build</code></a> module.</p><pre class="language-ocaml"><code>open Yocaml
 
 let destination = &quot;_build&quot;
 
@@ -59,7 +44,22 @@ let task =
     )
 
 let () =
-  Yocaml_unix.execute task</code></pre><p>That's it! You have your first template engine that you can try out and that replaces the PHP includes!</p><h4 id="adding-the-generator-as-a-dependency"><a href="#adding-the-generator-as-a-dependency" class="anchor"></a>Adding the generator as a dependency</h4><p>The functions in the <a href="Yocaml/Build/index.html"><code>Yocaml.Build</code></a> module capture their dependencies and compositions, with the <code>&gt;&gt;&gt;</code> operator merging them. In our example, each page to be built will have as dependencies <code>templates/header.html</code>, <code>templates/footer.html</code> and the page in the <code>pages</code> directory being observed. This means that each page will be rebuilt <em>if and only</em> if necessary.</p><p>On the other hand, if the generator is ever recompiled, which could have the effect of completely changing our site, we would also like to be able to consider that a file has to be regenerated. Fortunately the <a href="Yocaml/Build/index.html#val-watch"><code>Yocaml.Build.watch</code></a> function allows us to add a file to the dependencies without reading it, so we can modify our <code>task</code> in this way:</p><pre class="language-ocaml"><code>open YOCaml
+  print_endline &quot;Hello&quot;</code></pre><p>The API tries to be as clear as possible. The <code>process_files</code> function takes a list of directories as an argument and filters the entries with a predicate. Here, the files must end in <code>.html</code>. Then, for each file, we will create an image in our destination, read the header, read the browsed file and pipe it with the header content, read the footer and pipe it with the previous content.</p><p>Now you have to run the program described above. Nothing could be easier, we can use <code>Yocaml_unix</code>.execute. (It is possible to provide its own execution function, for that I refer you to <a href="https://github.com/xvw/preface/blob/master/guides/freer_effect_handling.md">the guide on the Preface effect handlers</a>).</p><pre class="language-ocaml"><code>open Yocaml
+
+let destination = &quot;_build&quot;
+
+let task =
+  process_files [&quot;pages/&quot;] (with_extension &quot;html&quot;) (fun file -&gt;
+      let target = basename file |&gt; into destination in
+      let open Build in
+      create_file target (
+        read_file &quot;templates/header.html&quot;
+        &gt;&gt;&gt; pipe_content file
+        &gt;&gt;&gt; pipe_content &quot;templates/footer.html&quot;)
+    )
+
+let () =
+  Yocaml_unix.execute task</code></pre><p>That's it! You have your first template engine that you can try out and that replaces the PHP includes!</p><h4 id="adding-the-generator-as-a-dependency"><a href="#adding-the-generator-as-a-dependency" class="anchor"></a>Adding the generator as a dependency</h4><p>The functions in the <a href="Yocaml/Build/index.html"><code>Yocaml.Build</code></a> module capture their dependencies and compositions, with the <code>&gt;&gt;&gt;</code> operator merging them. In our example, each page to be built will have as dependencies <code>templates/header.html</code>, <code>templates/footer.html</code> and the page in the <code>pages</code> directory being observed. This means that each page will be rebuilt <em>if and only</em> if necessary.</p><p>On the other hand, if the generator is ever recompiled, which could have the effect of completely changing our site, we would also like to be able to consider that a file has to be regenerated. Fortunately the <a href="Yocaml/Build/index.html#val-watch"><code>Yocaml.Build.watch</code></a> function allows us to add a file to the dependencies without reading it, so we can modify our <code>task</code> in this way:</p><pre class="language-ocaml"><code>open Yocaml
 
 let destination = &quot;_build&quot;
 let track_binary_update = Build.watch Sys.argv.(0)
