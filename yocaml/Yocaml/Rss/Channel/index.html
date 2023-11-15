@@ -1,34 +1,34 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml"><head><title>Channel (yocaml.Yocaml.Rss.Channel)</title><link rel="stylesheet" href="../../../../_odoc_support/odoc.css"/><meta charset="utf-8"/><meta name="generator" content="odoc 2.2.0"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/><script src="../../../../_odoc_support/highlight.pack.js"></script><script>hljs.initHighlightingOnLoad();</script></head><body class="odoc"><nav class="odoc-nav"><a href="../index.html">Up</a> – <a href="../../../index.html">yocaml</a> &#x00BB; <a href="../../index.html">Yocaml</a> &#x00BB; <a href="../index.html">Rss</a> &#x00BB; Channel</nav><header class="odoc-preamble"><h1>Module <code><span>Rss.Channel</span></code></h1></header><div class="odoc-content"><div class="odoc-spec"><div class="spec type anchored" id="type-t"><a href="#type-t" class="anchor"></a><code><span><span class="keyword">type</span> t</span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-make"><a href="#val-make" class="anchor"></a><code><span><span class="keyword">val</span> make : 
-  <span>?pub_date:<a href="../../Date/index.html#type-t">Date.t</a> <span class="arrow">&#45;&gt;</span></span>
-  <span>?last_build_date:<a href="../../Date/index.html#type-t">Date.t</a> <span class="arrow">&#45;&gt;</span></span>
-  <span>?category:<a href="../Category/index.html#type-t">Category.t</a> <span class="arrow">&#45;&gt;</span></span>
-  <span>?image:<a href="../Image/index.html#type-t">Image.t</a> <span class="arrow">&#45;&gt;</span></span>
-  <span>?cloud:<a href="../Cloud/index.html#type-t">Cloud.t</a> <span class="arrow">&#45;&gt;</span></span>
-  <span>?copyright:string <span class="arrow">&#45;&gt;</span></span>
-  <span>?docs:string <span class="arrow">&#45;&gt;</span></span>
-  <span>?generator:string <span class="arrow">&#45;&gt;</span></span>
-  <span>?managing_editor:string <span class="arrow">&#45;&gt;</span></span>
-  <span>?ttl:int <span class="arrow">&#45;&gt;</span></span>
-  <span>?webmaster:string <span class="arrow">&#45;&gt;</span></span>
-  <span>title:string <span class="arrow">&#45;&gt;</span></span>
-  <span>link:string <span class="arrow">&#45;&gt;</span></span>
-  <span>feed_link:string <span class="arrow">&#45;&gt;</span></span>
-  <span>description:string <span class="arrow">&#45;&gt;</span></span>
+<html xmlns="http://www.w3.org/1999/xhtml"><head><title>Channel (yocaml.Yocaml.Rss.Channel)</title><link rel="stylesheet" href="../../../../odoc.support/odoc.css"/><meta charset="utf-8"/><meta name="generator" content="odoc 2.3.1"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/><script src="../../../../odoc.support/highlight.pack.js"></script><script>hljs.initHighlightingOnLoad();</script></head><body class="odoc"><nav class="odoc-nav"><a href="../index.html">Up</a> – <a href="../../../index.html">yocaml</a> &#x00BB; <a href="../../index.html">Yocaml</a> &#x00BB; <a href="../index.html">Rss</a> &#x00BB; Channel</nav><header class="odoc-preamble"><h1>Module <code><span>Rss.Channel</span></code></h1></header><div class="odoc-content"><div class="odoc-spec"><div class="spec type anchored" id="type-t"><a href="#type-t" class="anchor"></a><code><span><span class="keyword">type</span> t</span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-make"><a href="#val-make" class="anchor"></a><code><span><span class="keyword">val</span> make : 
+  <span><span class="optlabel">?pub_date</span>:<a href="../../Date/index.html#type-t">Date.t</a> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="optlabel">?last_build_date</span>:<a href="../../Date/index.html#type-t">Date.t</a> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="optlabel">?category</span>:<a href="../Category/index.html#type-t">Category.t</a> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="optlabel">?image</span>:<a href="../Image/index.html#type-t">Image.t</a> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="optlabel">?cloud</span>:<a href="../Cloud/index.html#type-t">Cloud.t</a> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="optlabel">?copyright</span>:string <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="optlabel">?docs</span>:string <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="optlabel">?generator</span>:string <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="optlabel">?managing_editor</span>:string <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="optlabel">?ttl</span>:int <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="optlabel">?webmaster</span>:string <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="label">title</span>:string <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="label">link</span>:string <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="label">feed_link</span>:string <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="label">description</span>:string <span class="arrow">&#45;&gt;</span></span>
   <span><span><a href="../Item/index.html#type-t">Item.t</a> list</span> <span class="arrow">&#45;&gt;</span></span>
   <a href="#type-t">t</a></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-pp"><a href="#val-pp" class="anchor"></a><code><span><span class="keyword">val</span> pp : 
-  <span>?default_time:<span>(<a href="../../Date/index.html#type-hour">Date.hour</a> * <a href="../../Date/index.html#type-min">Date.min</a> * <a href="../../Date/index.html#type-sec">Date.sec</a>)</span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="optlabel">?default_time</span>:<span>(<a href="../../Date/index.html#type-hour">Date.hour</a> * <a href="../../Date/index.html#type-min">Date.min</a> * <a href="../../Date/index.html#type-sec">Date.sec</a>)</span> <span class="arrow">&#45;&gt;</span></span>
   <span><span class="xref-unresolved">Stdlib</span>.Format.formatter <span class="arrow">&#45;&gt;</span></span>
   <span><a href="#type-t">t</a> <span class="arrow">&#45;&gt;</span></span>
   unit</span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-pp_rss"><a href="#val-pp_rss" class="anchor"></a><code><span><span class="keyword">val</span> pp_rss : 
-  <span>?xml_version:string <span class="arrow">&#45;&gt;</span></span>
-  <span>?encoding:string <span class="arrow">&#45;&gt;</span></span>
-  <span>?default_time:<span>(<a href="../../Date/index.html#type-hour">Date.hour</a> * <a href="../../Date/index.html#type-min">Date.min</a> * <a href="../../Date/index.html#type-sec">Date.sec</a>)</span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="optlabel">?xml_version</span>:string <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="optlabel">?encoding</span>:string <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="optlabel">?default_time</span>:<span>(<a href="../../Date/index.html#type-hour">Date.hour</a> * <a href="../../Date/index.html#type-min">Date.min</a> * <a href="../../Date/index.html#type-sec">Date.sec</a>)</span> <span class="arrow">&#45;&gt;</span></span>
   <span><span class="xref-unresolved">Stdlib</span>.Format.formatter <span class="arrow">&#45;&gt;</span></span>
   <span><a href="#type-t">t</a> <span class="arrow">&#45;&gt;</span></span>
   unit</span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-to_rss"><a href="#val-to_rss" class="anchor"></a><code><span><span class="keyword">val</span> to_rss : 
-  <span>?xml_version:string <span class="arrow">&#45;&gt;</span></span>
-  <span>?encoding:string <span class="arrow">&#45;&gt;</span></span>
-  <span>?default_time:<span>(<a href="../../Date/index.html#type-hour">Date.hour</a> * <a href="../../Date/index.html#type-min">Date.min</a> * <a href="../../Date/index.html#type-sec">Date.sec</a>)</span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="optlabel">?xml_version</span>:string <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="optlabel">?encoding</span>:string <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="optlabel">?default_time</span>:<span>(<a href="../../Date/index.html#type-hour">Date.hour</a> * <a href="../../Date/index.html#type-min">Date.min</a> * <a href="../../Date/index.html#type-sec">Date.sec</a>)</span> <span class="arrow">&#45;&gt;</span></span>
   <span><a href="#type-t">t</a> <span class="arrow">&#45;&gt;</span></span>
   string</span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-equal"><a href="#val-equal" class="anchor"></a><code><span><span class="keyword">val</span> equal : <span><a href="#type-t">t</a> <span class="arrow">&#45;&gt;</span></span> <span><a href="#type-t">t</a> <span class="arrow">&#45;&gt;</span></span> bool</span></code></div></div></div></body></html>
