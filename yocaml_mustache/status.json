@@ -1,0 +1,13 @@
+{
+  "name": "yocaml_mustache",
+  "version": "dev",
+  "files": [
+    "yocaml_mustache/Yocaml_mustache/Pipeline/index.html",
+    "yocaml_mustache/Yocaml_mustache/index.html",
+    "yocaml_mustache/index.html",
+    "src/yocaml_mustache/yocaml_mustache.ml.html", "src/index.html",
+    "index.html"
+  ],
+  "failed": false,
+  "redirections": []
+}

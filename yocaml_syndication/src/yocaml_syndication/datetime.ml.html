@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"><head><title>Source: datetime.ml (yocaml_syndication.src.yocaml_syndication)</title><meta charset="utf-8"/><link rel="stylesheet" href="../../../odoc.css"/><meta name="generator" content="odoc 3.0.0"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/></head><body class="odoc-src"><nav class="odoc-nav"><a href="../index.html">Up</a> – <a href="../../../index.html">Package index</a> &#x00BB; <a href="../../index.html">yocaml_syndication</a> &#x00BB; <a href="../index.html">Sources</a> &#x00BB; yocaml_syndication &#x00BB; datetime.ml</nav><header class="odoc-preamble"><h1>Source file <code><span>datetime.ml</span></code></h1></header><div class="odoc-tocs"><nav class="odoc-toc odoc-global-toc"><ul><li><a href="../../index.html">yocaml_syndication</a><ul><li>Library <code>yocaml_syndication</code><ul><li><a href="../../yocaml_syndication/Yocaml_syndication/index.html">Yocaml_syndication</a></li></ul></li><li><a href="../index.html">Sources</a><ul><li>yocaml_syndication<ul><li><a href="atom.ml.html">atom.ml</a></li><li><a href="category.ml.html">category.ml</a></li><li><a href="#" class="current_unit">datetime.ml</a></li><li><a href="generator.ml.html">generator.ml</a></li><li><a href="lang.ml.html">lang.ml</a></li><li><a href="media_type.ml.html">media_type.ml</a></li><li><a href="opml.ml.html">opml.ml</a></li><li><a href="person.ml.html">person.ml</a></li><li><a href="rss1.ml.html">rss1.ml</a></li><li><a href="rss2.ml.html">rss2.ml</a></li><li><a href="text_input.ml.html">text_input.ml</a></li><li><a href="tz.ml.html">tz.ml</a></li><li><a href="xml.ml.html">xml.ml</a></li><li><a href="yocaml_syndication.ml.html">yocaml_syndication.ml</a></li><li><a href="yocaml_syndication__.ml.html">yocaml_syndication__.ml</a></li></ul></li></ul></li></ul></li></ul></nav></div><pre class="source_container"><code class="source_line_column"><a id="L1" class="source_line" href="#L1">1</a>
+<a id="L2" class="source_line" href="#L2">2</a>
+<a id="L3" class="source_line" href="#L3">3</a>
+<a id="L4" class="source_line" href="#L4">4</a>
+<a id="L5" class="source_line" href="#L5">5</a>
+<a id="L6" class="source_line" href="#L6">6</a>
+<a id="L7" class="source_line" href="#L7">7</a>
+<a id="L8" class="source_line" href="#L8">8</a>
+<a id="L9" class="source_line" href="#L9">9</a>
+<a id="L10" class="source_line" href="#L10">10</a>
+<a id="L11" class="source_line" href="#L11">11</a>
+<a id="L12" class="source_line" href="#L12">12</a>
+<a id="L13" class="source_line" href="#L13">13</a>
+<a id="L14" class="source_line" href="#L14">14</a>
+<a id="L15" class="source_line" href="#L15">15</a>
+<a id="L16" class="source_line" href="#L16">16</a>
+<a id="L17" class="source_line" href="#L17">17</a>
+<a id="L18" class="source_line" href="#L18">18</a>
+<a id="L19" class="source_line" href="#L19">19</a>
+<a id="L20" class="source_line" href="#L20">20</a>
+<a id="L21" class="source_line" href="#L21">21</a>
+<a id="L22" class="source_line" href="#L22">22</a>
+<a id="L23" class="source_line" href="#L23">23</a>
+<a id="L24" class="source_line" href="#L24">24</a>
+<a id="L25" class="source_line" href="#L25">25</a>
+<a id="L26" class="source_line" href="#L26">26</a>
+<a id="L27" class="source_line" href="#L27">27</a>
+<a id="L28" class="source_line" href="#L28">28</a>
+<a id="L29" class="source_line" href="#L29">29</a>
+</code><code class="source_code"><span><span class="COMMENT">(* YOCaml a static blog generator.
+   Copyright (C) 2024 The Funkyworkers and The YOCaml's developers
+
+   This program is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program.  If not, see &lt;https://www.gnu.org/licenses/&gt;. *)</span><span class="EOL">
+</span><span class="EOL">
+</span><span id="type-t"><span class="TYPE">type</span> <span class="LIDENT">t</span> <span class="EQUAL">=</span> <a href="tz.ml.html#type-t"><span class="UIDENT">Tz</span><span class="DOT">.</span><span class="LIDENT">t</span></a> <span class="STAR">*</span> <a href="../../../yocaml/src/yocaml/archetype.ml.html#module-Datetime.type-t"><span class="UIDENT">Yocaml</span><span class="DOT">.</span><span class="UIDENT">Datetime</span><span class="DOT">.</span><span class="LIDENT">t</span></a></span><span class="EOL">
+</span><span class="EOL">
+</span><span class="LET">let</span> <span id="val-make"><span class="LIDENT">make</span></span> <span class="QUESTION">?</span><span class="LPAREN">(</span><span id="local_tz_1"><span class="LIDENT">tz</span></span> <span class="EQUAL">=</span> <span class="UIDENT">Tz</span><span class="DOT">.</span><span class="UIDENT">Gmt</span><span class="RPAREN">)</span> <span id="local_date_2"><span class="LIDENT">date</span></span> <span class="EQUAL">=</span> <span class="LPAREN">(</span><a href="#local_tz_1"><span class="LIDENT">tz</span></a><span class="COMMA">,</span> <a href="#local_date_2"><span class="LIDENT">date</span></a><span class="RPAREN">)</span><span class="EOL">
+</span><span class="EOL">
+</span><span class="LET">let</span> <span id="val-to_string"><span class="LIDENT">to_string</span></span> <span class="LPAREN">(</span><span id="local_tz_3"><span class="LIDENT">tz</span></span><span class="COMMA">,</span> <span id="local_dt_4"><span class="LIDENT">dt</span></span><span class="RPAREN">)</span> <span class="EQUAL">=</span><span class="EOL">
+</span>  <span class="LET">let</span> <span id="local_tz_5"><span class="LIDENT">tz</span></span> <span class="EQUAL">=</span> <a href="tz.ml.html#val-to_string"><span class="UIDENT">Tz</span><span class="DOT">.</span><span class="LIDENT">to_string</span></a> <a href="#local_tz_3"><span class="LIDENT">tz</span></a> <span class="IN">in</span><span class="EOL">
+</span>  <a href="../../../ocaml-compiler/src/stdlib/format.ml.html#val-asprintf"><span class="UIDENT">Format</span><span class="DOT">.</span><span class="LIDENT">asprintf</span></a> <span class="STRING">&quot;%a&quot;</span> <span class="LPAREN">(</span><a href="../../../yocaml/src/yocaml/archetype.ml.html#module-Datetime.val-pp_rfc822"><span class="UIDENT">Yocaml</span><span class="DOT">.</span><span class="UIDENT">Datetime</span><span class="DOT">.</span><span class="LIDENT">pp_rfc822</span></a> <span class="TILDE">~</span><a href="#local_tz_5"><span class="LIDENT">tz</span></a> <span class="LPAREN">(</span><span class="RPAREN">)</span><span class="RPAREN">)</span> <a href="#local_dt_4"><span class="LIDENT">dt</span></a><span class="EOL">
+</span><span class="EOL">
+</span><span class="LET">let</span> <span id="val-to_string_rfc3339"><span class="LIDENT">to_string_rfc3339</span></span> <span class="LPAREN">(</span><span id="local_tz_6"><span class="LIDENT">tz</span></span><span class="COMMA">,</span> <span id="local_dt_7"><span class="LIDENT">dt</span></span><span class="RPAREN">)</span> <span class="EQUAL">=</span><span class="EOL">
+</span>  <span class="LET">let</span> <span id="local_tz_8"><span class="LIDENT">tz</span></span> <span class="EQUAL">=</span> <a href="tz.ml.html#val-to_string_rfc3339"><span class="UIDENT">Tz</span><span class="DOT">.</span><span class="LIDENT">to_string_rfc3339</span></a> <a href="#local_tz_6"><span class="LIDENT">tz</span></a> <span class="IN">in</span><span class="EOL">
+</span>  <a href="../../../ocaml-compiler/src/stdlib/format.ml.html#val-asprintf"><span class="UIDENT">Format</span><span class="DOT">.</span><span class="LIDENT">asprintf</span></a> <span class="STRING">&quot;%a&quot;</span> <span class="LPAREN">(</span><a href="../../../yocaml/src/yocaml/archetype.ml.html#module-Datetime.val-pp_rfc3339"><span class="UIDENT">Yocaml</span><span class="DOT">.</span><span class="UIDENT">Datetime</span><span class="DOT">.</span><span class="LIDENT">pp_rfc3339</span></a> <span class="TILDE">~</span><a href="#local_tz_8"><span class="LIDENT">tz</span></a> <span class="LPAREN">(</span><span class="RPAREN">)</span><span class="RPAREN">)</span> <a href="#local_dt_7"><span class="LIDENT">dt</span></a><span class="EOL">
+</span><span class="EOL">
+</span><span class="LET">let</span> <span id="val-compare"><span class="LIDENT">compare</span></span> <span class="LPAREN">(</span><span class="UNDERSCORE">_</span><span class="COMMA">,</span> <span id="local_a_9"><span class="LIDENT">a</span></span><span class="RPAREN">)</span> <span class="LPAREN">(</span><span class="UNDERSCORE">_</span><span class="COMMA">,</span> <span id="local_b_10"><span class="LIDENT">b</span></span><span class="RPAREN">)</span> <span class="EQUAL">=</span> <a href="../../../yocaml/src/yocaml/archetype.ml.html#module-Datetime.val-compare"><span class="UIDENT">Yocaml</span><span class="DOT">.</span><span class="UIDENT">Datetime</span><span class="DOT">.</span><span class="LIDENT">compare</span></a> <a href="#local_a_9"><span class="LIDENT">a</span></a> <a href="#local_b_10"><span class="LIDENT">b</span></a><span class="EOL">
+</span></span></code></pre></body></html>

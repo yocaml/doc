@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"><head><title>Source: text_input.ml (yocaml_syndication.src.yocaml_syndication)</title><meta charset="utf-8"/><link rel="stylesheet" href="../../../odoc.css"/><meta name="generator" content="odoc 3.0.0"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/></head><body class="odoc-src"><nav class="odoc-nav"><a href="../index.html">Up</a> – <a href="../../../index.html">Package index</a> &#x00BB; <a href="../../index.html">yocaml_syndication</a> &#x00BB; <a href="../index.html">Sources</a> &#x00BB; yocaml_syndication &#x00BB; text_input.ml</nav><header class="odoc-preamble"><h1>Source file <code><span>text_input.ml</span></code></h1></header><div class="odoc-tocs"><nav class="odoc-toc odoc-global-toc"><ul><li><a href="../../index.html">yocaml_syndication</a><ul><li>Library <code>yocaml_syndication</code><ul><li><a href="../../yocaml_syndication/Yocaml_syndication/index.html">Yocaml_syndication</a></li></ul></li><li><a href="../index.html">Sources</a><ul><li>yocaml_syndication<ul><li><a href="atom.ml.html">atom.ml</a></li><li><a href="category.ml.html">category.ml</a></li><li><a href="datetime.ml.html">datetime.ml</a></li><li><a href="generator.ml.html">generator.ml</a></li><li><a href="lang.ml.html">lang.ml</a></li><li><a href="media_type.ml.html">media_type.ml</a></li><li><a href="opml.ml.html">opml.ml</a></li><li><a href="person.ml.html">person.ml</a></li><li><a href="rss1.ml.html">rss1.ml</a></li><li><a href="rss2.ml.html">rss2.ml</a></li><li><a href="#" class="current_unit">text_input.ml</a></li><li><a href="tz.ml.html">tz.ml</a></li><li><a href="xml.ml.html">xml.ml</a></li><li><a href="yocaml_syndication.ml.html">yocaml_syndication.ml</a></li><li><a href="yocaml_syndication__.ml.html">yocaml_syndication__.ml</a></li></ul></li></ul></li></ul></li></ul></nav></div><pre class="source_container"><code class="source_line_column"><a id="L1" class="source_line" href="#L1">1</a>
+<a id="L2" class="source_line" href="#L2">2</a>
+<a id="L3" class="source_line" href="#L3">3</a>
+<a id="L4" class="source_line" href="#L4">4</a>
+<a id="L5" class="source_line" href="#L5">5</a>
+<a id="L6" class="source_line" href="#L6">6</a>
+<a id="L7" class="source_line" href="#L7">7</a>
+<a id="L8" class="source_line" href="#L8">8</a>
+<a id="L9" class="source_line" href="#L9">9</a>
+<a id="L10" class="source_line" href="#L10">10</a>
+<a id="L11" class="source_line" href="#L11">11</a>
+<a id="L12" class="source_line" href="#L12">12</a>
+<a id="L13" class="source_line" href="#L13">13</a>
+<a id="L14" class="source_line" href="#L14">14</a>
+<a id="L15" class="source_line" href="#L15">15</a>
+<a id="L16" class="source_line" href="#L16">16</a>
+<a id="L17" class="source_line" href="#L17">17</a>
+<a id="L18" class="source_line" href="#L18">18</a>
+<a id="L19" class="source_line" href="#L19">19</a>
+<a id="L20" class="source_line" href="#L20">20</a>
+<a id="L21" class="source_line" href="#L21">21</a>
+<a id="L22" class="source_line" href="#L22">22</a>
+<a id="L23" class="source_line" href="#L23">23</a>
+<a id="L24" class="source_line" href="#L24">24</a>
+<a id="L25" class="source_line" href="#L25">25</a>
+<a id="L26" class="source_line" href="#L26">26</a>
+<a id="L27" class="source_line" href="#L27">27</a>
+<a id="L28" class="source_line" href="#L28">28</a>
+<a id="L29" class="source_line" href="#L29">29</a>
+<a id="L30" class="source_line" href="#L30">30</a>
+<a id="L31" class="source_line" href="#L31">31</a>
+<a id="L32" class="source_line" href="#L32">32</a>
+<a id="L33" class="source_line" href="#L33">33</a>
+<a id="L34" class="source_line" href="#L34">34</a>
+<a id="L35" class="source_line" href="#L35">35</a>
+<a id="L36" class="source_line" href="#L36">36</a>
+<a id="L37" class="source_line" href="#L37">37</a>
+<a id="L38" class="source_line" href="#L38">38</a>
+<a id="L39" class="source_line" href="#L39">39</a>
+<a id="L40" class="source_line" href="#L40">40</a>
+<a id="L41" class="source_line" href="#L41">41</a>
+</code><code class="source_code"><span><span class="COMMENT">(* YOCaml a static blog generator.
+   Copyright (C) 2024 The Funkyworkers and The YOCaml's developers
+
+   This program is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program.  If not, see &lt;https://www.gnu.org/licenses/&gt;. *)</span><span class="EOL">
+</span><span class="EOL">
+</span><span id="type-t"><span class="TYPE">type</span> <span class="LIDENT">t</span> <span class="EQUAL">=</span> <span class="LBRACE">{</span> <span id="def_21"><span class="LIDENT">title</span> <span class="COLON">:</span> <span class="LIDENT">string</span><span class="SEMI">;</span></span> <span id="def_22"><span class="LIDENT">description</span> <span class="COLON">:</span> <span class="LIDENT">string</span><span class="SEMI">;</span></span> <span id="def_20"><span class="LIDENT">name</span> <span class="COLON">:</span> <span class="LIDENT">string</span><span class="SEMI">;</span></span> <span id="def_19"><span class="LIDENT">link</span> <span class="COLON">:</span> <span class="LIDENT">string</span></span> <span class="RBRACE">}</span></span><span class="EOL">
+</span><span class="EOL">
+</span><span class="LET">let</span> <span id="val-make"><span class="LIDENT">make</span></span> <span class="TILDE">~</span><span id="local_title_1"><span class="LIDENT">title</span></span> <span class="TILDE">~</span><span id="local_description_2"><span class="LIDENT">description</span></span> <span class="TILDE">~</span><span id="local_name_3"><span class="LIDENT">name</span></span> <span class="TILDE">~</span><span id="local_link_4"><span class="LIDENT">link</span></span> <span class="EQUAL">=</span> <span class="LBRACE">{</span> <a href="#local_title_1"><span class="LIDENT">title</span></a><span class="SEMI">;</span> <a href="#local_description_2"><span class="LIDENT">description</span></a><span class="SEMI">;</span> <a href="#local_name_3"><span class="LIDENT">name</span></a><span class="SEMI">;</span> <a href="#local_link_4"><span class="LIDENT">link</span></a> <span class="RBRACE">}</span><span class="EOL">
+</span><span class="EOL">
+</span><span id="module-X"><span class="MODULE">module</span> <span class="UIDENT">X</span> <span class="EQUAL">=</span> <span class="STRUCT">struct</span><span class="EOL">
+</span>  <span class="OPEN">open</span> <a href="xml.ml.html"><span class="UIDENT">Xml</span></a><span class="EOL">
+</span><span class="EOL">
+</span>  <span class="LET">let</span> <span id="module-X.val-title"><span class="LIDENT">title</span></span> <span id="local_x_5"><span class="LIDENT">x</span></span> <span class="EQUAL">=</span> <a href="xml.ml.html#val-leaf"><span class="LIDENT">leaf</span></a> <span class="LABEL">~name:</span><span class="STRING">&quot;title&quot;</span> <span class="LPAREN">(</span><a href="xml.ml.html#val-escape"><span class="LIDENT">escape</span></a> <a href="#local_x_5"><span class="LIDENT">x</span></a><span class="RPAREN">)</span><span class="EOL">
+</span>  <span class="LET">let</span> <span id="module-X.val-name"><span class="LIDENT">name</span></span> <span id="local_x_6"><span class="LIDENT">x</span></span> <span class="EQUAL">=</span> <a href="xml.ml.html#val-leaf"><span class="LIDENT">leaf</span></a> <span class="LABEL">~name:</span><span class="STRING">&quot;name&quot;</span> <span class="LPAREN">(</span><a href="xml.ml.html#val-escape"><span class="LIDENT">escape</span></a> <a href="#local_x_6"><span class="LIDENT">x</span></a><span class="RPAREN">)</span><span class="EOL">
+</span>  <span class="LET">let</span> <span id="module-X.val-link"><span class="LIDENT">link</span></span> <span id="local_x_7"><span class="LIDENT">x</span></span> <span class="EQUAL">=</span> <a href="xml.ml.html#val-leaf"><span class="LIDENT">leaf</span></a> <span class="LABEL">~name:</span><span class="STRING">&quot;link&quot;</span> <span class="LPAREN">(</span><span class="UIDENT">Some</span> <a href="#local_x_7"><span class="LIDENT">x</span></a><span class="RPAREN">)</span><span class="EOL">
+</span>  <span class="LET">let</span> <span id="module-X.val-description"><span class="LIDENT">description</span></span> <span id="local_x_8"><span class="LIDENT">x</span></span> <span class="EQUAL">=</span> <a href="xml.ml.html#val-leaf"><span class="LIDENT">leaf</span></a> <span class="LABEL">~name:</span><span class="STRING">&quot;description&quot;</span> <span class="LPAREN">(</span><a href="xml.ml.html#val-cdata"><span class="LIDENT">cdata</span></a> <a href="#local_x_8"><span class="LIDENT">x</span></a><span class="RPAREN">)</span><span class="EOL">
+</span>  <span class="LET">let</span> <span id="module-X.val-resource"><span class="LIDENT">resource</span></span> <span id="local_x_9"><span class="LIDENT">x</span></span> <span class="EQUAL">=</span> <a href="xml.ml.html#module-Attr.val-string"><span class="UIDENT">Attr</span><span class="DOT">.</span><span class="LIDENT">string</span></a> <span class="LABEL">~ns:</span><span class="STRING">&quot;rdf&quot;</span> <span class="LABEL">~key:</span><span class="STRING">&quot;resource&quot;</span> <a href="#local_x_9"><span class="LIDENT">x</span></a><span class="EOL">
+</span><span class="END">end</span></span><span class="EOL">
+</span><span class="EOL">
+</span><span class="LET">let</span> <span id="val-to_rss1_channel"><span class="LIDENT">to_rss1_channel</span></span> <span class="LBRACE">{</span> <span id="local_link_10"><span class="LIDENT">link</span></span><span class="SEMI">;</span> <span class="UNDERSCORE">_</span> <span class="RBRACE">}</span> <span class="EQUAL">=</span><span class="EOL">
+</span>  <a href="xml.ml.html#val-leaf"><span class="UIDENT">Xml</span><span class="DOT">.</span><span class="LIDENT">leaf</span></a> <span class="LABEL">~name:</span><span class="STRING">&quot;textinput&quot;</span> <span class="LABEL">~attr:</span><span class="LBRACKET">[</span> <span class="UIDENT">X</span><span class="DOT">.</span><span class="LIDENT">resource</span> <a href="#local_link_10"><span class="LIDENT">link</span></a> <span class="RBRACKET">]</span> <span class="UIDENT">None</span><span class="EOL">
+</span><span class="EOL">
+</span><span class="LET">let</span> <span id="val-to_rss1"><span class="LIDENT">to_rss1</span></span> <span class="LBRACE">{</span> <span id="local_title_11"><span class="LIDENT">title</span></span><span class="SEMI">;</span> <span id="local_description_12"><span class="LIDENT">description</span></span><span class="SEMI">;</span> <span id="local_name_13"><span class="LIDENT">name</span></span><span class="SEMI">;</span> <span id="local_link_14"><span class="LIDENT">link</span></span> <span class="RBRACE">}</span> <span class="EQUAL">=</span><span class="EOL">
+</span>  <a href="xml.ml.html#val-node"><span class="UIDENT">Xml</span><span class="DOT">.</span><span class="LIDENT">node</span></a> <span class="LABEL">~name:</span><span class="STRING">&quot;textinput&quot;</span><span class="EOL">
+</span>    <span class="LABEL">~attr:</span><span class="LBRACKET">[</span> <a href="xml.ml.html#module-Attr.val-string"><span class="UIDENT">Xml</span><span class="DOT">.</span><span class="UIDENT">Attr</span><span class="DOT">.</span><span class="LIDENT">string</span></a> <span class="LABEL">~ns:</span><span class="STRING">&quot;rdf&quot;</span> <span class="LABEL">~key:</span><span class="STRING">&quot;about&quot;</span> <a href="#local_link_14"><span class="LIDENT">link</span></a> <span class="RBRACKET">]</span><span class="EOL">
+</span>    <span class="LBRACKET">[</span> <span class="UIDENT">X</span><span class="DOT">.</span><span class="LIDENT">title</span> <a href="#local_title_11"><span class="LIDENT">title</span></a><span class="SEMI">;</span> <span class="UIDENT">X</span><span class="DOT">.</span><span class="LIDENT">description</span> <a href="#local_description_12"><span class="LIDENT">description</span></a><span class="SEMI">;</span> <span class="UIDENT">X</span><span class="DOT">.</span><span class="LIDENT">name</span> <a href="#local_name_13"><span class="LIDENT">name</span></a><span class="SEMI">;</span> <span class="UIDENT">X</span><span class="DOT">.</span><span class="LIDENT">link</span> <a href="#local_link_14"><span class="LIDENT">link</span></a> <span class="RBRACKET">]</span><span class="EOL">
+</span><span class="EOL">
+</span><span class="LET">let</span> <span id="val-to_rss2"><span class="LIDENT">to_rss2</span></span> <span class="LBRACE">{</span> <span id="local_title_15"><span class="LIDENT">title</span></span><span class="SEMI">;</span> <span id="local_description_16"><span class="LIDENT">description</span></span><span class="SEMI">;</span> <span id="local_name_17"><span class="LIDENT">name</span></span><span class="SEMI">;</span> <span id="local_link_18"><span class="LIDENT">link</span></span> <span class="RBRACE">}</span> <span class="EQUAL">=</span><span class="EOL">
+</span>  <a href="xml.ml.html#val-node"><span class="UIDENT">Xml</span><span class="DOT">.</span><span class="LIDENT">node</span></a> <span class="LABEL">~name:</span><span class="STRING">&quot;textInput&quot;</span><span class="EOL">
+</span>    <span class="LBRACKET">[</span> <span class="UIDENT">X</span><span class="DOT">.</span><span class="LIDENT">title</span> <a href="#local_title_15"><span class="LIDENT">title</span></a><span class="SEMI">;</span> <span class="UIDENT">X</span><span class="DOT">.</span><span class="LIDENT">description</span> <a href="#local_description_16"><span class="LIDENT">description</span></a><span class="SEMI">;</span> <span class="UIDENT">X</span><span class="DOT">.</span><span class="LIDENT">name</span> <a href="#local_name_17"><span class="LIDENT">name</span></a><span class="SEMI">;</span> <span class="UIDENT">X</span><span class="DOT">.</span><span class="LIDENT">link</span> <a href="#local_link_18"><span class="LIDENT">link</span></a> <span class="RBRACKET">]</span><span class="EOL">
+</span></span></code></pre></body></html>

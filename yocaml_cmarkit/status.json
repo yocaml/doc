@@ -1,0 +1,11 @@
+{
+  "name": "yocaml_cmarkit",
+  "version": "dev",
+  "files": [
+    "yocaml_cmarkit/Yocaml_cmarkit/index.html", "yocaml_cmarkit/index.html",
+    "src/yocaml_cmarkit/yocaml_cmarkit.ml.html", "src/index.html",
+    "index.html"
+  ],
+  "failed": false,
+  "redirections": []
+}

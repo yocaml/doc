@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"><head><title>Source: cache.ml (yocaml.src.yocaml)</title><meta charset="utf-8"/><link rel="stylesheet" href="../../../odoc.css"/><meta name="generator" content="odoc 3.0.0"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/></head><body class="odoc-src"><nav class="odoc-nav"><a href="../index.html">Up</a> – <a href="../../../index.html">Package index</a> &#x00BB; <a href="../../index.html">YOCaml</a> &#x00BB; <a href="../index.html">Sources</a> &#x00BB; yocaml &#x00BB; cache.ml</nav><header class="odoc-preamble"><h1>Source file <code><span>cache.ml</span></code></h1></header><div class="odoc-tocs"><nav class="odoc-toc odoc-global-toc"><ul><li><a href="../../index.html">YOCaml</a><ul><li><a href="../../data_validation.html">Generic validation of structured data</a></li><li><a href="../../effect.html">Effect abstraction</a></li><li>Library <code>yocaml</code><ul><li><a href="../../yocaml/Yocaml/index.html">Yocaml</a></li></ul></li><li><a href="../index.html">Sources</a><ul><li>yocaml<ul><li><a href="action.ml.html">action.ml</a></li><li><a href="archetype.ml.html">archetype.ml</a></li><li><a href="#" class="current_unit">cache.ml</a></li><li><a href="cmd.ml.html">cmd.ml</a></li><li><a href="data.ml.html">data.ml</a></li><li><a href="deps.ml.html">deps.ml</a></li><li><a href="diagnostic.ml.html">diagnostic.ml</a></li><li><a href="eff.ml.html">eff.ml</a></li><li><a href="lexicon.ml.html">lexicon.ml</a></li><li><a href="make.ml.html">make.ml</a></li><li><a href="markup.ml.html">markup.ml</a></li><li><a href="metadata.ml.html">metadata.ml</a></li><li><a href="nel.ml.html">nel.ml</a></li><li><a href="path.ml.html">path.ml</a></li><li><a href="pipeline.ml.html">pipeline.ml</a></li><li><a href="reader.ml.html">reader.ml</a></li><li><a href="runtime.ml.html">runtime.ml</a></li><li><a href="sexp.ml.html">sexp.ml</a></li><li><a href="sexp_provider.ml.html">sexp_provider.ml</a></li><li><a href="slug.ml.html">slug.ml</a></li><li><a href="task.ml.html">task.ml</a></li><li><a href="yocaml.ml.html">yocaml.ml</a></li><li><a href="yocaml__.ml.html">yocaml__.ml</a></li></ul></li></ul></li></ul></li></ul></nav></div><pre class="source_container"><code class="source_line_column"><a id="L1" class="source_line" href="#L1">1</a>
+<a id="L2" class="source_line" href="#L2">2</a>
+<a id="L3" class="source_line" href="#L3">3</a>
+<a id="L4" class="source_line" href="#L4">4</a>
+<a id="L5" class="source_line" href="#L5">5</a>
+<a id="L6" class="source_line" href="#L6">6</a>
+<a id="L7" class="source_line" href="#L7">7</a>
+<a id="L8" class="source_line" href="#L8">8</a>
+<a id="L9" class="source_line" href="#L9">9</a>
+<a id="L10" class="source_line" href="#L10">10</a>
+<a id="L11" class="source_line" href="#L11">11</a>
+<a id="L12" class="source_line" href="#L12">12</a>
+<a id="L13" class="source_line" href="#L13">13</a>
+<a id="L14" class="source_line" href="#L14">14</a>
+<a id="L15" class="source_line" href="#L15">15</a>
+<a id="L16" class="source_line" href="#L16">16</a>
+<a id="L17" class="source_line" href="#L17">17</a>
+<a id="L18" class="source_line" href="#L18">18</a>
+<a id="L19" class="source_line" href="#L19">19</a>
+<a id="L20" class="source_line" href="#L20">20</a>
+<a id="L21" class="source_line" href="#L21">21</a>
+<a id="L22" class="source_line" href="#L22">22</a>
+<a id="L23" class="source_line" href="#L23">23</a>
+<a id="L24" class="source_line" href="#L24">24</a>
+<a id="L25" class="source_line" href="#L25">25</a>
+<a id="L26" class="source_line" href="#L26">26</a>
+<a id="L27" class="source_line" href="#L27">27</a>
+<a id="L28" class="source_line" href="#L28">28</a>
+<a id="L29" class="source_line" href="#L29">29</a>
+<a id="L30" class="source_line" href="#L30">30</a>
+<a id="L31" class="source_line" href="#L31">31</a>
+<a id="L32" class="source_line" href="#L32">32</a>
+<a id="L33" class="source_line" href="#L33">33</a>
+<a id="L34" class="source_line" href="#L34">34</a>
+<a id="L35" class="source_line" href="#L35">35</a>
+<a id="L36" class="source_line" href="#L36">36</a>
+<a id="L37" class="source_line" href="#L37">37</a>
+<a id="L38" class="source_line" href="#L38">38</a>
+<a id="L39" class="source_line" href="#L39">39</a>
+<a id="L40" class="source_line" href="#L40">40</a>
+<a id="L41" class="source_line" href="#L41">41</a>
+<a id="L42" class="source_line" href="#L42">42</a>
+<a id="L43" class="source_line" href="#L43">43</a>
+<a id="L44" class="source_line" href="#L44">44</a>
+<a id="L45" class="source_line" href="#L45">45</a>
+<a id="L46" class="source_line" href="#L46">46</a>
+<a id="L47" class="source_line" href="#L47">47</a>
+<a id="L48" class="source_line" href="#L48">48</a>
+<a id="L49" class="source_line" href="#L49">49</a>
+<a id="L50" class="source_line" href="#L50">50</a>
+<a id="L51" class="source_line" href="#L51">51</a>
+<a id="L52" class="source_line" href="#L52">52</a>
+<a id="L53" class="source_line" href="#L53">53</a>
+<a id="L54" class="source_line" href="#L54">54</a>
+<a id="L55" class="source_line" href="#L55">55</a>
+<a id="L56" class="source_line" href="#L56">56</a>
+<a id="L57" class="source_line" href="#L57">57</a>
+<a id="L58" class="source_line" href="#L58">58</a>
+<a id="L59" class="source_line" href="#L59">59</a>
+<a id="L60" class="source_line" href="#L60">60</a>
+<a id="L61" class="source_line" href="#L61">61</a>
+<a id="L62" class="source_line" href="#L62">62</a>
+<a id="L63" class="source_line" href="#L63">63</a>
+<a id="L64" class="source_line" href="#L64">64</a>
+<a id="L65" class="source_line" href="#L65">65</a>
+<a id="L66" class="source_line" href="#L66">66</a>
+<a id="L67" class="source_line" href="#L67">67</a>
+<a id="L68" class="source_line" href="#L68">68</a>
+<a id="L69" class="source_line" href="#L69">69</a>
+<a id="L70" class="source_line" href="#L70">70</a>
+<a id="L71" class="source_line" href="#L71">71</a>
+<a id="L72" class="source_line" href="#L72">72</a>
+<a id="L73" class="source_line" href="#L73">73</a>
+<a id="L74" class="source_line" href="#L74">74</a>
+<a id="L75" class="source_line" href="#L75">75</a>
+<a id="L76" class="source_line" href="#L76">76</a>
+<a id="L77" class="source_line" href="#L77">77</a>
+<a id="L78" class="source_line" href="#L78">78</a>
+<a id="L79" class="source_line" href="#L79">79</a>
+<a id="L80" class="source_line" href="#L80">80</a>
+<a id="L81" class="source_line" href="#L81">81</a>
+<a id="L82" class="source_line" href="#L82">82</a>
+<a id="L83" class="source_line" href="#L83">83</a>
+<a id="L84" class="source_line" href="#L84">84</a>
+<a id="L85" class="source_line" href="#L85">85</a>
+<a id="L86" class="source_line" href="#L86">86</a>
+<a id="L87" class="source_line" href="#L87">87</a>
+<a id="L88" class="source_line" href="#L88">88</a>
+<a id="L89" class="source_line" href="#L89">89</a>
+<a id="L90" class="source_line" href="#L90">90</a>
+<a id="L91" class="source_line" href="#L91">91</a>
+<a id="L92" class="source_line" href="#L92">92</a>
+<a id="L93" class="source_line" href="#L93">93</a>
+<a id="L94" class="source_line" href="#L94">94</a>
+<a id="L95" class="source_line" href="#L95">95</a>
+<a id="L96" class="source_line" href="#L96">96</a>
+<a id="L97" class="source_line" href="#L97">97</a>
+<a id="L98" class="source_line" href="#L98">98</a>
+<a id="L99" class="source_line" href="#L99">99</a>
+<a id="L100" class="source_line" href="#L100">100</a>
+<a id="L101" class="source_line" href="#L101">101</a>
+<a id="L102" class="source_line" href="#L102">102</a>
+<a id="L103" class="source_line" href="#L103">103</a>
+<a id="L104" class="source_line" href="#L104">104</a>
+<a id="L105" class="source_line" href="#L105">105</a>
+<a id="L106" class="source_line" href="#L106">106</a>
+<a id="L107" class="source_line" href="#L107">107</a>
+<a id="L108" class="source_line" href="#L108">108</a>
+<a id="L109" class="source_line" href="#L109">109</a>
+<a id="L110" class="source_line" href="#L110">110</a>
+<a id="L111" class="source_line" href="#L111">111</a>
+<a id="L112" class="source_line" href="#L112">112</a>
+<a id="L113" class="source_line" href="#L113">113</a>
+<a id="L114" class="source_line" href="#L114">114</a>
+<a id="L115" class="source_line" href="#L115">115</a>
+<a id="L116" class="source_line" href="#L116">116</a>
+<a id="L117" class="source_line" href="#L117">117</a>
+<a id="L118" class="source_line" href="#L118">118</a>
+<a id="L119" class="source_line" href="#L119">119</a>
+<a id="L120" class="source_line" href="#L120">120</a>
+<a id="L121" class="source_line" href="#L121">121</a>
+<a id="L122" class="source_line" href="#L122">122</a>
+<a id="L123" class="source_line" href="#L123">123</a>
+<a id="L124" class="source_line" href="#L124">124</a>
+<a id="L125" class="source_line" href="#L125">125</a>
+<a id="L126" class="source_line" href="#L126">126</a>
+<a id="L127" class="source_line" href="#L127">127</a>
+<a id="L128" class="source_line" href="#L128">128</a>
+<a id="L129" class="source_line" href="#L129">129</a>
+</code><code class="source_code"><span><span class="COMMENT">(* YOCaml a static blog generator.
+   Copyright (C) 2024 The Funkyworkers and The YOCaml's developers
+
+   This program is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program.  If not, see &lt;https://www.gnu.org/licenses/&gt;. *)</span><span class="EOL">
+</span><span class="EOL">
+</span><span id="type-entry"><span class="TYPE">type</span> <span class="LIDENT">entry</span> <span class="EQUAL">=</span> <span class="LBRACE">{</span><span class="EOL">
+</span>    <span id="def_66"><span class="LIDENT">hashed_content</span> <span class="COLON">:</span> <span class="LIDENT">string</span><span class="EOL">
+</span>  <span class="SEMI">;</span></span> <span id="def_67"><span class="LIDENT">dynamic_dependencies</span> <span class="COLON">:</span> <a href="deps.ml.html#type-t"><span class="UIDENT">Deps</span><span class="DOT">.</span><span class="LIDENT">t</span></a><span class="EOL">
+</span>  <span class="SEMI">;</span></span> <span id="def_65"><span class="LIDENT">last_build_date</span> <span class="COLON">:</span> <span class="LIDENT">int</span> <span class="LIDENT">option</span></span><span class="EOL">
+</span><span class="RBRACE">}</span></span><span class="EOL">
+</span><span class="EOL">
+</span><span id="type-t"><span class="TYPE">type</span> <span class="LIDENT">t</span> <span class="EQUAL">=</span> <a href="../../../ocaml-compiler/src/stdlib/map.ml.html#module-Make.type-t"><span class="LIDENT">entry</span> <span class="UIDENT">Path</span><span class="DOT">.</span><span class="UIDENT">Map</span><span class="DOT">.</span><span class="LIDENT">t</span></a></span><span class="EOL">
+</span><span class="EOL">
+</span><span class="LET">let</span> <span id="val-entry"><span class="LIDENT">entry</span></span> <span class="QUESTION">?</span><span id="local_last_build_date_1"><span class="LIDENT">last_build_date</span></span> <span id="local_hashed_content_2"><span class="LIDENT">hashed_content</span></span> <span id="local_dynamic_dependencies_3"><span class="LIDENT">dynamic_dependencies</span></span> <span class="EQUAL">=</span><span class="EOL">
+</span>  <span class="LBRACE">{</span> <a href="#local_hashed_content_2"><span class="LIDENT">hashed_content</span></a><span class="SEMI">;</span> <a href="#local_dynamic_dependencies_3"><span class="LIDENT">dynamic_dependencies</span></a><span class="SEMI">;</span> <a href="#local_last_build_date_1"><span class="LIDENT">last_build_date</span></a> <span class="RBRACE">}</span><span class="EOL">
+</span><span class="EOL">
+</span><span class="LET">let</span> <span id="val-empty"><span class="LIDENT">empty</span></span> <span class="EQUAL">=</span> <a href="../../../ocaml-compiler/src/stdlib/map.ml.html#module-Make.val-empty"><span class="UIDENT">Path</span><span class="DOT">.</span><span class="UIDENT">Map</span><span class="DOT">.</span><span class="LIDENT">empty</span></a><span class="EOL">
+</span><span class="LET">let</span> <span id="val-from_list"><span class="LIDENT">from_list</span></span> <span class="EQUAL">=</span> <a href="../../../ocaml-compiler/src/stdlib/map.ml.html#module-Make.val-of_list"><span class="UIDENT">Path</span><span class="DOT">.</span><span class="UIDENT">Map</span><span class="DOT">.</span><span class="LIDENT">of_list</span></a><span class="EOL">
+</span><span class="EOL">
+</span><span class="LET">let</span> <span id="val-update"><span class="LIDENT">update</span></span> <span id="local_cache_4"><span class="LIDENT">cache</span></span> <span id="local_path_5"><span class="LIDENT">path</span></span> <span class="QUESTION">?</span><span class="LPAREN">(</span><span id="local_deps_6"><span class="LIDENT">deps</span></span> <span class="EQUAL">=</span> <a href="deps.ml.html#val-empty"><span class="UIDENT">Deps</span><span class="DOT">.</span><span class="LIDENT">empty</span></a><span class="RPAREN">)</span> <span class="TILDE">~</span><span id="local_now_7"><span class="LIDENT">now</span></span> <span id="local_content_8"><span class="LIDENT">content</span></span> <span class="EQUAL">=</span><span class="EOL">
+</span>  <span class="LET">let</span> <span id="local_entry_9"><span class="LIDENT">entry</span></span> <span class="EQUAL">=</span> <span class="LIDENT">entry</span> <span class="LABEL">~last_build_date:</span><a href="#local_now_7"><span class="LIDENT">now</span></a> <a href="#local_content_8"><span class="LIDENT">content</span></a> <a href="#local_deps_6"><span class="LIDENT">deps</span></a> <span class="IN">in</span><span class="EOL">
+</span>  <a href="../../../ocaml-compiler/src/stdlib/map.ml.html#module-Make.val-add"><span class="UIDENT">Path</span><span class="DOT">.</span><span class="UIDENT">Map</span><span class="DOT">.</span><span class="LIDENT">add</span></a> <a href="#local_path_5"><span class="LIDENT">path</span></a> <a href="#local_entry_9"><span class="LIDENT">entry</span></a> <a href="#local_cache_4"><span class="LIDENT">cache</span></a><span class="EOL">
+</span><span class="EOL">
+</span><span class="LET">let</span> <span id="val-get"><span class="LIDENT">get</span></span> <span id="local_cache_10"><span class="LIDENT">cache</span></span> <span id="local_path_11"><span class="LIDENT">path</span></span> <span class="EQUAL">=</span><span class="EOL">
+</span>  <a href="../../../ocaml-compiler/src/stdlib/option.ml.html#val-map"><span class="UIDENT">Option</span><span class="DOT">.</span><span class="LIDENT">map</span></a><span class="EOL">
+</span>    <span class="LPAREN">(</span><span class="FUN">fun</span> <span class="LBRACE">{</span> <span id="local_hashed_content_12"><span class="LIDENT">hashed_content</span></span><span class="SEMI">;</span> <span id="local_dynamic_dependencies_13"><span class="LIDENT">dynamic_dependencies</span></span><span class="SEMI">;</span> <span id="local_last_build_date_14"><span class="LIDENT">last_build_date</span></span> <span class="RBRACE">}</span> <span class="MINUSGREATER">-&gt;</span><span class="EOL">
+</span>      <span class="LPAREN">(</span><a href="#local_hashed_content_12"><span class="LIDENT">hashed_content</span></a><span class="COMMA">,</span> <a href="#local_dynamic_dependencies_13"><span class="LIDENT">dynamic_dependencies</span></a><span class="COMMA">,</span> <a href="#local_last_build_date_14"><span class="LIDENT">last_build_date</span></a><span class="RPAREN">)</span><span class="RPAREN">)</span><span class="EOL">
+</span>    <span class="LPAREN">(</span><a href="../../../ocaml-compiler/src/stdlib/map.ml.html#module-Make.val-find_opt"><span class="UIDENT">Path</span><span class="DOT">.</span><span class="UIDENT">Map</span><span class="DOT">.</span><span class="LIDENT">find_opt</span></a> <a href="#local_path_11"><span class="LIDENT">path</span></a> <a href="#local_cache_10"><span class="LIDENT">cache</span></a><span class="RPAREN">)</span><span class="EOL">
+</span><span class="EOL">
+</span><span class="LET">let</span> <span id="val-entry_to_sexp"><span class="LIDENT">entry_to_sexp</span></span> <span class="LBRACE">{</span> <span id="local_hashed_content_15"><span class="LIDENT">hashed_content</span></span><span class="SEMI">;</span> <span id="local_dynamic_dependencies_16"><span class="LIDENT">dynamic_dependencies</span></span><span class="SEMI">;</span> <span id="local_last_build_date_17"><span class="LIDENT">last_build_date</span></span> <span class="RBRACE">}</span> <span class="EQUAL">=</span><span class="EOL">
+</span>  <span class="LET">let</span> <span class="OPEN">open</span> <a href="sexp.ml.html"><span class="UIDENT">Sexp</span></a> <span class="IN">in</span><span class="EOL">
+</span>  <span class="LET">let</span> <span id="local_last_build_date_18"><span class="LIDENT">last_build_date</span></span> <span class="EQUAL">=</span><span class="EOL">
+</span>    <a href="#local_last_build_date_17"><span class="LIDENT">last_build_date</span></a><span class="EOL">
+</span>    <span class="INFIXOP0">|&gt;</span> <a href="../../../ocaml-compiler/src/stdlib/option.ml.html#val-map"><span class="UIDENT">Option</span><span class="DOT">.</span><span class="LIDENT">map</span></a> <span class="LPAREN">(</span><span class="FUN">fun</span> <span id="local_x_19"><span class="LIDENT">x</span></span> <span class="MINUSGREATER">-&gt;</span> <a href="#local_x_19"><span class="LIDENT">x</span></a> <span class="INFIXOP0">|&gt;</span> <a href="../../../ocaml-compiler/src/stdlib/stdlib.ml.html#val-string_of_int"><span class="LIDENT">string_of_int</span></a> <span class="INFIXOP0">|&gt;</span> <a href="sexp.ml.html#val-atom"><span class="LIDENT">atom</span></a><span class="RPAREN">)</span><span class="EOL">
+</span>    <span class="INFIXOP0">|&gt;</span> <a href="../../../ocaml-compiler/src/stdlib/option.ml.html#val-to_list"><span class="UIDENT">Option</span><span class="DOT">.</span><span class="LIDENT">to_list</span></a><span class="EOL">
+</span>  <span class="IN">in</span><span class="EOL">
+</span>  <a href="sexp.ml.html#val-node"><span class="LIDENT">node</span></a><span class="EOL">
+</span>    <span class="LPAREN">(</span><span class="LBRACKET">[</span> <a href="sexp.ml.html#val-atom"><span class="LIDENT">atom</span></a> <a href="#local_hashed_content_15"><span class="LIDENT">hashed_content</span></a><span class="SEMI">;</span> <a href="deps.ml.html#val-to_sexp"><span class="UIDENT">Deps</span><span class="DOT">.</span><span class="LIDENT">to_sexp</span></a> <a href="#local_dynamic_dependencies_16"><span class="LIDENT">dynamic_dependencies</span></a> <span class="RBRACKET">]</span><span class="EOL">
+</span>    <a href="../../../ocaml-compiler/src/stdlib/stdlib.ml.html#val-(@)"><span class="INFIXOP1">@</span></a> <a href="#local_last_build_date_18"><span class="LIDENT">last_build_date</span></a><span class="RPAREN">)</span><span class="EOL">
+</span><span class="EOL">
+</span><span class="LET">let</span> <span id="val-last_build_date_from_string"><span class="LIDENT">last_build_date_from_string</span></span> <span id="local_lbd_20"><span class="LIDENT">lbd</span></span> <span class="EQUAL">=</span><span class="EOL">
+</span>  <span class="MATCH">match</span> <a href="../../../ocaml-compiler/src/stdlib/stdlib.ml.html#val-int_of_string_opt"><span class="LIDENT">int_of_string_opt</span></a> <a href="#local_lbd_20"><span class="LIDENT">lbd</span></a> <span class="WITH">with</span><span class="EOL">
+</span>  <span class="BAR">|</span> <span class="UIDENT">None</span> <span class="MINUSGREATER">-&gt;</span> <span class="UIDENT">Error</span> <span class="LPAREN">(</span><span class="UIDENT">Sexp</span><span class="DOT">.</span><span class="UIDENT">Invalid_sexp</span> <span class="LPAREN">(</span><span class="UIDENT">Sexp</span><span class="DOT">.</span><span class="UIDENT">Atom</span> <a href="#local_lbd_20"><span class="LIDENT">lbd</span></a><span class="COMMA">,</span> <span class="STRING">&quot;last_build_date&quot;</span><span class="RPAREN">)</span><span class="RPAREN">)</span><span class="EOL">
+</span>  <span class="BAR">|</span> <span class="UIDENT">Some</span> <span id="local_x_21"><span class="LIDENT">x</span></span> <span class="MINUSGREATER">-&gt;</span> <span class="UIDENT">Ok</span> <a href="#local_x_21"><span class="LIDENT">x</span></a><span class="EOL">
+</span><span class="EOL">
+</span><span class="LET">let</span> <span id="val-entry_from_sexp"><span class="LIDENT">entry_from_sexp</span></span> <span id="local_sexp_22"><span class="LIDENT">sexp</span></span> <span class="EQUAL">=</span><span class="EOL">
+</span>  <span class="LET">let</span> <span id="local_make_23"><span class="LIDENT">make</span></span> <span id="local_hashed_content_24"><span class="LIDENT">hashed_content</span></span> <span id="local_potential_deps_25"><span class="LIDENT">potential_deps</span></span> <span id="local_last_build_date_26"><span class="LIDENT">last_build_date</span></span> <span class="EQUAL">=</span><span class="EOL">
+</span>    <span class="LET">let</span> <span id="local_entry_27"><span class="LIDENT">entry</span></span> <span class="EQUAL">=</span> <span class="LIDENT">entry</span> <span class="QUESTION">?</span><a href="#local_last_build_date_26"><span class="LIDENT">last_build_date</span></a> <a href="#local_hashed_content_24"><span class="LIDENT">hashed_content</span></a> <span class="IN">in</span><span class="EOL">
+</span>    <a href="#local_potential_deps_25"><span class="LIDENT">potential_deps</span></a><span class="EOL">
+</span>    <span class="INFIXOP0">|&gt;</span> <a href="deps.ml.html#val-from_sexp"><span class="UIDENT">Deps</span><span class="DOT">.</span><span class="LIDENT">from_sexp</span></a><span class="EOL">
+</span>    <span class="INFIXOP0">|&gt;</span> <a href="../../../ocaml-compiler/src/stdlib/result.ml.html#val-map_error"><span class="UIDENT">Result</span><span class="DOT">.</span><span class="LIDENT">map_error</span></a> <span class="LPAREN">(</span><span class="FUN">fun</span> <span class="UNDERSCORE">_</span> <span class="MINUSGREATER">-&gt;</span> <span class="UIDENT">Sexp</span><span class="DOT">.</span><span class="UIDENT">Invalid_sexp</span> <span class="LPAREN">(</span><a href="#local_sexp_22"><span class="LIDENT">sexp</span></a><span class="COMMA">,</span> <span class="STRING">&quot;cache&quot;</span><span class="RPAREN">)</span><span class="RPAREN">)</span><span class="EOL">
+</span>    <span class="INFIXOP0">|&gt;</span> <a href="../../../ocaml-compiler/src/stdlib/result.ml.html#val-map"><span class="UIDENT">Result</span><span class="DOT">.</span><span class="LIDENT">map</span></a> <a href="#local_entry_27"><span class="LIDENT">entry</span></a><span class="EOL">
+</span>  <span class="IN">in</span><span class="EOL">
+</span>  <span class="MATCH">match</span> <a href="#local_sexp_22"><span class="LIDENT">sexp</span></a> <span class="WITH">with</span><span class="EOL">
+</span>  <span class="BAR">|</span> <span class="UIDENT">Sexp</span><span class="DOT">.</span><span class="LPAREN">(</span><span class="UIDENT">Node</span> <span class="LBRACKET">[</span> <span class="UIDENT">Atom</span> <span id="local_hashed_content_28"><span class="LIDENT">hashed_content</span></span><span class="SEMI">;</span> <span id="local_potential_deps_29"><span class="LIDENT">potential_deps</span></span> <span class="RBRACKET">]</span><span class="RPAREN">)</span> <span class="MINUSGREATER">-&gt;</span><span class="EOL">
+</span>      <a href="#local_make_23"><span class="LIDENT">make</span></a> <a href="#local_hashed_content_28"><span class="LIDENT">hashed_content</span></a> <a href="#local_potential_deps_29"><span class="LIDENT">potential_deps</span></a> <span class="UIDENT">None</span><span class="EOL">
+</span>  <span class="BAR">|</span> <span class="UIDENT">Sexp</span><span class="DOT">.</span><span class="LPAREN">(</span><span class="UIDENT">Node</span> <span class="LBRACKET">[</span> <span class="UIDENT">Atom</span> <span id="local_hashed_content_30"><span class="LIDENT">hashed_content</span></span><span class="SEMI">;</span> <span id="local_potential_deps_31"><span class="LIDENT">potential_deps</span></span><span class="SEMI">;</span> <span class="UIDENT">Atom</span> <span id="local_last_build_date_32"><span class="LIDENT">last_build_date</span></span> <span class="RBRACKET">]</span><span class="RPAREN">)</span> <span class="MINUSGREATER">-&gt;</span><span class="EOL">
+</span>      <a href="../../../ocaml-compiler/src/stdlib/result.ml.html#val-bind"><span class="UIDENT">Result</span><span class="DOT">.</span><span class="LIDENT">bind</span></a> <span class="LPAREN">(</span><span class="LIDENT">last_build_date_from_string</span> <a href="#local_last_build_date_32"><span class="LIDENT">last_build_date</span></a><span class="RPAREN">)</span> <span class="LPAREN">(</span><span class="FUN">fun</span> <span id="local_lbd_33"><span class="LIDENT">lbd</span></span> <span class="MINUSGREATER">-&gt;</span><span class="EOL">
+</span>          <a href="#local_make_23"><span class="LIDENT">make</span></a> <a href="#local_hashed_content_30"><span class="LIDENT">hashed_content</span></a> <a href="#local_potential_deps_31"><span class="LIDENT">potential_deps</span></a> <span class="LPAREN">(</span><span class="UIDENT">Some</span> <a href="#local_lbd_33"><span class="LIDENT">lbd</span></a><span class="RPAREN">)</span><span class="RPAREN">)</span><span class="EOL">
+</span>  <span class="BAR">|</span> <span class="UNDERSCORE">_</span> <span class="MINUSGREATER">-&gt;</span> <span class="UIDENT">Error</span> <span class="LPAREN">(</span><span class="UIDENT">Sexp</span><span class="DOT">.</span><span class="UIDENT">Invalid_sexp</span> <span class="LPAREN">(</span><a href="#local_sexp_22"><span class="LIDENT">sexp</span></a><span class="COMMA">,</span> <span class="STRING">&quot;cache&quot;</span><span class="RPAREN">)</span><span class="RPAREN">)</span><span class="EOL">
+</span><span class="EOL">
+</span><span class="LET">let</span> <span id="val-to_sexp"><span class="LIDENT">to_sexp</span></span> <span id="local_cache_34"><span class="LIDENT">cache</span></span> <span class="EQUAL">=</span><span class="EOL">
+</span>  <a href="../../../ocaml-compiler/src/stdlib/map.ml.html#module-Make.val-fold"><span class="UIDENT">Path</span><span class="DOT">.</span><span class="UIDENT">Map</span><span class="DOT">.</span><span class="LIDENT">fold</span></a><span class="EOL">
+</span>    <span class="LPAREN">(</span><span class="FUN">fun</span> <span id="local_key_35"><span class="LIDENT">key</span></span> <span id="local_entry_36"><span class="LIDENT">entry</span></span> <span id="local_acc_37"><span class="LIDENT">acc</span></span> <span class="MINUSGREATER">-&gt;</span><span class="EOL">
+</span>      <span class="LET">let</span> <span id="local_k_38"><span class="LIDENT">k</span></span> <span class="EQUAL">=</span> <a href="path.ml.html#val-to_sexp"><span class="UIDENT">Path</span><span class="DOT">.</span><span class="LIDENT">to_sexp</span></a> <a href="#local_key_35"><span class="LIDENT">key</span></a> <span class="IN">in</span><span class="EOL">
+</span>      <span class="LET">let</span> <span id="local_v_39"><span class="LIDENT">v</span></span> <span class="EQUAL">=</span> <span class="LIDENT">entry_to_sexp</span> <a href="#local_entry_36"><span class="LIDENT">entry</span></a> <span class="IN">in</span><span class="EOL">
+</span>      <a href="sexp.ml.html#val-node"><span class="UIDENT">Sexp</span><span class="DOT">.</span><span class="LIDENT">node</span></a> <span class="LBRACKET">[</span> <a href="#local_k_38"><span class="LIDENT">k</span></a><span class="SEMI">;</span> <a href="#local_v_39"><span class="LIDENT">v</span></a> <span class="RBRACKET">]</span> <span class="COLONCOLON">::</span> <a href="#local_acc_37"><span class="LIDENT">acc</span></a><span class="RPAREN">)</span><span class="EOL">
+</span>    <a href="#local_cache_34"><span class="LIDENT">cache</span></a> <span class="LBRACKET">[</span><span class="RBRACKET">]</span><span class="EOL">
+</span>  <span class="INFIXOP0">|&gt;</span> <a href="sexp.ml.html#val-node"><span class="UIDENT">Sexp</span><span class="DOT">.</span><span class="LIDENT">node</span></a><span class="EOL">
+</span><span class="EOL">
+</span><span class="LET">let</span> <span id="val-key_value_from_sexp"><span class="LIDENT">key_value_from_sexp</span></span> <span id="local_sexp_40"><span class="LIDENT">sexp</span></span> <span class="EQUAL">=</span><span class="EOL">
+</span>  <span class="MATCH">match</span> <a href="#local_sexp_40"><span class="LIDENT">sexp</span></a> <span class="WITH">with</span><span class="EOL">
+</span>  <span class="BAR">|</span> <span class="UIDENT">Sexp</span><span class="DOT">.</span><span class="LPAREN">(</span><span class="UIDENT">Node</span> <span class="LBRACKET">[</span> <span id="local_key_41"><span class="LIDENT">key</span></span><span class="SEMI">;</span> <span id="local_value_42"><span class="LIDENT">value</span></span> <span class="RBRACKET">]</span><span class="RPAREN">)</span> <span class="MINUSGREATER">-&gt;</span><span class="EOL">
+</span>      <a href="../../../ocaml-compiler/src/stdlib/result.ml.html#val-bind"><span class="UIDENT">Result</span><span class="DOT">.</span><span class="LIDENT">bind</span></a> <span class="LPAREN">(</span><a href="path.ml.html#val-from_sexp"><span class="UIDENT">Path</span><span class="DOT">.</span><span class="LIDENT">from_sexp</span></a> <a href="#local_key_41"><span class="LIDENT">key</span></a><span class="RPAREN">)</span> <span class="LPAREN">(</span><span class="FUN">fun</span> <span id="local_key_43"><span class="LIDENT">key</span></span> <span class="MINUSGREATER">-&gt;</span><span class="EOL">
+</span>          <a href="#local_value_42"><span class="LIDENT">value</span></a> <span class="INFIXOP0">|&gt;</span> <span class="LIDENT">entry_from_sexp</span> <span class="INFIXOP0">|&gt;</span> <a href="../../../ocaml-compiler/src/stdlib/result.ml.html#val-map"><span class="UIDENT">Result</span><span class="DOT">.</span><span class="LIDENT">map</span></a> <span class="LPAREN">(</span><span class="FUN">fun</span> <span id="local_value_44"><span class="LIDENT">value</span></span> <span class="MINUSGREATER">-&gt;</span> <span class="LPAREN">(</span><a href="#local_key_43"><span class="LIDENT">key</span></a><span class="COMMA">,</span> <a href="#local_value_44"><span class="LIDENT">value</span></a><span class="RPAREN">)</span><span class="RPAREN">)</span><span class="RPAREN">)</span><span class="EOL">
+</span>      <span class="INFIXOP0">|&gt;</span> <a href="../../../ocaml-compiler/src/stdlib/result.ml.html#val-map_error"><span class="UIDENT">Result</span><span class="DOT">.</span><span class="LIDENT">map_error</span></a> <span class="LPAREN">(</span><span class="FUN">fun</span> <span class="UNDERSCORE">_</span> <span class="MINUSGREATER">-&gt;</span> <span class="UIDENT">Sexp</span><span class="DOT">.</span><span class="UIDENT">Invalid_sexp</span> <span class="LPAREN">(</span><a href="#local_sexp_40"><span class="LIDENT">sexp</span></a><span class="COMMA">,</span> <span class="STRING">&quot;cache&quot;</span><span class="RPAREN">)</span><span class="RPAREN">)</span><span class="EOL">
+</span>  <span class="BAR">|</span> <span class="UNDERSCORE">_</span> <span class="MINUSGREATER">-&gt;</span> <span class="UIDENT">Error</span> <span class="LPAREN">(</span><span class="UIDENT">Sexp</span><span class="DOT">.</span><span class="UIDENT">Invalid_sexp</span> <span class="LPAREN">(</span><a href="#local_sexp_40"><span class="LIDENT">sexp</span></a><span class="COMMA">,</span> <span class="STRING">&quot;cache&quot;</span><span class="RPAREN">)</span><span class="RPAREN">)</span><span class="EOL">
+</span><span class="EOL">
+</span><span class="LET">let</span> <span id="val-from_sexp"><span class="LIDENT">from_sexp</span></span> <span id="local_sexp_45"><span class="LIDENT">sexp</span></span> <span class="EQUAL">=</span><span class="EOL">
+</span>  <span class="MATCH">match</span> <a href="#local_sexp_45"><span class="LIDENT">sexp</span></a> <span class="WITH">with</span><span class="EOL">
+</span>  <span class="BAR">|</span> <span class="UIDENT">Sexp</span><span class="DOT">.</span><span class="LPAREN">(</span><span class="UIDENT">Node</span> <span id="local_entries_46"><span class="LIDENT">entries</span></span><span class="RPAREN">)</span> <span class="MINUSGREATER">-&gt;</span><span class="EOL">
+</span>      <a href="../../../ocaml-compiler/src/stdlib/list.ml.html#val-fold_left"><span class="UIDENT">List</span><span class="DOT">.</span><span class="LIDENT">fold_left</span></a><span class="EOL">
+</span>        <span class="LPAREN">(</span><span class="FUN">fun</span> <span id="local_acc_47"><span class="LIDENT">acc</span></span> <span id="local_line_48"><span class="LIDENT">line</span></span> <span class="MINUSGREATER">-&gt;</span><span class="EOL">
+</span>          <a href="../../../ocaml-compiler/src/stdlib/result.ml.html#val-bind"><span class="UIDENT">Result</span><span class="DOT">.</span><span class="LIDENT">bind</span></a> <a href="#local_acc_47"><span class="LIDENT">acc</span></a> <span class="LPAREN">(</span><span class="FUN">fun</span> <span id="local_acc_49"><span class="LIDENT">acc</span></span> <span class="MINUSGREATER">-&gt;</span><span class="EOL">
+</span>              <a href="#local_line_48"><span class="LIDENT">line</span></a> <span class="INFIXOP0">|&gt;</span> <span class="LIDENT">key_value_from_sexp</span> <span class="INFIXOP0">|&gt;</span> <a href="../../../ocaml-compiler/src/stdlib/result.ml.html#val-map"><span class="UIDENT">Result</span><span class="DOT">.</span><span class="LIDENT">map</span></a> <span class="LPAREN">(</span><span class="FUN">fun</span> <span id="local_x_50"><span class="LIDENT">x</span></span> <span class="MINUSGREATER">-&gt;</span> <a href="#local_x_50"><span class="LIDENT">x</span></a> <span class="COLONCOLON">::</span> <a href="#local_acc_49"><span class="LIDENT">acc</span></a><span class="RPAREN">)</span><span class="RPAREN">)</span><span class="RPAREN">)</span><span class="EOL">
+</span>        <span class="LPAREN">(</span><span class="UIDENT">Ok</span> <span class="LBRACKET">[</span><span class="RBRACKET">]</span><span class="RPAREN">)</span> <a href="#local_entries_46"><span class="LIDENT">entries</span></a><span class="EOL">
+</span>      <span class="INFIXOP0">|&gt;</span> <a href="../../../ocaml-compiler/src/stdlib/result.ml.html#val-map"><span class="UIDENT">Result</span><span class="DOT">.</span><span class="LIDENT">map</span></a> <a href="../../../ocaml-compiler/src/stdlib/map.ml.html#module-Make.val-of_list"><span class="UIDENT">Path</span><span class="DOT">.</span><span class="UIDENT">Map</span><span class="DOT">.</span><span class="LIDENT">of_list</span></a><span class="EOL">
+</span>  <span class="BAR">|</span> <span class="UNDERSCORE">_</span> <span class="MINUSGREATER">-&gt;</span> <span class="UIDENT">Error</span> <span class="LPAREN">(</span><span class="UIDENT">Sexp</span><span class="DOT">.</span><span class="UIDENT">Invalid_sexp</span> <span class="LPAREN">(</span><a href="#local_sexp_45"><span class="LIDENT">sexp</span></a><span class="COMMA">,</span> <span class="STRING">&quot;cache&quot;</span><span class="RPAREN">)</span><span class="RPAREN">)</span><span class="EOL">
+</span><span class="EOL">
+</span><span class="LET">let</span> <span id="val-entry_equal"><span class="LIDENT">entry_equal</span></span><span class="EOL">
+</span>    <span class="LBRACE">{</span><span class="EOL">
+</span>      <span class="LIDENT">hashed_content</span> <span class="EQUAL">=</span> <span id="local_hashed_a_51"><span class="LIDENT">hashed_a</span></span><span class="EOL">
+</span>    <span class="SEMI">;</span> <span class="LIDENT">dynamic_dependencies</span> <span class="EQUAL">=</span> <span id="local_deps_a_52"><span class="LIDENT">deps_a</span></span><span class="EOL">
+</span>    <span class="SEMI">;</span> <span class="LIDENT">last_build_date</span> <span class="EQUAL">=</span> <span id="local_lbd_a_53"><span class="LIDENT">lbd_a</span></span><span class="EOL">
+</span>    <span class="RBRACE">}</span><span class="EOL">
+</span>    <span class="LBRACE">{</span><span class="EOL">
+</span>      <span class="LIDENT">hashed_content</span> <span class="EQUAL">=</span> <span id="local_hashed_b_54"><span class="LIDENT">hashed_b</span></span><span class="EOL">
+</span>    <span class="SEMI">;</span> <span class="LIDENT">dynamic_dependencies</span> <span class="EQUAL">=</span> <span id="local_deps_b_55"><span class="LIDENT">deps_b</span></span><span class="EOL">
+</span>    <span class="SEMI">;</span> <span class="LIDENT">last_build_date</span> <span class="EQUAL">=</span> <span id="local_lbd_b_56"><span class="LIDENT">lbd_b</span></span><span class="EOL">
+</span>    <span class="RBRACE">}</span> <span class="EQUAL">=</span><span class="EOL">
+</span>  <a href="../../../ocaml-compiler/src/stdlib/string.ml.html#val-equal"><span class="UIDENT">String</span><span class="DOT">.</span><span class="LIDENT">equal</span></a> <a href="#local_hashed_a_51"><span class="LIDENT">hashed_a</span></a> <a href="#local_hashed_b_54"><span class="LIDENT">hashed_b</span></a><span class="EOL">
+</span>  <a href="../../../ocaml-compiler/src/stdlib/stdlib.ml.html#val-(&amp;&amp;)"><span class="AMPERAMPER">&amp;&amp;</span></a> <a href="deps.ml.html#val-equal"><span class="UIDENT">Deps</span><span class="DOT">.</span><span class="LIDENT">equal</span></a> <a href="#local_deps_a_52"><span class="LIDENT">deps_a</span></a> <a href="#local_deps_b_55"><span class="LIDENT">deps_b</span></a><span class="EOL">
+</span>  <a href="../../../ocaml-compiler/src/stdlib/stdlib.ml.html#val-(&amp;&amp;)"><span class="AMPERAMPER">&amp;&amp;</span></a> <a href="../../../ocaml-compiler/src/stdlib/option.ml.html#val-equal"><span class="UIDENT">Option</span><span class="DOT">.</span><span class="LIDENT">equal</span></a> <a href="../../../ocaml-compiler/src/stdlib/int.ml.html#val-equal"><span class="UIDENT">Int</span><span class="DOT">.</span><span class="LIDENT">equal</span></a> <a href="#local_lbd_a_53"><span class="LIDENT">lbd_a</span></a> <a href="#local_lbd_b_56"><span class="LIDENT">lbd_b</span></a><span class="EOL">
+</span><span class="EOL">
+</span><span class="LET">let</span> <span id="val-equal"><span class="LIDENT">equal</span></span> <span class="EQUAL">=</span> <a href="../../../ocaml-compiler/src/stdlib/map.ml.html#module-Make.val-equal"><span class="UIDENT">Path</span><span class="DOT">.</span><span class="UIDENT">Map</span><span class="DOT">.</span><span class="LIDENT">equal</span></a> <span class="LIDENT">entry_equal</span><span class="EOL">
+</span><span class="EOL">
+</span><span class="LET">let</span> <span id="val-pp_kv"><span class="LIDENT">pp_kv</span></span> <span id="local_ppf_57"><span class="LIDENT">ppf</span></span> <span class="LPAREN">(</span><span id="local_key_58"><span class="LIDENT">key</span></span><span class="COMMA">,</span> <span class="LBRACE">{</span> <span id="local_hashed_content_59"><span class="LIDENT">hashed_content</span></span><span class="SEMI">;</span> <span id="local_dynamic_dependencies_60"><span class="LIDENT">dynamic_dependencies</span></span><span class="SEMI">;</span> <span id="local_last_build_date_61"><span class="LIDENT">last_build_date</span></span> <span class="RBRACE">}</span><span class="RPAREN">)</span> <span class="EQUAL">=</span><span class="EOL">
+</span>  <a href="../../../ocaml-compiler/src/stdlib/format.ml.html#val-fprintf"><span class="UIDENT">Format</span><span class="DOT">.</span><span class="LIDENT">fprintf</span></a> <a href="#local_ppf_57"><span class="LIDENT">ppf</span></a> <span class="STRING">&quot;%a =&gt; deps: @[&lt;v 0&gt;%a@]@hash:%s (%a)&quot;</span> <a href="path.ml.html#val-pp"><span class="UIDENT">Path</span><span class="DOT">.</span><span class="LIDENT">pp</span></a> <a href="#local_key_58"><span class="LIDENT">key</span></a> <a href="deps.ml.html#val-pp"><span class="UIDENT">Deps</span><span class="DOT">.</span><span class="LIDENT">pp</span></a><span class="EOL">
+</span>    <a href="#local_dynamic_dependencies_60"><span class="LIDENT">dynamic_dependencies</span></a> <a href="#local_hashed_content_59"><span class="LIDENT">hashed_content</span></a><span class="EOL">
+</span>    <span class="LPAREN">(</span><a href="../../../ocaml-compiler/src/stdlib/format.ml.html#val-pp_print_option"><span class="UIDENT">Format</span><span class="DOT">.</span><span class="LIDENT">pp_print_option</span></a> <a href="../../../ocaml-compiler/src/stdlib/format.ml.html#val-pp_print_int"><span class="UIDENT">Format</span><span class="DOT">.</span><span class="LIDENT">pp_print_int</span></a><span class="RPAREN">)</span><span class="EOL">
+</span>    <a href="#local_last_build_date_61"><span class="LIDENT">last_build_date</span></a><span class="EOL">
+</span><span class="EOL">
+</span><span class="LET">let</span> <span id="val-pp"><span class="LIDENT">pp</span></span> <span id="local_ppf_62"><span class="LIDENT">ppf</span></span> <span id="local_cache_63"><span class="LIDENT">cache</span></span> <span class="EQUAL">=</span><span class="EOL">
+</span>  <a href="../../../ocaml-compiler/src/stdlib/format.ml.html#val-fprintf"><span class="UIDENT">Format</span><span class="DOT">.</span><span class="LIDENT">fprintf</span></a> <a href="#local_ppf_62"><span class="LIDENT">ppf</span></a> <span class="STRING">&quot;Cache [@[&lt;v 0&gt;%a@]]&quot;</span><span class="EOL">
+</span>    <span class="LPAREN">(</span><a href="../../../ocaml-compiler/src/stdlib/format.ml.html#val-pp_print_list"><span class="UIDENT">Format</span><span class="DOT">.</span><span class="LIDENT">pp_print_list</span></a><span class="EOL">
+</span>       <span class="LABEL">~pp_sep:</span><span class="LPAREN">(</span><span class="FUN">fun</span> <span id="local_ppf_64"><span class="LIDENT">ppf</span></span> <span class="LPAREN">(</span><span class="RPAREN">)</span> <span class="MINUSGREATER">-&gt;</span> <a href="../../../ocaml-compiler/src/stdlib/format.ml.html#val-fprintf"><span class="UIDENT">Format</span><span class="DOT">.</span><span class="LIDENT">fprintf</span></a> <a href="#local_ppf_64"><span class="LIDENT">ppf</span></a> <span class="STRING">&quot;;@ &quot;</span><span class="RPAREN">)</span><span class="EOL">
+</span>       <span class="LIDENT">pp_kv</span><span class="RPAREN">)</span><span class="EOL">
+</span>    <span class="LPAREN">(</span><a href="../../../ocaml-compiler/src/stdlib/map.ml.html#module-Make.val-to_list"><span class="UIDENT">Path</span><span class="DOT">.</span><span class="UIDENT">Map</span><span class="DOT">.</span><span class="LIDENT">to_list</span></a> <a href="#local_cache_63"><span class="LIDENT">cache</span></a><span class="RPAREN">)</span><span class="EOL">
+</span></span></code></pre></body></html>

@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"><head><title>Source: runtime.ml (yocaml.src.yocaml)</title><meta charset="utf-8"/><link rel="stylesheet" href="../../../odoc.css"/><meta name="generator" content="odoc 3.0.0"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/></head><body class="odoc-src"><nav class="odoc-nav"><a href="../index.html">Up</a> – <a href="../../../index.html">Package index</a> &#x00BB; <a href="../../index.html">YOCaml</a> &#x00BB; <a href="../index.html">Sources</a> &#x00BB; yocaml &#x00BB; runtime.ml</nav><header class="odoc-preamble"><h1>Source file <code><span>runtime.ml</span></code></h1></header><div class="odoc-tocs"><nav class="odoc-toc odoc-global-toc"><ul><li><a href="../../index.html">YOCaml</a><ul><li><a href="../../data_validation.html">Generic validation of structured data</a></li><li><a href="../../effect.html">Effect abstraction</a></li><li>Library <code>yocaml</code><ul><li><a href="../../yocaml/Yocaml/index.html">Yocaml</a></li></ul></li><li><a href="../index.html">Sources</a><ul><li>yocaml<ul><li><a href="action.ml.html">action.ml</a></li><li><a href="archetype.ml.html">archetype.ml</a></li><li><a href="cache.ml.html">cache.ml</a></li><li><a href="cmd.ml.html">cmd.ml</a></li><li><a href="data.ml.html">data.ml</a></li><li><a href="deps.ml.html">deps.ml</a></li><li><a href="diagnostic.ml.html">diagnostic.ml</a></li><li><a href="eff.ml.html">eff.ml</a></li><li><a href="lexicon.ml.html">lexicon.ml</a></li><li><a href="make.ml.html">make.ml</a></li><li><a href="markup.ml.html">markup.ml</a></li><li><a href="metadata.ml.html">metadata.ml</a></li><li><a href="nel.ml.html">nel.ml</a></li><li><a href="path.ml.html">path.ml</a></li><li><a href="pipeline.ml.html">pipeline.ml</a></li><li><a href="reader.ml.html">reader.ml</a></li><li><a href="#" class="current_unit">runtime.ml</a></li><li><a href="sexp.ml.html">sexp.ml</a></li><li><a href="sexp_provider.ml.html">sexp_provider.ml</a></li><li><a href="slug.ml.html">slug.ml</a></li><li><a href="task.ml.html">task.ml</a></li><li><a href="yocaml.ml.html">yocaml.ml</a></li><li><a href="yocaml__.ml.html">yocaml__.ml</a></li></ul></li></ul></li></ul></li></ul></nav></div><pre class="source_container"><code class="source_line_column"><a id="L1" class="source_line" href="#L1">1</a>
+<a id="L2" class="source_line" href="#L2">2</a>
+<a id="L3" class="source_line" href="#L3">3</a>
+<a id="L4" class="source_line" href="#L4">4</a>
+<a id="L5" class="source_line" href="#L5">5</a>
+<a id="L6" class="source_line" href="#L6">6</a>
+<a id="L7" class="source_line" href="#L7">7</a>
+<a id="L8" class="source_line" href="#L8">8</a>
+<a id="L9" class="source_line" href="#L9">9</a>
+<a id="L10" class="source_line" href="#L10">10</a>
+<a id="L11" class="source_line" href="#L11">11</a>
+<a id="L12" class="source_line" href="#L12">12</a>
+<a id="L13" class="source_line" href="#L13">13</a>
+<a id="L14" class="source_line" href="#L14">14</a>
+<a id="L15" class="source_line" href="#L15">15</a>
+<a id="L16" class="source_line" href="#L16">16</a>
+<a id="L17" class="source_line" href="#L17">17</a>
+<a id="L18" class="source_line" href="#L18">18</a>
+<a id="L19" class="source_line" href="#L19">19</a>
+<a id="L20" class="source_line" href="#L20">20</a>
+<a id="L21" class="source_line" href="#L21">21</a>
+<a id="L22" class="source_line" href="#L22">22</a>
+<a id="L23" class="source_line" href="#L23">23</a>
+<a id="L24" class="source_line" href="#L24">24</a>
+<a id="L25" class="source_line" href="#L25">25</a>
+<a id="L26" class="source_line" href="#L26">26</a>
+<a id="L27" class="source_line" href="#L27">27</a>
+<a id="L28" class="source_line" href="#L28">28</a>
+<a id="L29" class="source_line" href="#L29">29</a>
+<a id="L30" class="source_line" href="#L30">30</a>
+<a id="L31" class="source_line" href="#L31">31</a>
+<a id="L32" class="source_line" href="#L32">32</a>
+<a id="L33" class="source_line" href="#L33">33</a>
+<a id="L34" class="source_line" href="#L34">34</a>
+<a id="L35" class="source_line" href="#L35">35</a>
+<a id="L36" class="source_line" href="#L36">36</a>
+<a id="L37" class="source_line" href="#L37">37</a>
+<a id="L38" class="source_line" href="#L38">38</a>
+<a id="L39" class="source_line" href="#L39">39</a>
+<a id="L40" class="source_line" href="#L40">40</a>
+<a id="L41" class="source_line" href="#L41">41</a>
+<a id="L42" class="source_line" href="#L42">42</a>
+<a id="L43" class="source_line" href="#L43">43</a>
+<a id="L44" class="source_line" href="#L44">44</a>
+<a id="L45" class="source_line" href="#L45">45</a>
+<a id="L46" class="source_line" href="#L46">46</a>
+<a id="L47" class="source_line" href="#L47">47</a>
+<a id="L48" class="source_line" href="#L48">48</a>
+<a id="L49" class="source_line" href="#L49">49</a>
+<a id="L50" class="source_line" href="#L50">50</a>
+<a id="L51" class="source_line" href="#L51">51</a>
+<a id="L52" class="source_line" href="#L52">52</a>
+<a id="L53" class="source_line" href="#L53">53</a>
+<a id="L54" class="source_line" href="#L54">54</a>
+<a id="L55" class="source_line" href="#L55">55</a>
+<a id="L56" class="source_line" href="#L56">56</a>
+<a id="L57" class="source_line" href="#L57">57</a>
+<a id="L58" class="source_line" href="#L58">58</a>
+<a id="L59" class="source_line" href="#L59">59</a>
+<a id="L60" class="source_line" href="#L60">60</a>
+<a id="L61" class="source_line" href="#L61">61</a>
+<a id="L62" class="source_line" href="#L62">62</a>
+<a id="L63" class="source_line" href="#L63">63</a>
+<a id="L64" class="source_line" href="#L64">64</a>
+<a id="L65" class="source_line" href="#L65">65</a>
+<a id="L66" class="source_line" href="#L66">66</a>
+<a id="L67" class="source_line" href="#L67">67</a>
+<a id="L68" class="source_line" href="#L68">68</a>
+<a id="L69" class="source_line" href="#L69">69</a>
+<a id="L70" class="source_line" href="#L70">70</a>
+<a id="L71" class="source_line" href="#L71">71</a>
+<a id="L72" class="source_line" href="#L72">72</a>
+<a id="L73" class="source_line" href="#L73">73</a>
+<a id="L74" class="source_line" href="#L74">74</a>
+<a id="L75" class="source_line" href="#L75">75</a>
+<a id="L76" class="source_line" href="#L76">76</a>
+<a id="L77" class="source_line" href="#L77">77</a>
+<a id="L78" class="source_line" href="#L78">78</a>
+<a id="L79" class="source_line" href="#L79">79</a>
+<a id="L80" class="source_line" href="#L80">80</a>
+<a id="L81" class="source_line" href="#L81">81</a>
+<a id="L82" class="source_line" href="#L82">82</a>
+<a id="L83" class="source_line" href="#L83">83</a>
+<a id="L84" class="source_line" href="#L84">84</a>
+<a id="L85" class="source_line" href="#L85">85</a>
+<a id="L86" class="source_line" href="#L86">86</a>
+<a id="L87" class="source_line" href="#L87">87</a>
+<a id="L88" class="source_line" href="#L88">88</a>
+<a id="L89" class="source_line" href="#L89">89</a>
+<a id="L90" class="source_line" href="#L90">90</a>
+<a id="L91" class="source_line" href="#L91">91</a>
+<a id="L92" class="source_line" href="#L92">92</a>
+<a id="L93" class="source_line" href="#L93">93</a>
+<a id="L94" class="source_line" href="#L94">94</a>
+<a id="L95" class="source_line" href="#L95">95</a>
+<a id="L96" class="source_line" href="#L96">96</a>
+<a id="L97" class="source_line" href="#L97">97</a>
+<a id="L98" class="source_line" href="#L98">98</a>
+<a id="L99" class="source_line" href="#L99">99</a>
+<a id="L100" class="source_line" href="#L100">100</a>
+<a id="L101" class="source_line" href="#L101">101</a>
+<a id="L102" class="source_line" href="#L102">102</a>
+<a id="L103" class="source_line" href="#L103">103</a>
+<a id="L104" class="source_line" href="#L104">104</a>
+<a id="L105" class="source_line" href="#L105">105</a>
+<a id="L106" class="source_line" href="#L106">106</a>
+<a id="L107" class="source_line" href="#L107">107</a>
+<a id="L108" class="source_line" href="#L108">108</a>
+<a id="L109" class="source_line" href="#L109">109</a>
+<a id="L110" class="source_line" href="#L110">110</a>
+<a id="L111" class="source_line" href="#L111">111</a>
+<a id="L112" class="source_line" href="#L112">112</a>
+<a id="L113" class="source_line" href="#L113">113</a>
+</code><code class="source_code"><span><span class="COMMENT">(* YOCaml a static blog generator.
+   Copyright (C) 2024 The Funkyworkers and The YOCaml's developers
+
+   This program is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program.  If not, see &lt;https://www.gnu.org/licenses/&gt;. *)</span><span class="EOL">
+</span><span class="EOL">
+</span><span id="module-Make"><span class="MODULE">module</span> <span class="UIDENT">Make</span> <span class="LPAREN">(</span><span class="UIDENT">Runtime</span> <span class="COLON">:</span> <span class="UIDENT">Required</span><span class="DOT">.</span><span class="UIDENT">RUNTIME</span><span class="RPAREN">)</span> <span class="EQUAL">=</span> <span class="STRUCT">struct</span><span class="EOL">
+</span>  <span class="LET">let</span> <span id="module-Make.val-exnc"><span class="LIDENT">exnc</span></span> <span class="QUESTION">?</span><span id="local_custom_error_handler_1"><span class="LIDENT">custom_error_handler</span></span> <span id="local_exn_2"><span class="LIDENT">exn</span></span> <span class="EQUAL">=</span><span class="EOL">
+</span>    <span class="LET">let</span> <span id="local_msg_3"><span class="LIDENT">msg</span></span> <span class="EQUAL">=</span><span class="EOL">
+</span>      <a href="../../../ocaml-compiler/src/stdlib/format.ml.html#val-asprintf"><span class="UIDENT">Format</span><span class="DOT">.</span><span class="LIDENT">asprintf</span></a> <span class="STRING">&quot;%a&quot;</span><span class="EOL">
+</span>        <span class="LPAREN">(</span><a href="diagnostic.ml.html#val-exception_to_diagnostic"><span class="UIDENT">Diagnostic</span><span class="DOT">.</span><span class="LIDENT">exception_to_diagnostic</span></a> <span class="OPTLABEL">?custom_error:</span><a href="#local_custom_error_handler_1"><span class="LIDENT">custom_error_handler</span></a><span class="EOL">
+</span>           <span class="LABEL">~in_exception_handler:</span><span class="TRUE">true</span><span class="RPAREN">)</span><span class="EOL">
+</span>        <a href="#local_exn_2"><span class="LIDENT">exn</span></a><span class="EOL">
+</span>    <span class="IN">in</span><span class="EOL">
+</span>    <a href="#local_msg_3"><span class="LIDENT">msg</span></a> <span class="INFIXOP0">|&gt;</span> <span class="UIDENT">Runtime</span><span class="DOT">.</span><span class="LIDENT">log</span> <span class="BACKQUOTE">`</span><span class="UIDENT">Error</span> <span class="INFIXOP0">|&gt;</span> <span class="UIDENT">Runtime</span><span class="DOT">.</span><span class="LIDENT">bind</span> <span class="LPAREN">(</span><span class="FUN">fun</span> <span class="LPAREN">(</span><span class="RPAREN">)</span> <span class="MINUSGREATER">-&gt;</span> <a href="../../../ocaml-compiler/src/stdlib/stdlib.ml.html#val-raise"><span class="LIDENT">raise</span></a> <span class="UIDENT">Exit</span><span class="RPAREN">)</span><span class="EOL">
+</span><span class="EOL">
+</span>  <span class="LET">let</span> <span id="module-Make.val-runtimec"><span class="LIDENT">runtimec</span></span> <span id="local_error_4"><span class="LIDENT">error</span></span> <span class="EQUAL">=</span><span class="EOL">
+</span>    <span class="LET">let</span> <span id="local_error_5"><span class="LIDENT">error</span></span> <span class="EQUAL">=</span> <span class="UIDENT">Runtime</span><span class="DOT">.</span><span class="LIDENT">runtime_error_to_string</span> <a href="#local_error_4"><span class="LIDENT">error</span></a> <span class="IN">in</span><span class="EOL">
+</span>    <span class="LET">let</span> <span id="local_msg_6"><span class="LIDENT">msg</span></span> <span class="EQUAL">=</span><span class="EOL">
+</span>      <a href="../../../ocaml-compiler/src/stdlib/format.ml.html#val-asprintf"><span class="UIDENT">Format</span><span class="DOT">.</span><span class="LIDENT">asprintf</span></a> <span class="STRING">&quot;%a&quot;</span> <a href="diagnostic.ml.html#val-runtime_error_to_diagnostic"><span class="UIDENT">Diagnostic</span><span class="DOT">.</span><span class="LIDENT">runtime_error_to_diagnostic</span></a> <a href="#local_error_5"><span class="LIDENT">error</span></a><span class="EOL">
+</span>    <span class="IN">in</span><span class="EOL">
+</span>    <span class="UIDENT">Runtime</span><span class="DOT">.</span><span class="LIDENT">log</span> <span class="BACKQUOTE">`</span><span class="UIDENT">Error</span> <a href="#local_msg_6"><span class="LIDENT">msg</span></a><span class="EOL">
+</span><span class="EOL">
+</span>  <span class="LET">let</span> <span id="module-Make.val-run"><span class="LIDENT">run</span></span> <span class="QUESTION">?</span><span id="local_custom_error_handler_7"><span class="LIDENT">custom_error_handler</span></span> <span id="local_program_8"><span class="LIDENT">program</span></span> <span class="EQUAL">=</span><span class="EOL">
+</span>    <span class="LET">let</span> <span id="local_exnc_9"><span class="LIDENT">exnc</span></span> <span class="EQUAL">=</span> <span class="LIDENT">exnc</span> <span class="QUESTION">?</span><a href="#local_custom_error_handler_7"><span class="LIDENT">custom_error_handler</span></a> <span class="IN">in</span><span class="EOL">
+</span>    <span class="LET">let</span> <span id="local_handler_10"><span class="LIDENT">handler</span></span> <span class="EQUAL">=</span><span class="EOL">
+</span>      <a href="../../../ocaml-compiler/src/stdlib/effect.ml.html#module-Deep"><span class="UIDENT">Effect</span><span class="DOT">.</span><span class="UIDENT">Deep</span></a><span class="DOT">.</span><span class="EOL">
+</span>        <span class="LBRACE">{</span><span class="EOL">
+</span>          <a href="#local_exnc_9"><span class="LIDENT">exnc</span></a><span class="EOL">
+</span>        <span class="SEMI">;</span> <span class="LIDENT">retc</span> <span class="EQUAL">=</span> <span class="LPAREN">(</span><span class="FUN">fun</span> <span class="LPAREN">(</span><span class="RPAREN">)</span> <span class="MINUSGREATER">-&gt;</span> <span class="UIDENT">Runtime</span><span class="DOT">.</span><span class="LIDENT">return</span> <span class="LPAREN">(</span><span class="RPAREN">)</span><span class="RPAREN">)</span><span class="EOL">
+</span>        <span class="SEMI">;</span> <span class="LIDENT">effc</span> <span class="EQUAL">=</span><span class="EOL">
+</span>            <span class="LPAREN">(</span><span class="FUN">fun</span> <span class="LPAREN">(</span><span class="TYPE">type</span> <span class="LIDENT">a</span><span class="RPAREN">)</span> <span class="LPAREN">(</span><span id="local_eff_11"><span class="LIDENT">eff</span></span> <span class="COLON">:</span> <a href="../../../ocaml-compiler/src/stdlib/effect.ml.html#type-t"><span class="LIDENT">a</span> <span class="UIDENT">Effect</span><span class="DOT">.</span><span class="LIDENT">t</span></a><span class="RPAREN">)</span> <span class="MINUSGREATER">-&gt;</span><span class="EOL">
+</span>              <span class="MATCH">match</span> <a href="#local_eff_11"><span class="LIDENT">eff</span></a> <span class="WITH">with</span><span class="EOL">
+</span>              <span class="BAR">|</span> <span class="UIDENT">Eff</span><span class="DOT">.</span><span class="UIDENT">Yocaml_failwith</span> <span id="local_exn_12"><span class="LIDENT">exn</span></span> <span class="MINUSGREATER">-&gt;</span> <span class="UIDENT">Some</span> <span class="LPAREN">(</span><span class="FUN">fun</span> <span id="local__k_13"><span class="LIDENT">_k</span></span> <span class="MINUSGREATER">-&gt;</span> <a href="#local_exnc_9"><span class="LIDENT">exnc</span></a> <a href="#local_exn_12"><span class="LIDENT">exn</span></a><span class="RPAREN">)</span><span class="EOL">
+</span>              <span class="BAR">|</span> <span class="UIDENT">Eff</span><span class="DOT">.</span><span class="UIDENT">Yocaml_log</span> <span class="LPAREN">(</span><span id="local_level_14"><span class="LIDENT">level</span></span><span class="COMMA">,</span> <span id="local_message_15"><span class="LIDENT">message</span></span><span class="RPAREN">)</span> <span class="MINUSGREATER">-&gt;</span><span class="EOL">
+</span>                  <span class="UIDENT">Some</span><span class="EOL">
+</span>                    <span class="LPAREN">(</span><span class="FUN">fun</span> <span class="LPAREN">(</span><span id="local_k_16"><span class="LIDENT">k</span></span> <span class="COLON">:</span> <a href="../../../ocaml-compiler/src/stdlib/effect.ml.html#module-Deep.type-continuation"><span class="LPAREN">(</span><span class="LIDENT">a</span><span class="COMMA">,</span> <span class="UNDERSCORE">_</span><span class="RPAREN">)</span> <span class="LIDENT">continuation</span></a><span class="RPAREN">)</span> <span class="MINUSGREATER">-&gt;</span><span class="EOL">
+</span>                      <span class="UIDENT">Runtime</span><span class="DOT">.</span><span class="LIDENT">bind</span> <span class="LPAREN">(</span><a href="../../../ocaml-compiler/src/stdlib/effect.ml.html#module-Deep.val-continue"><span class="LIDENT">continue</span></a> <a href="#local_k_16"><span class="LIDENT">k</span></a><span class="RPAREN">)</span> <span class="LPAREN">(</span><span class="UIDENT">Runtime</span><span class="DOT">.</span><span class="LIDENT">log</span> <a href="#local_level_14"><span class="LIDENT">level</span></a> <a href="#local_message_15"><span class="LIDENT">message</span></a><span class="RPAREN">)</span><span class="RPAREN">)</span><span class="EOL">
+</span>              <span class="BAR">|</span> <span class="UIDENT">Eff</span><span class="DOT">.</span><span class="UIDENT">Yocaml_get_time</span> <span class="LPAREN">(</span><span class="RPAREN">)</span> <span class="MINUSGREATER">-&gt;</span><span class="EOL">
+</span>                  <span class="UIDENT">Some</span><span class="EOL">
+</span>                    <span class="LPAREN">(</span><span class="FUN">fun</span> <span class="LPAREN">(</span><span id="local_k_17"><span class="LIDENT">k</span></span> <span class="COLON">:</span> <a href="../../../ocaml-compiler/src/stdlib/effect.ml.html#module-Deep.type-continuation"><span class="LPAREN">(</span><span class="LIDENT">a</span><span class="COMMA">,</span> <span class="UNDERSCORE">_</span><span class="RPAREN">)</span> <span class="LIDENT">continuation</span></a><span class="RPAREN">)</span> <span class="MINUSGREATER">-&gt;</span><span class="EOL">
+</span>                      <span class="UIDENT">Runtime</span><span class="DOT">.</span><span class="LIDENT">bind</span> <span class="LPAREN">(</span><a href="../../../ocaml-compiler/src/stdlib/effect.ml.html#module-Deep.val-continue"><span class="LIDENT">continue</span></a> <a href="#local_k_17"><span class="LIDENT">k</span></a><span class="RPAREN">)</span> <span class="LPAREN">(</span><span class="UIDENT">Runtime</span><span class="DOT">.</span><span class="LIDENT">get_time</span> <span class="LPAREN">(</span><span class="RPAREN">)</span><span class="RPAREN">)</span><span class="RPAREN">)</span><span class="EOL">
+</span>              <span class="BAR">|</span> <span class="UIDENT">Eff</span><span class="DOT">.</span><span class="UIDENT">Yocaml_file_exists</span> <span class="LPAREN">(</span><span id="local_filesystem_18"><span class="LIDENT">filesystem</span></span><span class="COMMA">,</span> <span id="local_path_19"><span class="LIDENT">path</span></span><span class="RPAREN">)</span> <span class="MINUSGREATER">-&gt;</span><span class="EOL">
+</span>                  <span class="UIDENT">Some</span><span class="EOL">
+</span>                    <span class="LPAREN">(</span><span class="FUN">fun</span> <span class="LPAREN">(</span><span id="local_k_20"><span class="LIDENT">k</span></span> <span class="COLON">:</span> <a href="../../../ocaml-compiler/src/stdlib/effect.ml.html#module-Deep.type-continuation"><span class="LPAREN">(</span><span class="LIDENT">a</span><span class="COMMA">,</span> <span class="UNDERSCORE">_</span><span class="RPAREN">)</span> <span class="LIDENT">continuation</span></a><span class="RPAREN">)</span> <span class="MINUSGREATER">-&gt;</span><span class="EOL">
+</span>                      <span class="UIDENT">Runtime</span><span class="DOT">.</span><span class="LIDENT">bind</span> <span class="LPAREN">(</span><a href="../../../ocaml-compiler/src/stdlib/effect.ml.html#module-Deep.val-continue"><span class="LIDENT">continue</span></a> <a href="#local_k_20"><span class="LIDENT">k</span></a><span class="RPAREN">)</span><span class="EOL">
+</span>                        <span class="LPAREN">(</span><span class="UIDENT">Runtime</span><span class="DOT">.</span><span class="LIDENT">file_exists</span> <span class="LABEL">~on:</span><a href="#local_filesystem_18"><span class="LIDENT">filesystem</span></a> <a href="#local_path_19"><span class="LIDENT">path</span></a><span class="RPAREN">)</span><span class="RPAREN">)</span><span class="EOL">
+</span>              <span class="BAR">|</span> <span class="UIDENT">Eff</span><span class="DOT">.</span><span class="UIDENT">Yocaml_read_file</span> <span class="LPAREN">(</span><span id="local_filesystem_21"><span class="LIDENT">filesystem</span></span><span class="COMMA">,</span> <span id="local_path_22"><span class="LIDENT">path</span></span><span class="RPAREN">)</span> <span class="MINUSGREATER">-&gt;</span><span class="EOL">
+</span>                  <span class="UIDENT">Some</span><span class="EOL">
+</span>                    <span class="LPAREN">(</span><span class="FUN">fun</span> <span class="LPAREN">(</span><span id="local_k_23"><span class="LIDENT">k</span></span> <span class="COLON">:</span> <a href="../../../ocaml-compiler/src/stdlib/effect.ml.html#module-Deep.type-continuation"><span class="LPAREN">(</span><span class="LIDENT">a</span><span class="COMMA">,</span> <span class="UNDERSCORE">_</span><span class="RPAREN">)</span> <span class="LIDENT">continuation</span></a><span class="RPAREN">)</span> <span class="MINUSGREATER">-&gt;</span><span class="EOL">
+</span>                      <span class="UIDENT">Runtime</span><span class="DOT">.</span><span class="LIDENT">bind</span><span class="EOL">
+</span>                        <span class="LPAREN">(</span><span class="FUNCTION">function</span><span class="EOL">
+</span>                          <span class="BAR">|</span> <span class="UIDENT">Ok</span> <span id="local_x_24"><span class="LIDENT">x</span></span> <span class="MINUSGREATER">-&gt;</span> <a href="../../../ocaml-compiler/src/stdlib/effect.ml.html#module-Deep.val-continue"><span class="LIDENT">continue</span></a> <a href="#local_k_23"><span class="LIDENT">k</span></a> <a href="#local_x_24"><span class="LIDENT">x</span></a> <span class="BAR">|</span> <span class="UIDENT">Error</span> <span id="local_err_25"><span class="LIDENT">err</span></span> <span class="MINUSGREATER">-&gt;</span> <span class="LIDENT">runtimec</span> <a href="#local_err_25"><span class="LIDENT">err</span></a><span class="RPAREN">)</span><span class="EOL">
+</span>                        <span class="LPAREN">(</span><span class="UIDENT">Runtime</span><span class="DOT">.</span><span class="LIDENT">read_file</span> <span class="LABEL">~on:</span><a href="#local_filesystem_21"><span class="LIDENT">filesystem</span></a> <a href="#local_path_22"><span class="LIDENT">path</span></a><span class="RPAREN">)</span><span class="RPAREN">)</span><span class="EOL">
+</span>              <span class="BAR">|</span> <span class="UIDENT">Eff</span><span class="DOT">.</span><span class="UIDENT">Yocaml_get_mtime</span> <span class="LPAREN">(</span><span id="local_filesystem_26"><span class="LIDENT">filesystem</span></span><span class="COMMA">,</span> <span id="local_path_27"><span class="LIDENT">path</span></span><span class="RPAREN">)</span> <span class="MINUSGREATER">-&gt;</span><span class="EOL">
+</span>                  <span class="UIDENT">Some</span><span class="EOL">
+</span>                    <span class="LPAREN">(</span><span class="FUN">fun</span> <span class="LPAREN">(</span><span id="local_k_28"><span class="LIDENT">k</span></span> <span class="COLON">:</span> <a href="../../../ocaml-compiler/src/stdlib/effect.ml.html#module-Deep.type-continuation"><span class="LPAREN">(</span><span class="LIDENT">a</span><span class="COMMA">,</span> <span class="UNDERSCORE">_</span><span class="RPAREN">)</span> <span class="LIDENT">continuation</span></a><span class="RPAREN">)</span> <span class="MINUSGREATER">-&gt;</span><span class="EOL">
+</span>                      <span class="UIDENT">Runtime</span><span class="DOT">.</span><span class="LIDENT">bind</span><span class="EOL">
+</span>                        <span class="LPAREN">(</span><span class="FUNCTION">function</span><span class="EOL">
+</span>                          <span class="BAR">|</span> <span class="UIDENT">Ok</span> <span id="local_x_29"><span class="LIDENT">x</span></span> <span class="MINUSGREATER">-&gt;</span> <a href="../../../ocaml-compiler/src/stdlib/effect.ml.html#module-Deep.val-continue"><span class="LIDENT">continue</span></a> <a href="#local_k_28"><span class="LIDENT">k</span></a> <a href="#local_x_29"><span class="LIDENT">x</span></a> <span class="BAR">|</span> <span class="UIDENT">Error</span> <span id="local_err_30"><span class="LIDENT">err</span></span> <span class="MINUSGREATER">-&gt;</span> <span class="LIDENT">runtimec</span> <a href="#local_err_30"><span class="LIDENT">err</span></a><span class="RPAREN">)</span><span class="EOL">
+</span>                        <span class="LPAREN">(</span><span class="UIDENT">Runtime</span><span class="DOT">.</span><span class="LIDENT">get_mtime</span> <span class="LABEL">~on:</span><a href="#local_filesystem_26"><span class="LIDENT">filesystem</span></a> <a href="#local_path_27"><span class="LIDENT">path</span></a><span class="RPAREN">)</span><span class="RPAREN">)</span><span class="EOL">
+</span>              <span class="BAR">|</span> <span class="UIDENT">Eff</span><span class="DOT">.</span><span class="UIDENT">Yocaml_hash_content</span> <span id="local_content_31"><span class="LIDENT">content</span></span> <span class="MINUSGREATER">-&gt;</span><span class="EOL">
+</span>                  <span class="UIDENT">Some</span><span class="EOL">
+</span>                    <span class="LPAREN">(</span><span class="FUN">fun</span> <span class="LPAREN">(</span><span id="local_k_32"><span class="LIDENT">k</span></span> <span class="COLON">:</span> <a href="../../../ocaml-compiler/src/stdlib/effect.ml.html#module-Deep.type-continuation"><span class="LPAREN">(</span><span class="LIDENT">a</span><span class="COMMA">,</span> <span class="UNDERSCORE">_</span><span class="RPAREN">)</span> <span class="LIDENT">continuation</span></a><span class="RPAREN">)</span> <span class="MINUSGREATER">-&gt;</span><span class="EOL">
+</span>                      <span class="UIDENT">Runtime</span><span class="DOT">.</span><span class="LIDENT">bind</span> <span class="LPAREN">(</span><a href="../../../ocaml-compiler/src/stdlib/effect.ml.html#module-Deep.val-continue"><span class="LIDENT">continue</span></a> <a href="#local_k_32"><span class="LIDENT">k</span></a><span class="RPAREN">)</span> <span class="LPAREN">(</span><span class="UIDENT">Runtime</span><span class="DOT">.</span><span class="LIDENT">hash_content</span> <a href="#local_content_31"><span class="LIDENT">content</span></a><span class="RPAREN">)</span><span class="RPAREN">)</span><span class="EOL">
+</span>              <span class="BAR">|</span> <span class="UIDENT">Eff</span><span class="DOT">.</span><span class="UIDENT">Yocaml_write_file</span> <span class="LPAREN">(</span><span id="local_filesystem_33"><span class="LIDENT">filesystem</span></span><span class="COMMA">,</span> <span id="local_path_34"><span class="LIDENT">path</span></span><span class="COMMA">,</span> <span id="local_content_35"><span class="LIDENT">content</span></span><span class="RPAREN">)</span> <span class="MINUSGREATER">-&gt;</span><span class="EOL">
+</span>                  <span class="UIDENT">Some</span><span class="EOL">
+</span>                    <span class="LPAREN">(</span><span class="FUN">fun</span> <span class="LPAREN">(</span><span id="local_k_36"><span class="LIDENT">k</span></span> <span class="COLON">:</span> <a href="../../../ocaml-compiler/src/stdlib/effect.ml.html#module-Deep.type-continuation"><span class="LPAREN">(</span><span class="LIDENT">a</span><span class="COMMA">,</span> <span class="UNDERSCORE">_</span><span class="RPAREN">)</span> <span class="LIDENT">continuation</span></a><span class="RPAREN">)</span> <span class="MINUSGREATER">-&gt;</span><span class="EOL">
+</span>                      <span class="UIDENT">Runtime</span><span class="DOT">.</span><span class="LIDENT">bind</span><span class="EOL">
+</span>                        <span class="LPAREN">(</span><span class="FUNCTION">function</span><span class="EOL">
+</span>                          <span class="BAR">|</span> <span class="UIDENT">Ok</span> <span id="local_x_37"><span class="LIDENT">x</span></span> <span class="MINUSGREATER">-&gt;</span> <a href="../../../ocaml-compiler/src/stdlib/effect.ml.html#module-Deep.val-continue"><span class="LIDENT">continue</span></a> <a href="#local_k_36"><span class="LIDENT">k</span></a> <a href="#local_x_37"><span class="LIDENT">x</span></a> <span class="BAR">|</span> <span class="UIDENT">Error</span> <span id="local_err_38"><span class="LIDENT">err</span></span> <span class="MINUSGREATER">-&gt;</span> <span class="LIDENT">runtimec</span> <a href="#local_err_38"><span class="LIDENT">err</span></a><span class="RPAREN">)</span><span class="EOL">
+</span>                        <span class="LPAREN">(</span><span class="UIDENT">Runtime</span><span class="DOT">.</span><span class="LIDENT">write_file</span> <span class="LABEL">~on:</span><a href="#local_filesystem_33"><span class="LIDENT">filesystem</span></a> <a href="#local_path_34"><span class="LIDENT">path</span></a> <a href="#local_content_35"><span class="LIDENT">content</span></a><span class="RPAREN">)</span><span class="RPAREN">)</span><span class="EOL">
+</span>              <span class="BAR">|</span> <span class="UIDENT">Eff</span><span class="DOT">.</span><span class="UIDENT">Yocaml_create_dir</span> <span class="LPAREN">(</span><span id="local_filesystem_39"><span class="LIDENT">filesystem</span></span><span class="COMMA">,</span> <span id="local_path_40"><span class="LIDENT">path</span></span><span class="RPAREN">)</span> <span class="MINUSGREATER">-&gt;</span><span class="EOL">
+</span>                  <span class="UIDENT">Some</span><span class="EOL">
+</span>                    <span class="LPAREN">(</span><span class="FUN">fun</span> <span class="LPAREN">(</span><span id="local_k_41"><span class="LIDENT">k</span></span> <span class="COLON">:</span> <a href="../../../ocaml-compiler/src/stdlib/effect.ml.html#module-Deep.type-continuation"><span class="LPAREN">(</span><span class="LIDENT">a</span><span class="COMMA">,</span> <span class="UNDERSCORE">_</span><span class="RPAREN">)</span> <span class="LIDENT">continuation</span></a><span class="RPAREN">)</span> <span class="MINUSGREATER">-&gt;</span><span class="EOL">
+</span>                      <span class="UIDENT">Runtime</span><span class="DOT">.</span><span class="LIDENT">bind</span><span class="EOL">
+</span>                        <span class="LPAREN">(</span><span class="FUNCTION">function</span><span class="EOL">
+</span>                          <span class="BAR">|</span> <span class="UIDENT">Ok</span> <span id="local_x_42"><span class="LIDENT">x</span></span> <span class="MINUSGREATER">-&gt;</span> <a href="../../../ocaml-compiler/src/stdlib/effect.ml.html#module-Deep.val-continue"><span class="LIDENT">continue</span></a> <a href="#local_k_41"><span class="LIDENT">k</span></a> <a href="#local_x_42"><span class="LIDENT">x</span></a> <span class="BAR">|</span> <span class="UIDENT">Error</span> <span id="local_err_43"><span class="LIDENT">err</span></span> <span class="MINUSGREATER">-&gt;</span> <span class="LIDENT">runtimec</span> <a href="#local_err_43"><span class="LIDENT">err</span></a><span class="RPAREN">)</span><span class="EOL">
+</span>                        <span class="LPAREN">(</span><span class="UIDENT">Runtime</span><span class="DOT">.</span><span class="LIDENT">create_directory</span> <span class="LABEL">~on:</span><a href="#local_filesystem_39"><span class="LIDENT">filesystem</span></a> <a href="#local_path_40"><span class="LIDENT">path</span></a><span class="RPAREN">)</span><span class="RPAREN">)</span><span class="EOL">
+</span>              <span class="BAR">|</span> <span class="UIDENT">Eff</span><span class="DOT">.</span><span class="UIDENT">Yocaml_is_directory</span> <span class="LPAREN">(</span><span id="local_filesystem_44"><span class="LIDENT">filesystem</span></span><span class="COMMA">,</span> <span id="local_path_45"><span class="LIDENT">path</span></span><span class="RPAREN">)</span> <span class="MINUSGREATER">-&gt;</span><span class="EOL">
+</span>                  <span class="UIDENT">Some</span><span class="EOL">
+</span>                    <span class="LPAREN">(</span><span class="FUN">fun</span> <span class="LPAREN">(</span><span id="local_k_46"><span class="LIDENT">k</span></span> <span class="COLON">:</span> <a href="../../../ocaml-compiler/src/stdlib/effect.ml.html#module-Deep.type-continuation"><span class="LPAREN">(</span><span class="LIDENT">a</span><span class="COMMA">,</span> <span class="UNDERSCORE">_</span><span class="RPAREN">)</span> <span class="LIDENT">continuation</span></a><span class="RPAREN">)</span> <span class="MINUSGREATER">-&gt;</span><span class="EOL">
+</span>                      <span class="UIDENT">Runtime</span><span class="DOT">.</span><span class="LIDENT">bind</span> <span class="LPAREN">(</span><a href="../../../ocaml-compiler/src/stdlib/effect.ml.html#module-Deep.val-continue"><span class="LIDENT">continue</span></a> <a href="#local_k_46"><span class="LIDENT">k</span></a><span class="RPAREN">)</span><span class="EOL">
+</span>                        <span class="LPAREN">(</span><span class="UIDENT">Runtime</span><span class="DOT">.</span><span class="LIDENT">is_directory</span> <span class="LABEL">~on:</span><a href="#local_filesystem_44"><span class="LIDENT">filesystem</span></a> <a href="#local_path_45"><span class="LIDENT">path</span></a><span class="RPAREN">)</span><span class="RPAREN">)</span><span class="EOL">
+</span>              <span class="BAR">|</span> <span class="UIDENT">Eff</span><span class="DOT">.</span><span class="UIDENT">Yocaml_read_dir</span> <span class="LPAREN">(</span><span id="local_filesystem_47"><span class="LIDENT">filesystem</span></span><span class="COMMA">,</span> <span id="local_path_48"><span class="LIDENT">path</span></span><span class="RPAREN">)</span> <span class="MINUSGREATER">-&gt;</span><span class="EOL">
+</span>                  <span class="UIDENT">Some</span><span class="EOL">
+</span>                    <span class="LPAREN">(</span><span class="FUN">fun</span> <span class="LPAREN">(</span><span id="local_k_49"><span class="LIDENT">k</span></span> <span class="COLON">:</span> <a href="../../../ocaml-compiler/src/stdlib/effect.ml.html#module-Deep.type-continuation"><span class="LPAREN">(</span><span class="LIDENT">a</span><span class="COMMA">,</span> <span class="UNDERSCORE">_</span><span class="RPAREN">)</span> <span class="LIDENT">continuation</span></a><span class="RPAREN">)</span> <span class="MINUSGREATER">-&gt;</span><span class="EOL">
+</span>                      <span class="UIDENT">Runtime</span><span class="DOT">.</span><span class="LIDENT">bind</span><span class="EOL">
+</span>                        <span class="LPAREN">(</span><span class="FUNCTION">function</span><span class="EOL">
+</span>                          <span class="BAR">|</span> <span class="UIDENT">Ok</span> <span id="local_x_50"><span class="LIDENT">x</span></span> <span class="MINUSGREATER">-&gt;</span> <a href="../../../ocaml-compiler/src/stdlib/effect.ml.html#module-Deep.val-continue"><span class="LIDENT">continue</span></a> <a href="#local_k_49"><span class="LIDENT">k</span></a> <a href="#local_x_50"><span class="LIDENT">x</span></a> <span class="BAR">|</span> <span class="UIDENT">Error</span> <span id="local_err_51"><span class="LIDENT">err</span></span> <span class="MINUSGREATER">-&gt;</span> <span class="LIDENT">runtimec</span> <a href="#local_err_51"><span class="LIDENT">err</span></a><span class="RPAREN">)</span><span class="EOL">
+</span>                        <span class="LPAREN">(</span><span class="UIDENT">Runtime</span><span class="DOT">.</span><span class="LIDENT">read_dir</span> <span class="LABEL">~on:</span><a href="#local_filesystem_47"><span class="LIDENT">filesystem</span></a> <a href="#local_path_48"><span class="LIDENT">path</span></a><span class="RPAREN">)</span><span class="RPAREN">)</span><span class="EOL">
+</span>              <span class="BAR">|</span> <span class="UIDENT">Eff</span><span class="DOT">.</span><span class="UIDENT">Yocaml_exec_command</span> <span class="LPAREN">(</span><span id="local_prog_52"><span class="LIDENT">prog</span></span><span class="COMMA">,</span> <span id="local_args_53"><span class="LIDENT">args</span></span><span class="COMMA">,</span> <span id="local_is_success_54"><span class="LIDENT">is_success</span></span><span class="RPAREN">)</span> <span class="MINUSGREATER">-&gt;</span><span class="EOL">
+</span>                  <span class="UIDENT">Some</span><span class="EOL">
+</span>                    <span class="LPAREN">(</span><span class="FUN">fun</span> <span class="LPAREN">(</span><span id="local_k_55"><span class="LIDENT">k</span></span> <span class="COLON">:</span> <a href="../../../ocaml-compiler/src/stdlib/effect.ml.html#module-Deep.type-continuation"><span class="LPAREN">(</span><span class="LIDENT">a</span><span class="COMMA">,</span> <span class="UNDERSCORE">_</span><span class="RPAREN">)</span> <span class="LIDENT">continuation</span></a><span class="RPAREN">)</span> <span class="MINUSGREATER">-&gt;</span><span class="EOL">
+</span>                      <span class="UIDENT">Runtime</span><span class="DOT">.</span><span class="LIDENT">bind</span><span class="EOL">
+</span>                        <span class="LPAREN">(</span><span class="FUNCTION">function</span><span class="EOL">
+</span>                          <span class="BAR">|</span> <span class="UIDENT">Ok</span> <span id="local_x_56"><span class="LIDENT">x</span></span> <span class="MINUSGREATER">-&gt;</span> <a href="../../../ocaml-compiler/src/stdlib/effect.ml.html#module-Deep.val-continue"><span class="LIDENT">continue</span></a> <a href="#local_k_55"><span class="LIDENT">k</span></a> <a href="#local_x_56"><span class="LIDENT">x</span></a> <span class="BAR">|</span> <span class="UIDENT">Error</span> <span id="local_err_57"><span class="LIDENT">err</span></span> <span class="MINUSGREATER">-&gt;</span> <span class="LIDENT">runtimec</span> <a href="#local_err_57"><span class="LIDENT">err</span></a><span class="RPAREN">)</span><span class="EOL">
+</span>                        <span class="LPAREN">(</span><span class="UIDENT">Runtime</span><span class="DOT">.</span><span class="LIDENT">exec</span> <span class="TILDE">~</span><a href="#local_is_success_54"><span class="LIDENT">is_success</span></a> <a href="#local_prog_52"><span class="LIDENT">prog</span></a> <a href="#local_args_53"><span class="LIDENT">args</span></a><span class="RPAREN">)</span><span class="RPAREN">)</span><span class="EOL">
+</span>              <span class="BAR">|</span> <span class="UNDERSCORE">_</span> <span class="MINUSGREATER">-&gt;</span> <span class="UIDENT">None</span><span class="RPAREN">)</span><span class="EOL">
+</span>        <span class="RBRACE">}</span><span class="EOL">
+</span>    <span class="IN">in</span><span class="EOL">
+</span>    <a href="eff.ml.html#val-run"><span class="UIDENT">Eff</span><span class="DOT">.</span><span class="LIDENT">run</span></a> <a href="#local_handler_10"><span class="LIDENT">handler</span></a> <a href="#local_program_8"><span class="LIDENT">program</span></a> <span class="LPAREN">(</span><span class="RPAREN">)</span><span class="EOL">
+</span><span class="END">end</span></span><span class="EOL">
+</span></span></code></pre></body></html>

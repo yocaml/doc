@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"><head><title>Source: lexicon.ml (yocaml.src.yocaml)</title><meta charset="utf-8"/><link rel="stylesheet" href="../../../odoc.css"/><meta name="generator" content="odoc 3.0.0"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/></head><body class="odoc-src"><nav class="odoc-nav"><a href="../index.html">Up</a> – <a href="../../../index.html">Package index</a> &#x00BB; <a href="../../index.html">YOCaml</a> &#x00BB; <a href="../index.html">Sources</a> &#x00BB; yocaml &#x00BB; lexicon.ml</nav><header class="odoc-preamble"><h1>Source file <code><span>lexicon.ml</span></code></h1></header><div class="odoc-tocs"><nav class="odoc-toc odoc-global-toc"><ul><li><a href="../../index.html">YOCaml</a><ul><li><a href="../../data_validation.html">Generic validation of structured data</a></li><li><a href="../../effect.html">Effect abstraction</a></li><li>Library <code>yocaml</code><ul><li><a href="../../yocaml/Yocaml/index.html">Yocaml</a></li></ul></li><li><a href="../index.html">Sources</a><ul><li>yocaml<ul><li><a href="action.ml.html">action.ml</a></li><li><a href="archetype.ml.html">archetype.ml</a></li><li><a href="cache.ml.html">cache.ml</a></li><li><a href="cmd.ml.html">cmd.ml</a></li><li><a href="data.ml.html">data.ml</a></li><li><a href="deps.ml.html">deps.ml</a></li><li><a href="diagnostic.ml.html">diagnostic.ml</a></li><li><a href="eff.ml.html">eff.ml</a></li><li><a href="#" class="current_unit">lexicon.ml</a></li><li><a href="make.ml.html">make.ml</a></li><li><a href="markup.ml.html">markup.ml</a></li><li><a href="metadata.ml.html">metadata.ml</a></li><li><a href="nel.ml.html">nel.ml</a></li><li><a href="path.ml.html">path.ml</a></li><li><a href="pipeline.ml.html">pipeline.ml</a></li><li><a href="reader.ml.html">reader.ml</a></li><li><a href="runtime.ml.html">runtime.ml</a></li><li><a href="sexp.ml.html">sexp.ml</a></li><li><a href="sexp_provider.ml.html">sexp_provider.ml</a></li><li><a href="slug.ml.html">slug.ml</a></li><li><a href="task.ml.html">task.ml</a></li><li><a href="yocaml.ml.html">yocaml.ml</a></li><li><a href="yocaml__.ml.html">yocaml__.ml</a></li></ul></li></ul></li></ul></li></ul></nav></div><pre class="source_container"><code class="source_line_column"><a id="L1" class="source_line" href="#L1">1</a>
+<a id="L2" class="source_line" href="#L2">2</a>
+<a id="L3" class="source_line" href="#L3">3</a>
+<a id="L4" class="source_line" href="#L4">4</a>
+<a id="L5" class="source_line" href="#L5">5</a>
+<a id="L6" class="source_line" href="#L6">6</a>
+<a id="L7" class="source_line" href="#L7">7</a>
+<a id="L8" class="source_line" href="#L8">8</a>
+<a id="L9" class="source_line" href="#L9">9</a>
+<a id="L10" class="source_line" href="#L10">10</a>
+<a id="L11" class="source_line" href="#L11">11</a>
+<a id="L12" class="source_line" href="#L12">12</a>
+<a id="L13" class="source_line" href="#L13">13</a>
+<a id="L14" class="source_line" href="#L14">14</a>
+<a id="L15" class="source_line" href="#L15">15</a>
+<a id="L16" class="source_line" href="#L16">16</a>
+<a id="L17" class="source_line" href="#L17">17</a>
+<a id="L18" class="source_line" href="#L18">18</a>
+<a id="L19" class="source_line" href="#L19">19</a>
+<a id="L20" class="source_line" href="#L20">20</a>
+<a id="L21" class="source_line" href="#L21">21</a>
+<a id="L22" class="source_line" href="#L22">22</a>
+<a id="L23" class="source_line" href="#L23">23</a>
+<a id="L24" class="source_line" href="#L24">24</a>
+<a id="L25" class="source_line" href="#L25">25</a>
+<a id="L26" class="source_line" href="#L26">26</a>
+<a id="L27" class="source_line" href="#L27">27</a>
+<a id="L28" class="source_line" href="#L28">28</a>
+<a id="L29" class="source_line" href="#L29">29</a>
+<a id="L30" class="source_line" href="#L30">30</a>
+<a id="L31" class="source_line" href="#L31">31</a>
+<a id="L32" class="source_line" href="#L32">32</a>
+<a id="L33" class="source_line" href="#L33">33</a>
+<a id="L34" class="source_line" href="#L34">34</a>
+<a id="L35" class="source_line" href="#L35">35</a>
+<a id="L36" class="source_line" href="#L36">36</a>
+<a id="L37" class="source_line" href="#L37">37</a>
+<a id="L38" class="source_line" href="#L38">38</a>
+<a id="L39" class="source_line" href="#L39">39</a>
+<a id="L40" class="source_line" href="#L40">40</a>
+<a id="L41" class="source_line" href="#L41">41</a>
+<a id="L42" class="source_line" href="#L42">42</a>
+<a id="L43" class="source_line" href="#L43">43</a>
+<a id="L44" class="source_line" href="#L44">44</a>
+<a id="L45" class="source_line" href="#L45">45</a>
+<a id="L46" class="source_line" href="#L46">46</a>
+<a id="L47" class="source_line" href="#L47">47</a>
+<a id="L48" class="source_line" href="#L48">48</a>
+<a id="L49" class="source_line" href="#L49">49</a>
+<a id="L50" class="source_line" href="#L50">50</a>
+<a id="L51" class="source_line" href="#L51">51</a>
+<a id="L52" class="source_line" href="#L52">52</a>
+<a id="L53" class="source_line" href="#L53">53</a>
+<a id="L54" class="source_line" href="#L54">54</a>
+<a id="L55" class="source_line" href="#L55">55</a>
+<a id="L56" class="source_line" href="#L56">56</a>
+<a id="L57" class="source_line" href="#L57">57</a>
+<a id="L58" class="source_line" href="#L58">58</a>
+<a id="L59" class="source_line" href="#L59">59</a>
+<a id="L60" class="source_line" href="#L60">60</a>
+<a id="L61" class="source_line" href="#L61">61</a>
+<a id="L62" class="source_line" href="#L62">62</a>
+<a id="L63" class="source_line" href="#L63">63</a>
+<a id="L64" class="source_line" href="#L64">64</a>
+<a id="L65" class="source_line" href="#L65">65</a>
+<a id="L66" class="source_line" href="#L66">66</a>
+<a id="L67" class="source_line" href="#L67">67</a>
+<a id="L68" class="source_line" href="#L68">68</a>
+<a id="L69" class="source_line" href="#L69">69</a>
+<a id="L70" class="source_line" href="#L70">70</a>
+<a id="L71" class="source_line" href="#L71">71</a>
+<a id="L72" class="source_line" href="#L72">72</a>
+<a id="L73" class="source_line" href="#L73">73</a>
+<a id="L74" class="source_line" href="#L74">74</a>
+<a id="L75" class="source_line" href="#L75">75</a>
+<a id="L76" class="source_line" href="#L76">76</a>
+<a id="L77" class="source_line" href="#L77">77</a>
+<a id="L78" class="source_line" href="#L78">78</a>
+<a id="L79" class="source_line" href="#L79">79</a>
+<a id="L80" class="source_line" href="#L80">80</a>
+<a id="L81" class="source_line" href="#L81">81</a>
+<a id="L82" class="source_line" href="#L82">82</a>
+<a id="L83" class="source_line" href="#L83">83</a>
+<a id="L84" class="source_line" href="#L84">84</a>
+<a id="L85" class="source_line" href="#L85">85</a>
+<a id="L86" class="source_line" href="#L86">86</a>
+<a id="L87" class="source_line" href="#L87">87</a>
+<a id="L88" class="source_line" href="#L88">88</a>
+<a id="L89" class="source_line" href="#L89">89</a>
+<a id="L90" class="source_line" href="#L90">90</a>
+<a id="L91" class="source_line" href="#L91">91</a>
+<a id="L92" class="source_line" href="#L92">92</a>
+<a id="L93" class="source_line" href="#L93">93</a>
+<a id="L94" class="source_line" href="#L94">94</a>
+<a id="L95" class="source_line" href="#L95">95</a>
+<a id="L96" class="source_line" href="#L96">96</a>
+<a id="L97" class="source_line" href="#L97">97</a>
+<a id="L98" class="source_line" href="#L98">98</a>
+<a id="L99" class="source_line" href="#L99">99</a>
+<a id="L100" class="source_line" href="#L100">100</a>
+<a id="L101" class="source_line" href="#L101">101</a>
+<a id="L102" class="source_line" href="#L102">102</a>
+<a id="L103" class="source_line" href="#L103">103</a>
+<a id="L104" class="source_line" href="#L104">104</a>
+<a id="L105" class="source_line" href="#L105">105</a>
+<a id="L106" class="source_line" href="#L106">106</a>
+<a id="L107" class="source_line" href="#L107">107</a>
+<a id="L108" class="source_line" href="#L108">108</a>
+<a id="L109" class="source_line" href="#L109">109</a>
+<a id="L110" class="source_line" href="#L110">110</a>
+<a id="L111" class="source_line" href="#L111">111</a>
+<a id="L112" class="source_line" href="#L112">112</a>
+<a id="L113" class="source_line" href="#L113">113</a>
+<a id="L114" class="source_line" href="#L114">114</a>
+<a id="L115" class="source_line" href="#L115">115</a>
+<a id="L116" class="source_line" href="#L116">116</a>
+<a id="L117" class="source_line" href="#L117">117</a>
+<a id="L118" class="source_line" href="#L118">118</a>
+<a id="L119" class="source_line" href="#L119">119</a>
+</code><code class="source_code"><span><span class="COMMENT">(* YOCaml a static blog generator.
+   Copyright (C) 2024 The Funkyworkers and The YOCaml's developers
+
+   This program is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program.  If not, see &lt;https://www.gnu.org/licenses/&gt;. *)</span><span class="EOL">
+</span><span class="EOL">
+</span><span class="LET">let</span> <span id="val-bug_tracker"><span class="LIDENT">bug_tracker</span></span> <span class="EQUAL">=</span> <span class="STRING">&quot;https://github.com/xhtmlboi/yocaml/issues&quot;</span><span class="EOL">
+</span><span class="EOL">
+</span><span class="LET">let</span> <span id="val-target_already_up_to_date"><span class="LIDENT">target_already_up_to_date</span></span> <span id="local_target_1"><span class="LIDENT">target</span></span> <span class="EQUAL">=</span><span class="EOL">
+</span>  <a href="../../../ocaml-compiler/src/stdlib/format.ml.html#val-asprintf"><span class="UIDENT">Format</span><span class="DOT">.</span><span class="LIDENT">asprintf</span></a> <span class="STRING">&quot;`%a` is already up-to-date&quot;</span> <a href="path.ml.html#val-pp"><span class="UIDENT">Path</span><span class="DOT">.</span><span class="LIDENT">pp</span></a> <a href="#local_target_1"><span class="LIDENT">target</span></a><span class="EOL">
+</span><span class="EOL">
+</span><span class="LET">let</span> <span id="val-target_need_to_be_built"><span class="LIDENT">target_need_to_be_built</span></span> <span id="local_target_2"><span class="LIDENT">target</span></span> <span class="EQUAL">=</span><span class="EOL">
+</span>  <a href="../../../ocaml-compiler/src/stdlib/format.ml.html#val-asprintf"><span class="UIDENT">Format</span><span class="DOT">.</span><span class="LIDENT">asprintf</span></a> <span class="STRING">&quot;`%a` need to be built&quot;</span> <a href="path.ml.html#val-pp"><span class="UIDENT">Path</span><span class="DOT">.</span><span class="LIDENT">pp</span></a> <a href="#local_target_2"><span class="LIDENT">target</span></a><span class="EOL">
+</span><span class="EOL">
+</span><span class="LET">let</span> <span id="val-target_is_written"><span class="LIDENT">target_is_written</span></span> <span id="local_target_3"><span class="LIDENT">target</span></span> <span class="EQUAL">=</span><span class="EOL">
+</span>  <a href="../../../ocaml-compiler/src/stdlib/format.ml.html#val-asprintf"><span class="UIDENT">Format</span><span class="DOT">.</span><span class="LIDENT">asprintf</span></a> <span class="STRING">&quot;`%a` will be written&quot;</span> <a href="path.ml.html#val-pp"><span class="UIDENT">Path</span><span class="DOT">.</span><span class="LIDENT">pp</span></a> <a href="#local_target_3"><span class="LIDENT">target</span></a><span class="EOL">
+</span><span class="EOL">
+</span><span class="LET">let</span> <span id="val-target_was_written"><span class="LIDENT">target_was_written</span></span> <span id="local_target_4"><span class="LIDENT">target</span></span> <span class="EQUAL">=</span><span class="EOL">
+</span>  <a href="../../../ocaml-compiler/src/stdlib/format.ml.html#val-asprintf"><span class="UIDENT">Format</span><span class="DOT">.</span><span class="LIDENT">asprintf</span></a> <span class="STRING">&quot;`%a` has been written&quot;</span> <a href="path.ml.html#val-pp"><span class="UIDENT">Path</span><span class="DOT">.</span><span class="LIDENT">pp</span></a> <a href="#local_target_4"><span class="LIDENT">target</span></a><span class="EOL">
+</span><span class="EOL">
+</span><span class="LET">let</span> <span id="val-target_hash_is_unchanged"><span class="LIDENT">target_hash_is_unchanged</span></span> <span id="local_target_5"><span class="LIDENT">target</span></span> <span class="EQUAL">=</span><span class="EOL">
+</span>  <a href="../../../ocaml-compiler/src/stdlib/format.ml.html#val-asprintf"><span class="UIDENT">Format</span><span class="DOT">.</span><span class="LIDENT">asprintf</span></a><span class="EOL">
+</span>    <span class="STRING">&quot;`%a` always has the same hash as in the cache, already up-to-date&quot;</span> <a href="path.ml.html#val-pp"><span class="UIDENT">Path</span><span class="DOT">.</span><span class="LIDENT">pp</span></a><span class="EOL">
+</span>    <a href="#local_target_5"><span class="LIDENT">target</span></a><span class="EOL">
+</span><span class="EOL">
+</span><span class="LET">let</span> <span id="val-target_hash_is_changed"><span class="LIDENT">target_hash_is_changed</span></span> <span id="local_target_6"><span class="LIDENT">target</span></span> <span class="EQUAL">=</span><span class="EOL">
+</span>  <a href="../../../ocaml-compiler/src/stdlib/format.ml.html#val-asprintf"><span class="UIDENT">Format</span><span class="DOT">.</span><span class="LIDENT">asprintf</span></a> <span class="STRING">&quot;`%a` has a different hash, need to be built&quot;</span> <a href="path.ml.html#val-pp"><span class="UIDENT">Path</span><span class="DOT">.</span><span class="LIDENT">pp</span></a> <a href="#local_target_6"><span class="LIDENT">target</span></a><span class="EOL">
+</span><span class="EOL">
+</span><span class="LET">let</span> <span id="val-found_dynamic_dependencies"><span class="LIDENT">found_dynamic_dependencies</span></span> <span id="local_target_7"><span class="LIDENT">target</span></span> <span class="EQUAL">=</span><span class="EOL">
+</span>  <a href="../../../ocaml-compiler/src/stdlib/format.ml.html#val-asprintf"><span class="UIDENT">Format</span><span class="DOT">.</span><span class="LIDENT">asprintf</span></a> <span class="STRING">&quot;`%a` has dynamic dependencies&quot;</span> <a href="path.ml.html#val-pp"><span class="UIDENT">Path</span><span class="DOT">.</span><span class="LIDENT">pp</span></a> <a href="#local_target_7"><span class="LIDENT">target</span></a><span class="EOL">
+</span><span class="EOL">
+</span><span class="LET">let</span> <span id="val-cache_invalid_csexp"><span class="LIDENT">cache_invalid_csexp</span></span> <span id="local_target_8"><span class="LIDENT">target</span></span> <span class="EQUAL">=</span><span class="EOL">
+</span>  <a href="../../../ocaml-compiler/src/stdlib/format.ml.html#val-asprintf"><span class="UIDENT">Format</span><span class="DOT">.</span><span class="LIDENT">asprintf</span></a> <span class="STRING">&quot;Cache located in `%a` is invalid Csexp&quot;</span> <a href="path.ml.html#val-pp"><span class="UIDENT">Path</span><span class="DOT">.</span><span class="LIDENT">pp</span></a> <a href="#local_target_8"><span class="LIDENT">target</span></a><span class="EOL">
+</span><span class="EOL">
+</span><span class="LET">let</span> <span id="val-cache_invalid_repr"><span class="LIDENT">cache_invalid_repr</span></span> <span id="local_target_9"><span class="LIDENT">target</span></span> <span class="EQUAL">=</span><span class="EOL">
+</span>  <a href="../../../ocaml-compiler/src/stdlib/format.ml.html#val-asprintf"><span class="UIDENT">Format</span><span class="DOT">.</span><span class="LIDENT">asprintf</span></a> <span class="STRING">&quot;Cache located in `%a` is invalid representation&quot;</span> <a href="path.ml.html#val-pp"><span class="UIDENT">Path</span><span class="DOT">.</span><span class="LIDENT">pp</span></a><span class="EOL">
+</span>    <a href="#local_target_9"><span class="LIDENT">target</span></a><span class="EOL">
+</span><span class="EOL">
+</span><span class="LET">let</span> <span id="val-cache_restored"><span class="LIDENT">cache_restored</span></span> <span id="local_target_10"><span class="LIDENT">target</span></span> <span class="EQUAL">=</span><span class="EOL">
+</span>  <a href="../../../ocaml-compiler/src/stdlib/format.ml.html#val-asprintf"><span class="UIDENT">Format</span><span class="DOT">.</span><span class="LIDENT">asprintf</span></a> <span class="STRING">&quot;Cache restored from `%a`&quot;</span> <a href="path.ml.html#val-pp"><span class="UIDENT">Path</span><span class="DOT">.</span><span class="LIDENT">pp</span></a> <a href="#local_target_10"><span class="LIDENT">target</span></a><span class="EOL">
+</span><span class="EOL">
+</span><span class="LET">let</span> <span id="val-cache_initiated"><span class="LIDENT">cache_initiated</span></span> <span id="local_target_11"><span class="LIDENT">target</span></span> <span class="EQUAL">=</span><span class="EOL">
+</span>  <a href="../../../ocaml-compiler/src/stdlib/format.ml.html#val-asprintf"><span class="UIDENT">Format</span><span class="DOT">.</span><span class="LIDENT">asprintf</span></a> <span class="STRING">&quot;Cache initiated in `%a`&quot;</span> <a href="path.ml.html#val-pp"><span class="UIDENT">Path</span><span class="DOT">.</span><span class="LIDENT">pp</span></a> <a href="#local_target_11"><span class="LIDENT">target</span></a><span class="EOL">
+</span><span class="EOL">
+</span><span class="LET">let</span> <span id="val-cache_stored"><span class="LIDENT">cache_stored</span></span> <span id="local_target_12"><span class="LIDENT">target</span></span> <span class="EQUAL">=</span> <a href="../../../ocaml-compiler/src/stdlib/format.ml.html#val-asprintf"><span class="UIDENT">Format</span><span class="DOT">.</span><span class="LIDENT">asprintf</span></a> <span class="STRING">&quot;Cache stored in `%a`&quot;</span> <a href="path.ml.html#val-pp"><span class="UIDENT">Path</span><span class="DOT">.</span><span class="LIDENT">pp</span></a> <a href="#local_target_12"><span class="LIDENT">target</span></a><span class="EOL">
+</span><span class="EOL">
+</span><span class="LET">let</span> <span id="val-copy_file"><span class="LIDENT">copy_file</span></span> <span class="QUESTION">?</span><span id="local_new_name_13"><span class="LIDENT">new_name</span></span> <span class="TILDE">~</span><span id="local_into_14"><span class="LIDENT">into</span></span> <span id="local_source_15"><span class="LIDENT">source</span></span> <span class="EQUAL">=</span><span class="EOL">
+</span>  <span class="LET">let</span> <span id="local_with_new_name_16"><span class="LIDENT">with_new_name</span></span> <span class="EQUAL">=</span><span class="EOL">
+</span>    <a href="../../../ocaml-compiler/src/stdlib/option.ml.html#val-fold"><span class="UIDENT">Option</span><span class="DOT">.</span><span class="LIDENT">fold</span></a> <span class="LABEL">~none:</span><span class="STRING">&quot;&quot;</span><span class="EOL">
+</span>      <span class="LABEL">~some:</span><span class="LPAREN">(</span><a href="../../../ocaml-compiler/src/stdlib/format.ml.html#val-asprintf"><span class="UIDENT">Format</span><span class="DOT">.</span><span class="LIDENT">asprintf</span></a> <span class="STRING">&quot; (with new name `%s`)&quot;</span><span class="RPAREN">)</span><span class="EOL">
+</span>      <a href="#local_new_name_13"><span class="LIDENT">new_name</span></a><span class="EOL">
+</span>  <span class="IN">in</span><span class="EOL">
+</span>  <a href="../../../ocaml-compiler/src/stdlib/format.ml.html#val-asprintf"><span class="UIDENT">Format</span><span class="DOT">.</span><span class="LIDENT">asprintf</span></a> <span class="STRING">&quot;Copy file `%a` into `%a`%s&quot;</span> <a href="path.ml.html#val-pp"><span class="UIDENT">Path</span><span class="DOT">.</span><span class="LIDENT">pp</span></a> <a href="#local_source_15"><span class="LIDENT">source</span></a> <a href="path.ml.html#val-pp"><span class="UIDENT">Path</span><span class="DOT">.</span><span class="LIDENT">pp</span></a> <a href="#local_into_14"><span class="LIDENT">into</span></a><span class="EOL">
+</span>    <a href="#local_with_new_name_16"><span class="LIDENT">with_new_name</span></a><span class="EOL">
+</span><span class="EOL">
+</span><span class="LET">let</span> <span id="val-copy_directory"><span class="LIDENT">copy_directory</span></span> <span class="QUESTION">?</span><span id="local_new_name_17"><span class="LIDENT">new_name</span></span> <span class="TILDE">~</span><span id="local_into_18"><span class="LIDENT">into</span></span> <span id="local_source_19"><span class="LIDENT">source</span></span> <span class="EQUAL">=</span><span class="EOL">
+</span>  <span class="LET">let</span> <span id="local_with_new_name_20"><span class="LIDENT">with_new_name</span></span> <span class="EQUAL">=</span><span class="EOL">
+</span>    <a href="../../../ocaml-compiler/src/stdlib/option.ml.html#val-fold"><span class="UIDENT">Option</span><span class="DOT">.</span><span class="LIDENT">fold</span></a> <span class="LABEL">~none:</span><span class="STRING">&quot;&quot;</span><span class="EOL">
+</span>      <span class="LABEL">~some:</span><span class="LPAREN">(</span><a href="../../../ocaml-compiler/src/stdlib/format.ml.html#val-asprintf"><span class="UIDENT">Format</span><span class="DOT">.</span><span class="LIDENT">asprintf</span></a> <span class="STRING">&quot; (with new name `%s`)&quot;</span><span class="RPAREN">)</span><span class="EOL">
+</span>      <a href="#local_new_name_17"><span class="LIDENT">new_name</span></a><span class="EOL">
+</span>  <span class="IN">in</span><span class="EOL">
+</span>  <a href="../../../ocaml-compiler/src/stdlib/format.ml.html#val-asprintf"><span class="UIDENT">Format</span><span class="DOT">.</span><span class="LIDENT">asprintf</span></a> <span class="STRING">&quot;Copy directory `%a` into `%a`%s&quot;</span> <a href="path.ml.html#val-pp"><span class="UIDENT">Path</span><span class="DOT">.</span><span class="LIDENT">pp</span></a> <a href="#local_source_19"><span class="LIDENT">source</span></a> <a href="path.ml.html#val-pp"><span class="UIDENT">Path</span><span class="DOT">.</span><span class="LIDENT">pp</span></a> <a href="#local_into_18"><span class="LIDENT">into</span></a><span class="EOL">
+</span>    <a href="#local_with_new_name_20"><span class="LIDENT">with_new_name</span></a><span class="EOL">
+</span><span class="EOL">
+</span><span class="LET">let</span> <span id="val-pp_filesystem"><span class="LIDENT">pp_filesystem</span></span> <span id="local_ppf_21"><span class="LIDENT">ppf</span></span> <span class="EQUAL">=</span> <span class="FUNCTION">function</span><span class="EOL">
+</span>  <span class="BAR">|</span> <span class="BACKQUOTE">`</span><span class="UIDENT">Source</span> <span class="MINUSGREATER">-&gt;</span> <a href="../../../ocaml-compiler/src/stdlib/format.ml.html#val-fprintf"><span class="UIDENT">Format</span><span class="DOT">.</span><span class="LIDENT">fprintf</span></a> <a href="#local_ppf_21"><span class="LIDENT">ppf</span></a> <span class="STRING">&quot;source&quot;</span><span class="EOL">
+</span>  <span class="BAR">|</span> <span class="BACKQUOTE">`</span><span class="UIDENT">Target</span> <span class="MINUSGREATER">-&gt;</span> <a href="../../../ocaml-compiler/src/stdlib/format.ml.html#val-fprintf"><span class="UIDENT">Format</span><span class="DOT">.</span><span class="LIDENT">fprintf</span></a> <a href="#local_ppf_21"><span class="LIDENT">ppf</span></a> <span class="STRING">&quot;target&quot;</span><span class="EOL">
+</span><span class="EOL">
+</span><span class="LET">let</span> <span id="val-backtrace_not_available"><span class="LIDENT">backtrace_not_available</span></span> <span class="EQUAL">=</span><span class="EOL">
+</span>  <span class="STRING">&quot;The backtrace is not available because the function is called (according to \
+   the [in_exception_handler] parameter) outside an exception handler. This \
+   makes the trace unspecified.&quot;</span><span class="EOL">
+</span><span class="EOL">
+</span><span class="LET">let</span> <span id="val-there_is_an_error"><span class="LIDENT">there_is_an_error</span></span> <span id="local_ppf_22"><span class="LIDENT">ppf</span></span> <span class="LPAREN">(</span><span class="RPAREN">)</span> <span class="EQUAL">=</span><span class="EOL">
+</span>  <a href="../../../ocaml-compiler/src/stdlib/format.ml.html#val-fprintf"><span class="UIDENT">Format</span><span class="DOT">.</span><span class="LIDENT">fprintf</span></a> <a href="#local_ppf_22"><span class="LIDENT">ppf</span></a> <span class="STRING">&quot;Oh dear, an error has occurred&quot;</span><span class="EOL">
+</span><span class="EOL">
+</span><span class="LET">let</span> <span id="val-unknown_error"><span class="LIDENT">unknown_error</span></span> <span id="local_ppf_23"><span class="LIDENT">ppf</span></span> <span id="local_exn_24"><span class="LIDENT">exn</span></span> <span class="EQUAL">=</span><span class="EOL">
+</span>  <a href="../../../ocaml-compiler/src/stdlib/format.ml.html#val-fprintf"><span class="UIDENT">Format</span><span class="DOT">.</span><span class="LIDENT">fprintf</span></a> <a href="#local_ppf_23"><span class="LIDENT">ppf</span></a><span class="EOL">
+</span>    <span class="STRING">&quot;No idea what error is. This is very annoying. It's probably a bug and you \
+     should report the error here: &lt;%s&gt; : @[&lt;1&gt;%s;@ %s@]&quot;</span><span class="EOL">
+</span>    <span class="LIDENT">bug_tracker</span><span class="EOL">
+</span>    <span class="LPAREN">(</span><a href="../../../ocaml-compiler/src/stdlib/printexc.ml.html#val-exn_slot_name"><span class="UIDENT">Printexc</span><span class="DOT">.</span><span class="LIDENT">exn_slot_name</span></a> <a href="#local_exn_24"><span class="LIDENT">exn</span></a><span class="RPAREN">)</span><span class="EOL">
+</span>    <span class="LPAREN">(</span><a href="../../../ocaml-compiler/src/stdlib/printexc.ml.html#val-to_string"><span class="UIDENT">Printexc</span><span class="DOT">.</span><span class="LIDENT">to_string</span></a> <a href="#local_exn_24"><span class="LIDENT">exn</span></a><span class="RPAREN">)</span><span class="EOL">
+</span><span class="EOL">
+</span><span class="LET">let</span> <span id="val-file_not_exists"><span class="LIDENT">file_not_exists</span></span> <span id="local_source_25"><span class="LIDENT">source</span></span> <span id="local_path_26"><span class="LIDENT">path</span></span> <span id="local_ppf_27"><span class="LIDENT">ppf</span></span> <span class="LPAREN">(</span><span class="RPAREN">)</span> <span class="EQUAL">=</span><span class="EOL">
+</span>  <a href="../../../ocaml-compiler/src/stdlib/format.ml.html#val-fprintf"><span class="UIDENT">Format</span><span class="DOT">.</span><span class="LIDENT">fprintf</span></a> <a href="#local_ppf_27"><span class="LIDENT">ppf</span></a> <span class="STRING">&quot;The file `%a` (on `%a`) does not exists&quot;</span> <a href="path.ml.html#val-pp"><span class="UIDENT">Path</span><span class="DOT">.</span><span class="LIDENT">pp</span></a> <a href="#local_path_26"><span class="LIDENT">path</span></a><span class="EOL">
+</span>    <span class="LIDENT">pp_filesystem</span> <a href="#local_source_25"><span class="LIDENT">source</span></a><span class="EOL">
+</span><span class="EOL">
+</span><span class="LET">let</span> <span id="val-invalid_path"><span class="LIDENT">invalid_path</span></span> <span id="local_source_28"><span class="LIDENT">source</span></span> <span id="local_path_29"><span class="LIDENT">path</span></span> <span id="local_ppf_30"><span class="LIDENT">ppf</span></span> <span class="LPAREN">(</span><span class="RPAREN">)</span> <span class="EQUAL">=</span><span class="EOL">
+</span>  <a href="../../../ocaml-compiler/src/stdlib/format.ml.html#val-fprintf"><span class="UIDENT">Format</span><span class="DOT">.</span><span class="LIDENT">fprintf</span></a> <a href="#local_ppf_30"><span class="LIDENT">ppf</span></a> <span class="STRING">&quot;The path `%a` (on `%a`) is invalid&quot;</span> <a href="path.ml.html#val-pp"><span class="UIDENT">Path</span><span class="DOT">.</span><span class="LIDENT">pp</span></a> <a href="#local_path_29"><span class="LIDENT">path</span></a><span class="EOL">
+</span>    <span class="LIDENT">pp_filesystem</span> <a href="#local_source_28"><span class="LIDENT">source</span></a><span class="EOL">
+</span><span class="EOL">
+</span><span class="LET">let</span> <span id="val-file_is_a_directory"><span class="LIDENT">file_is_a_directory</span></span> <span id="local_source_31"><span class="LIDENT">source</span></span> <span id="local_path_32"><span class="LIDENT">path</span></span> <span id="local_ppf_33"><span class="LIDENT">ppf</span></span> <span class="LPAREN">(</span><span class="RPAREN">)</span> <span class="EQUAL">=</span><span class="EOL">
+</span>  <a href="../../../ocaml-compiler/src/stdlib/format.ml.html#val-fprintf"><span class="UIDENT">Format</span><span class="DOT">.</span><span class="LIDENT">fprintf</span></a> <a href="#local_ppf_33"><span class="LIDENT">ppf</span></a><span class="EOL">
+</span>    <span class="STRING">&quot;The following path: `%a` (on `%a`) is a directory (and attempts to be \
+     used as a file)&quot;</span><span class="EOL">
+</span>    <span class="LIDENT">pp_filesystem</span> <a href="#local_source_31"><span class="LIDENT">source</span></a> <a href="path.ml.html#val-pp"><span class="UIDENT">Path</span><span class="DOT">.</span><span class="LIDENT">pp</span></a> <a href="#local_path_32"><span class="LIDENT">path</span></a><span class="EOL">
+</span><span class="EOL">
+</span><span class="LET">let</span> <span id="val-directory_is_a_file"><span class="LIDENT">directory_is_a_file</span></span> <span id="local_source_34"><span class="LIDENT">source</span></span> <span id="local_path_35"><span class="LIDENT">path</span></span> <span id="local_ppf_36"><span class="LIDENT">ppf</span></span> <span class="LPAREN">(</span><span class="RPAREN">)</span> <span class="EQUAL">=</span><span class="EOL">
+</span>  <a href="../../../ocaml-compiler/src/stdlib/format.ml.html#val-fprintf"><span class="UIDENT">Format</span><span class="DOT">.</span><span class="LIDENT">fprintf</span></a> <a href="#local_ppf_36"><span class="LIDENT">ppf</span></a><span class="EOL">
+</span>    <span class="STRING">&quot;The following path: `%a` (on `%a`) is a file (and attempts to be used as \
+     a directory)&quot;</span><span class="EOL">
+</span>    <span class="LIDENT">pp_filesystem</span> <a href="#local_source_34"><span class="LIDENT">source</span></a> <a href="path.ml.html#val-pp"><span class="UIDENT">Path</span><span class="DOT">.</span><span class="LIDENT">pp</span></a> <a href="#local_path_35"><span class="LIDENT">path</span></a><span class="EOL">
+</span><span class="EOL">
+</span><span class="LET">let</span> <span id="val-directory_not_exists"><span class="LIDENT">directory_not_exists</span></span> <span id="local_source_37"><span class="LIDENT">source</span></span> <span id="local_path_38"><span class="LIDENT">path</span></span> <span id="local_ppf_39"><span class="LIDENT">ppf</span></span> <span class="LPAREN">(</span><span class="RPAREN">)</span> <span class="EQUAL">=</span><span class="EOL">
+</span>  <a href="../../../ocaml-compiler/src/stdlib/format.ml.html#val-fprintf"><span class="UIDENT">Format</span><span class="DOT">.</span><span class="LIDENT">fprintf</span></a> <a href="#local_ppf_39"><span class="LIDENT">ppf</span></a><span class="EOL">
+</span>    <span class="STRING">&quot;The following directory: `%a` (on `%a`) does not exists (or is maybe a \
+     file and not a directory)&quot;</span><span class="EOL">
+</span>    <a href="path.ml.html#val-pp"><span class="UIDENT">Path</span><span class="DOT">.</span><span class="LIDENT">pp</span></a> <a href="#local_path_38"><span class="LIDENT">path</span></a> <span class="LIDENT">pp_filesystem</span> <a href="#local_source_37"><span class="LIDENT">source</span></a><span class="EOL">
+</span></span></code></pre></body></html>

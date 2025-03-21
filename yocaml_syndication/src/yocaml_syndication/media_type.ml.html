@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"><head><title>Source: media_type.ml (yocaml_syndication.src.yocaml_syndication)</title><meta charset="utf-8"/><link rel="stylesheet" href="../../../odoc.css"/><meta name="generator" content="odoc 3.0.0"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/></head><body class="odoc-src"><nav class="odoc-nav"><a href="../index.html">Up</a> – <a href="../../../index.html">Package index</a> &#x00BB; <a href="../../index.html">yocaml_syndication</a> &#x00BB; <a href="../index.html">Sources</a> &#x00BB; yocaml_syndication &#x00BB; media_type.ml</nav><header class="odoc-preamble"><h1>Source file <code><span>media_type.ml</span></code></h1></header><div class="odoc-tocs"><nav class="odoc-toc odoc-global-toc"><ul><li><a href="../../index.html">yocaml_syndication</a><ul><li>Library <code>yocaml_syndication</code><ul><li><a href="../../yocaml_syndication/Yocaml_syndication/index.html">Yocaml_syndication</a></li></ul></li><li><a href="../index.html">Sources</a><ul><li>yocaml_syndication<ul><li><a href="atom.ml.html">atom.ml</a></li><li><a href="category.ml.html">category.ml</a></li><li><a href="datetime.ml.html">datetime.ml</a></li><li><a href="generator.ml.html">generator.ml</a></li><li><a href="lang.ml.html">lang.ml</a></li><li><a href="#" class="current_unit">media_type.ml</a></li><li><a href="opml.ml.html">opml.ml</a></li><li><a href="person.ml.html">person.ml</a></li><li><a href="rss1.ml.html">rss1.ml</a></li><li><a href="rss2.ml.html">rss2.ml</a></li><li><a href="text_input.ml.html">text_input.ml</a></li><li><a href="tz.ml.html">tz.ml</a></li><li><a href="xml.ml.html">xml.ml</a></li><li><a href="yocaml_syndication.ml.html">yocaml_syndication.ml</a></li><li><a href="yocaml_syndication__.ml.html">yocaml_syndication__.ml</a></li></ul></li></ul></li></ul></li></ul></nav></div><pre class="source_container"><code class="source_line_column"><a id="L1" class="source_line" href="#L1">1</a>
+<a id="L2" class="source_line" href="#L2">2</a>
+<a id="L3" class="source_line" href="#L3">3</a>
+<a id="L4" class="source_line" href="#L4">4</a>
+<a id="L5" class="source_line" href="#L5">5</a>
+<a id="L6" class="source_line" href="#L6">6</a>
+<a id="L7" class="source_line" href="#L7">7</a>
+<a id="L8" class="source_line" href="#L8">8</a>
+<a id="L9" class="source_line" href="#L9">9</a>
+<a id="L10" class="source_line" href="#L10">10</a>
+<a id="L11" class="source_line" href="#L11">11</a>
+<a id="L12" class="source_line" href="#L12">12</a>
+<a id="L13" class="source_line" href="#L13">13</a>
+<a id="L14" class="source_line" href="#L14">14</a>
+<a id="L15" class="source_line" href="#L15">15</a>
+<a id="L16" class="source_line" href="#L16">16</a>
+<a id="L17" class="source_line" href="#L17">17</a>
+<a id="L18" class="source_line" href="#L18">18</a>
+<a id="L19" class="source_line" href="#L19">19</a>
+<a id="L20" class="source_line" href="#L20">20</a>
+<a id="L21" class="source_line" href="#L21">21</a>
+<a id="L22" class="source_line" href="#L22">22</a>
+<a id="L23" class="source_line" href="#L23">23</a>
+<a id="L24" class="source_line" href="#L24">24</a>
+<a id="L25" class="source_line" href="#L25">25</a>
+<a id="L26" class="source_line" href="#L26">26</a>
+<a id="L27" class="source_line" href="#L27">27</a>
+<a id="L28" class="source_line" href="#L28">28</a>
+<a id="L29" class="source_line" href="#L29">29</a>
+<a id="L30" class="source_line" href="#L30">30</a>
+<a id="L31" class="source_line" href="#L31">31</a>
+<a id="L32" class="source_line" href="#L32">32</a>
+<a id="L33" class="source_line" href="#L33">33</a>
+<a id="L34" class="source_line" href="#L34">34</a>
+<a id="L35" class="source_line" href="#L35">35</a>
+<a id="L36" class="source_line" href="#L36">36</a>
+<a id="L37" class="source_line" href="#L37">37</a>
+<a id="L38" class="source_line" href="#L38">38</a>
+<a id="L39" class="source_line" href="#L39">39</a>
+<a id="L40" class="source_line" href="#L40">40</a>
+<a id="L41" class="source_line" href="#L41">41</a>
+<a id="L42" class="source_line" href="#L42">42</a>
+<a id="L43" class="source_line" href="#L43">43</a>
+<a id="L44" class="source_line" href="#L44">44</a>
+<a id="L45" class="source_line" href="#L45">45</a>
+<a id="L46" class="source_line" href="#L46">46</a>
+<a id="L47" class="source_line" href="#L47">47</a>
+<a id="L48" class="source_line" href="#L48">48</a>
+<a id="L49" class="source_line" href="#L49">49</a>
+<a id="L50" class="source_line" href="#L50">50</a>
+<a id="L51" class="source_line" href="#L51">51</a>
+<a id="L52" class="source_line" href="#L52">52</a>
+<a id="L53" class="source_line" href="#L53">53</a>
+<a id="L54" class="source_line" href="#L54">54</a>
+<a id="L55" class="source_line" href="#L55">55</a>
+<a id="L56" class="source_line" href="#L56">56</a>
+<a id="L57" class="source_line" href="#L57">57</a>
+<a id="L58" class="source_line" href="#L58">58</a>
+<a id="L59" class="source_line" href="#L59">59</a>
+<a id="L60" class="source_line" href="#L60">60</a>
+<a id="L61" class="source_line" href="#L61">61</a>
+<a id="L62" class="source_line" href="#L62">62</a>
+<a id="L63" class="source_line" href="#L63">63</a>
+<a id="L64" class="source_line" href="#L64">64</a>
+<a id="L65" class="source_line" href="#L65">65</a>
+<a id="L66" class="source_line" href="#L66">66</a>
+<a id="L67" class="source_line" href="#L67">67</a>
+<a id="L68" class="source_line" href="#L68">68</a>
+<a id="L69" class="source_line" href="#L69">69</a>
+<a id="L70" class="source_line" href="#L70">70</a>
+<a id="L71" class="source_line" href="#L71">71</a>
+<a id="L72" class="source_line" href="#L72">72</a>
+<a id="L73" class="source_line" href="#L73">73</a>
+<a id="L74" class="source_line" href="#L74">74</a>
+<a id="L75" class="source_line" href="#L75">75</a>
+<a id="L76" class="source_line" href="#L76">76</a>
+<a id="L77" class="source_line" href="#L77">77</a>
+<a id="L78" class="source_line" href="#L78">78</a>
+<a id="L79" class="source_line" href="#L79">79</a>
+<a id="L80" class="source_line" href="#L80">80</a>
+<a id="L81" class="source_line" href="#L81">81</a>
+<a id="L82" class="source_line" href="#L82">82</a>
+<a id="L83" class="source_line" href="#L83">83</a>
+<a id="L84" class="source_line" href="#L84">84</a>
+<a id="L85" class="source_line" href="#L85">85</a>
+<a id="L86" class="source_line" href="#L86">86</a>
+<a id="L87" class="source_line" href="#L87">87</a>
+<a id="L88" class="source_line" href="#L88">88</a>
+<a id="L89" class="source_line" href="#L89">89</a>
+<a id="L90" class="source_line" href="#L90">90</a>
+<a id="L91" class="source_line" href="#L91">91</a>
+<a id="L92" class="source_line" href="#L92">92</a>
+<a id="L93" class="source_line" href="#L93">93</a>
+<a id="L94" class="source_line" href="#L94">94</a>
+<a id="L95" class="source_line" href="#L95">95</a>
+<a id="L96" class="source_line" href="#L96">96</a>
+<a id="L97" class="source_line" href="#L97">97</a>
+<a id="L98" class="source_line" href="#L98">98</a>
+<a id="L99" class="source_line" href="#L99">99</a>
+<a id="L100" class="source_line" href="#L100">100</a>
+<a id="L101" class="source_line" href="#L101">101</a>
+<a id="L102" class="source_line" href="#L102">102</a>
+<a id="L103" class="source_line" href="#L103">103</a>
+<a id="L104" class="source_line" href="#L104">104</a>
+<a id="L105" class="source_line" href="#L105">105</a>
+<a id="L106" class="source_line" href="#L106">106</a>
+<a id="L107" class="source_line" href="#L107">107</a>
+<a id="L108" class="source_line" href="#L108">108</a>
+<a id="L109" class="source_line" href="#L109">109</a>
+<a id="L110" class="source_line" href="#L110">110</a>
+<a id="L111" class="source_line" href="#L111">111</a>
+<a id="L112" class="source_line" href="#L112">112</a>
+<a id="L113" class="source_line" href="#L113">113</a>
+<a id="L114" class="source_line" href="#L114">114</a>
+<a id="L115" class="source_line" href="#L115">115</a>
+<a id="L116" class="source_line" href="#L116">116</a>
+<a id="L117" class="source_line" href="#L117">117</a>
+<a id="L118" class="source_line" href="#L118">118</a>
+<a id="L119" class="source_line" href="#L119">119</a>
+<a id="L120" class="source_line" href="#L120">120</a>
+<a id="L121" class="source_line" href="#L121">121</a>
+<a id="L122" class="source_line" href="#L122">122</a>
+<a id="L123" class="source_line" href="#L123">123</a>
+<a id="L124" class="source_line" href="#L124">124</a>
+<a id="L125" class="source_line" href="#L125">125</a>
+<a id="L126" class="source_line" href="#L126">126</a>
+<a id="L127" class="source_line" href="#L127">127</a>
+<a id="L128" class="source_line" href="#L128">128</a>
+<a id="L129" class="source_line" href="#L129">129</a>
+<a id="L130" class="source_line" href="#L130">130</a>
+<a id="L131" class="source_line" href="#L131">131</a>
+<a id="L132" class="source_line" href="#L132">132</a>
+<a id="L133" class="source_line" href="#L133">133</a>
+<a id="L134" class="source_line" href="#L134">134</a>
+<a id="L135" class="source_line" href="#L135">135</a>
+<a id="L136" class="source_line" href="#L136">136</a>
+<a id="L137" class="source_line" href="#L137">137</a>
+<a id="L138" class="source_line" href="#L138">138</a>
+<a id="L139" class="source_line" href="#L139">139</a>
+<a id="L140" class="source_line" href="#L140">140</a>
+<a id="L141" class="source_line" href="#L141">141</a>
+<a id="L142" class="source_line" href="#L142">142</a>
+<a id="L143" class="source_line" href="#L143">143</a>
+<a id="L144" class="source_line" href="#L144">144</a>
+<a id="L145" class="source_line" href="#L145">145</a>
+<a id="L146" class="source_line" href="#L146">146</a>
+<a id="L147" class="source_line" href="#L147">147</a>
+<a id="L148" class="source_line" href="#L148">148</a>
+<a id="L149" class="source_line" href="#L149">149</a>
+<a id="L150" class="source_line" href="#L150">150</a>
+<a id="L151" class="source_line" href="#L151">151</a>
+<a id="L152" class="source_line" href="#L152">152</a>
+<a id="L153" class="source_line" href="#L153">153</a>
+<a id="L154" class="source_line" href="#L154">154</a>
+<a id="L155" class="source_line" href="#L155">155</a>
+<a id="L156" class="source_line" href="#L156">156</a>
+<a id="L157" class="source_line" href="#L157">157</a>
+<a id="L158" class="source_line" href="#L158">158</a>
+<a id="L159" class="source_line" href="#L159">159</a>
+<a id="L160" class="source_line" href="#L160">160</a>
+<a id="L161" class="source_line" href="#L161">161</a>
+<a id="L162" class="source_line" href="#L162">162</a>
+<a id="L163" class="source_line" href="#L163">163</a>
+<a id="L164" class="source_line" href="#L164">164</a>
+<a id="L165" class="source_line" href="#L165">165</a>
+<a id="L166" class="source_line" href="#L166">166</a>
+<a id="L167" class="source_line" href="#L167">167</a>
+<a id="L168" class="source_line" href="#L168">168</a>
+<a id="L169" class="source_line" href="#L169">169</a>
+<a id="L170" class="source_line" href="#L170">170</a>
+<a id="L171" class="source_line" href="#L171">171</a>
+<a id="L172" class="source_line" href="#L172">172</a>
+<a id="L173" class="source_line" href="#L173">173</a>
+<a id="L174" class="source_line" href="#L174">174</a>
+<a id="L175" class="source_line" href="#L175">175</a>
+</code><code class="source_code"><span><span class="COMMENT">(* YOCaml a static blog generator.
+   Copyright (C) 2024 The Funkyworkers and The YOCaml's developers
+
+   This program is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program.  If not, see &lt;https://www.gnu.org/licenses/&gt;. *)</span><span class="EOL">
+</span><span class="EOL">
+</span><span id="type-t"><span class="TYPE">type</span> <span class="LIDENT">t</span> <span class="EQUAL">=</span><span class="EOL">
+</span>  <span id="type-t.constructor-Audio_aac"><span class="BAR">|</span> <span class="UIDENT">Audio_aac</span></span><span class="EOL">
+</span>  <span id="type-t.constructor-Application_x_abiword"><span class="BAR">|</span> <span class="UIDENT">Application_x_abiword</span></span><span class="EOL">
+</span>  <span id="type-t.constructor-Application_x_freearc"><span class="BAR">|</span> <span class="UIDENT">Application_x_freearc</span></span><span class="EOL">
+</span>  <span id="type-t.constructor-Video_x_msvideo"><span class="BAR">|</span> <span class="UIDENT">Video_x_msvideo</span></span><span class="EOL">
+</span>  <span id="type-t.constructor-Application_vnd_amazon_ebook"><span class="BAR">|</span> <span class="UIDENT">Application_vnd_amazon_ebook</span></span><span class="EOL">
+</span>  <span id="type-t.constructor-Application_octet_stream"><span class="BAR">|</span> <span class="UIDENT">Application_octet_stream</span></span><span class="EOL">
+</span>  <span id="type-t.constructor-Image_bmp"><span class="BAR">|</span> <span class="UIDENT">Image_bmp</span></span><span class="EOL">
+</span>  <span id="type-t.constructor-Application_x_bzip"><span class="BAR">|</span> <span class="UIDENT">Application_x_bzip</span></span><span class="EOL">
+</span>  <span id="type-t.constructor-Application_x_bzip2"><span class="BAR">|</span> <span class="UIDENT">Application_x_bzip2</span></span><span class="EOL">
+</span>  <span id="type-t.constructor-Application_x_cdf"><span class="BAR">|</span> <span class="UIDENT">Application_x_cdf</span></span><span class="EOL">
+</span>  <span id="type-t.constructor-Application_x_csh"><span class="BAR">|</span> <span class="UIDENT">Application_x_csh</span></span><span class="EOL">
+</span>  <span id="type-t.constructor-Text_css"><span class="BAR">|</span> <span class="UIDENT">Text_css</span></span><span class="EOL">
+</span>  <span id="type-t.constructor-Text_csv"><span class="BAR">|</span> <span class="UIDENT">Text_csv</span></span><span class="EOL">
+</span>  <span id="type-t.constructor-Application_msword"><span class="BAR">|</span> <span class="UIDENT">Application_msword</span></span><span class="EOL">
+</span>  <span id="type-t.constructor-Application_vnd_openxmlformats_officedocument_wordprocessingml_document"><span class="BAR">|</span> <span class="UIDENT">Application_vnd_openxmlformats_officedocument_wordprocessingml_document</span></span><span class="EOL">
+</span>  <span id="type-t.constructor-Application_vnd_ms_fontobject"><span class="BAR">|</span> <span class="UIDENT">Application_vnd_ms_fontobject</span></span><span class="EOL">
+</span>  <span id="type-t.constructor-Application_epub_zip"><span class="BAR">|</span> <span class="UIDENT">Application_epub_zip</span></span><span class="EOL">
+</span>  <span id="type-t.constructor-Application_gzip"><span class="BAR">|</span> <span class="UIDENT">Application_gzip</span></span><span class="EOL">
+</span>  <span id="type-t.constructor-Image_gif"><span class="BAR">|</span> <span class="UIDENT">Image_gif</span></span><span class="EOL">
+</span>  <span id="type-t.constructor-Text_html"><span class="BAR">|</span> <span class="UIDENT">Text_html</span></span><span class="EOL">
+</span>  <span id="type-t.constructor-Image_vnd_microsoft_icon"><span class="BAR">|</span> <span class="UIDENT">Image_vnd_microsoft_icon</span></span><span class="EOL">
+</span>  <span id="type-t.constructor-Text_calendar"><span class="BAR">|</span> <span class="UIDENT">Text_calendar</span></span><span class="EOL">
+</span>  <span id="type-t.constructor-Application_java_archive"><span class="BAR">|</span> <span class="UIDENT">Application_java_archive</span></span><span class="EOL">
+</span>  <span id="type-t.constructor-Image_jpeg"><span class="BAR">|</span> <span class="UIDENT">Image_jpeg</span></span><span class="EOL">
+</span>  <span id="type-t.constructor-Text_javascript"><span class="BAR">|</span> <span class="UIDENT">Text_javascript</span></span><span class="EOL">
+</span>  <span id="type-t.constructor-Application_json"><span class="BAR">|</span> <span class="UIDENT">Application_json</span></span><span class="EOL">
+</span>  <span id="type-t.constructor-Application_ld_json"><span class="BAR">|</span> <span class="UIDENT">Application_ld_json</span></span><span class="EOL">
+</span>  <span id="type-t.constructor-Audio_midi"><span class="BAR">|</span> <span class="UIDENT">Audio_midi</span></span><span class="EOL">
+</span>  <span id="type-t.constructor-Audio_x_midi"><span class="BAR">|</span> <span class="UIDENT">Audio_x_midi</span></span><span class="EOL">
+</span>  <span id="type-t.constructor-Audio_mpeg"><span class="BAR">|</span> <span class="UIDENT">Audio_mpeg</span></span><span class="EOL">
+</span>  <span id="type-t.constructor-Video_mp4"><span class="BAR">|</span> <span class="UIDENT">Video_mp4</span></span><span class="EOL">
+</span>  <span id="type-t.constructor-Video_mpeg"><span class="BAR">|</span> <span class="UIDENT">Video_mpeg</span></span><span class="EOL">
+</span>  <span id="type-t.constructor-Application_vnd_apple_installer_xml"><span class="BAR">|</span> <span class="UIDENT">Application_vnd_apple_installer_xml</span></span><span class="EOL">
+</span>  <span id="type-t.constructor-Application_vnd_oasis_opendocument_presentation"><span class="BAR">|</span> <span class="UIDENT">Application_vnd_oasis_opendocument_presentation</span></span><span class="EOL">
+</span>  <span id="type-t.constructor-Application_vnd_oasis_opendocument_spreadsheet"><span class="BAR">|</span> <span class="UIDENT">Application_vnd_oasis_opendocument_spreadsheet</span></span><span class="EOL">
+</span>  <span id="type-t.constructor-Application_vnd_oasis_opendocument_text"><span class="BAR">|</span> <span class="UIDENT">Application_vnd_oasis_opendocument_text</span></span><span class="EOL">
+</span>  <span id="type-t.constructor-Audio_ogg"><span class="BAR">|</span> <span class="UIDENT">Audio_ogg</span></span><span class="EOL">
+</span>  <span id="type-t.constructor-Video_ogg"><span class="BAR">|</span> <span class="UIDENT">Video_ogg</span></span><span class="EOL">
+</span>  <span id="type-t.constructor-Application_ogg"><span class="BAR">|</span> <span class="UIDENT">Application_ogg</span></span><span class="EOL">
+</span>  <span id="type-t.constructor-Audio_opus"><span class="BAR">|</span> <span class="UIDENT">Audio_opus</span></span><span class="EOL">
+</span>  <span id="type-t.constructor-Font_otf"><span class="BAR">|</span> <span class="UIDENT">Font_otf</span></span><span class="EOL">
+</span>  <span id="type-t.constructor-Image_png"><span class="BAR">|</span> <span class="UIDENT">Image_png</span></span><span class="EOL">
+</span>  <span id="type-t.constructor-Application_pdf"><span class="BAR">|</span> <span class="UIDENT">Application_pdf</span></span><span class="EOL">
+</span>  <span id="type-t.constructor-Application_x_httpd_php"><span class="BAR">|</span> <span class="UIDENT">Application_x_httpd_php</span></span><span class="EOL">
+</span>  <span id="type-t.constructor-Application_vnd_ms_powerpoint"><span class="BAR">|</span> <span class="UIDENT">Application_vnd_ms_powerpoint</span></span><span class="EOL">
+</span>  <span id="type-t.constructor-Application_vnd_openxmlformats_officedocument_presentationml_presentation"><span class="BAR">|</span> <span class="UIDENT">Application_vnd_openxmlformats_officedocument_presentationml_presentation</span></span><span class="EOL">
+</span>  <span id="type-t.constructor-Application_vnd_rar"><span class="BAR">|</span> <span class="UIDENT">Application_vnd_rar</span></span><span class="EOL">
+</span>  <span id="type-t.constructor-Application_rtf"><span class="BAR">|</span> <span class="UIDENT">Application_rtf</span></span><span class="EOL">
+</span>  <span id="type-t.constructor-Application_x_sh"><span class="BAR">|</span> <span class="UIDENT">Application_x_sh</span></span><span class="EOL">
+</span>  <span id="type-t.constructor-Image_svg_xml"><span class="BAR">|</span> <span class="UIDENT">Image_svg_xml</span></span><span class="EOL">
+</span>  <span id="type-t.constructor-Application_x_shockwave_flash"><span class="BAR">|</span> <span class="UIDENT">Application_x_shockwave_flash</span></span><span class="EOL">
+</span>  <span id="type-t.constructor-Application_x_tar"><span class="BAR">|</span> <span class="UIDENT">Application_x_tar</span></span><span class="EOL">
+</span>  <span id="type-t.constructor-Image_tiff"><span class="BAR">|</span> <span class="UIDENT">Image_tiff</span></span><span class="EOL">
+</span>  <span id="type-t.constructor-Video_mp2T"><span class="BAR">|</span> <span class="UIDENT">Video_mp2T</span></span><span class="EOL">
+</span>  <span id="type-t.constructor-Font_ttf"><span class="BAR">|</span> <span class="UIDENT">Font_ttf</span></span><span class="EOL">
+</span>  <span id="type-t.constructor-Text_plain"><span class="BAR">|</span> <span class="UIDENT">Text_plain</span></span><span class="EOL">
+</span>  <span id="type-t.constructor-Application_vnd_visio"><span class="BAR">|</span> <span class="UIDENT">Application_vnd_visio</span></span><span class="EOL">
+</span>  <span id="type-t.constructor-Audio_wav"><span class="BAR">|</span> <span class="UIDENT">Audio_wav</span></span><span class="EOL">
+</span>  <span id="type-t.constructor-Audio_webm"><span class="BAR">|</span> <span class="UIDENT">Audio_webm</span></span><span class="EOL">
+</span>  <span id="type-t.constructor-Video_webm"><span class="BAR">|</span> <span class="UIDENT">Video_webm</span></span><span class="EOL">
+</span>  <span id="type-t.constructor-Image_webp"><span class="BAR">|</span> <span class="UIDENT">Image_webp</span></span><span class="EOL">
+</span>  <span id="type-t.constructor-Font_woff"><span class="BAR">|</span> <span class="UIDENT">Font_woff</span></span><span class="EOL">
+</span>  <span id="type-t.constructor-Font_woff2"><span class="BAR">|</span> <span class="UIDENT">Font_woff2</span></span><span class="EOL">
+</span>  <span id="type-t.constructor-Application_xhtml_xml"><span class="BAR">|</span> <span class="UIDENT">Application_xhtml_xml</span></span><span class="EOL">
+</span>  <span id="type-t.constructor-Application_vnd_ms_excel"><span class="BAR">|</span> <span class="UIDENT">Application_vnd_ms_excel</span></span><span class="EOL">
+</span>  <span id="type-t.constructor-Application_vnd_openxmlformats_officedocument_spreadsheetml_sheet"><span class="BAR">|</span> <span class="UIDENT">Application_vnd_openxmlformats_officedocument_spreadsheetml_sheet</span></span><span class="EOL">
+</span>  <span id="type-t.constructor-Application_xml"><span class="BAR">|</span> <span class="UIDENT">Application_xml</span></span><span class="EOL">
+</span>  <span id="type-t.constructor-Text_xml"><span class="BAR">|</span> <span class="UIDENT">Text_xml</span></span><span class="EOL">
+</span>  <span id="type-t.constructor-Application_vnd_mozilla_xul_xml"><span class="BAR">|</span> <span class="UIDENT">Application_vnd_mozilla_xul_xml</span></span><span class="EOL">
+</span>  <span id="type-t.constructor-Application_zip"><span class="BAR">|</span> <span class="UIDENT">Application_zip</span></span><span class="EOL">
+</span>  <span id="type-t.constructor-Video_3Gpp"><span class="BAR">|</span> <span class="UIDENT">Video_3Gpp</span></span><span class="EOL">
+</span>  <span id="type-t.constructor-Audio_3Gpp"><span class="BAR">|</span> <span class="UIDENT">Audio_3Gpp</span></span><span class="EOL">
+</span>  <span id="type-t.constructor-Video_3Gpp2"><span class="BAR">|</span> <span class="UIDENT">Video_3Gpp2</span></span><span class="EOL">
+</span>  <span id="type-t.constructor-Audio_3Gpp2"><span class="BAR">|</span> <span class="UIDENT">Audio_3Gpp2</span></span><span class="EOL">
+</span>  <span id="type-t.constructor-Application_x_7Z_compressed"><span class="BAR">|</span> <span class="UIDENT">Application_x_7Z_compressed</span></span></span><span class="EOL">
+</span><span class="EOL">
+</span><span class="LET">let</span> <span id="val-to_string"><span class="LIDENT">to_string</span></span> <span class="EQUAL">=</span> <span class="FUNCTION">function</span><span class="EOL">
+</span>  <span class="BAR">|</span> <span class="UIDENT">Audio_aac</span> <span class="MINUSGREATER">-&gt;</span> <span class="STRING">&quot;audio/aac&quot;</span><span class="EOL">
+</span>  <span class="BAR">|</span> <span class="UIDENT">Application_x_abiword</span> <span class="MINUSGREATER">-&gt;</span> <span class="STRING">&quot;application/x-abiword&quot;</span><span class="EOL">
+</span>  <span class="BAR">|</span> <span class="UIDENT">Application_x_freearc</span> <span class="MINUSGREATER">-&gt;</span> <span class="STRING">&quot;application/x-freearc&quot;</span><span class="EOL">
+</span>  <span class="BAR">|</span> <span class="UIDENT">Video_x_msvideo</span> <span class="MINUSGREATER">-&gt;</span> <span class="STRING">&quot;video/x-msvideo&quot;</span><span class="EOL">
+</span>  <span class="BAR">|</span> <span class="UIDENT">Application_vnd_amazon_ebook</span> <span class="MINUSGREATER">-&gt;</span> <span class="STRING">&quot;application/vnd.amazon.ebook&quot;</span><span class="EOL">
+</span>  <span class="BAR">|</span> <span class="UIDENT">Application_octet_stream</span> <span class="MINUSGREATER">-&gt;</span> <span class="STRING">&quot;application/octet-stream&quot;</span><span class="EOL">
+</span>  <span class="BAR">|</span> <span class="UIDENT">Image_bmp</span> <span class="MINUSGREATER">-&gt;</span> <span class="STRING">&quot;image/bmp&quot;</span><span class="EOL">
+</span>  <span class="BAR">|</span> <span class="UIDENT">Application_x_bzip</span> <span class="MINUSGREATER">-&gt;</span> <span class="STRING">&quot;application/x-bzip&quot;</span><span class="EOL">
+</span>  <span class="BAR">|</span> <span class="UIDENT">Application_x_bzip2</span> <span class="MINUSGREATER">-&gt;</span> <span class="STRING">&quot;application/x-bzip2&quot;</span><span class="EOL">
+</span>  <span class="BAR">|</span> <span class="UIDENT">Application_x_cdf</span> <span class="MINUSGREATER">-&gt;</span> <span class="STRING">&quot;application/x-cdf&quot;</span><span class="EOL">
+</span>  <span class="BAR">|</span> <span class="UIDENT">Application_x_csh</span> <span class="MINUSGREATER">-&gt;</span> <span class="STRING">&quot;application/x-csh&quot;</span><span class="EOL">
+</span>  <span class="BAR">|</span> <span class="UIDENT">Text_css</span> <span class="MINUSGREATER">-&gt;</span> <span class="STRING">&quot;text/css&quot;</span><span class="EOL">
+</span>  <span class="BAR">|</span> <span class="UIDENT">Text_csv</span> <span class="MINUSGREATER">-&gt;</span> <span class="STRING">&quot;text/csv&quot;</span><span class="EOL">
+</span>  <span class="BAR">|</span> <span class="UIDENT">Application_msword</span> <span class="MINUSGREATER">-&gt;</span> <span class="STRING">&quot;application/msword&quot;</span><span class="EOL">
+</span>  <span class="BAR">|</span> <span class="UIDENT">Application_vnd_openxmlformats_officedocument_wordprocessingml_document</span> <span class="MINUSGREATER">-&gt;</span><span class="EOL">
+</span>      <span class="STRING">&quot;application/vnd.openxmlformats-officedocument.wordprocessingml.document&quot;</span><span class="EOL">
+</span>  <span class="BAR">|</span> <span class="UIDENT">Application_vnd_ms_fontobject</span> <span class="MINUSGREATER">-&gt;</span> <span class="STRING">&quot;application/vnd.ms-fontobject&quot;</span><span class="EOL">
+</span>  <span class="BAR">|</span> <span class="UIDENT">Application_epub_zip</span> <span class="MINUSGREATER">-&gt;</span> <span class="STRING">&quot;application/epub+zip&quot;</span><span class="EOL">
+</span>  <span class="BAR">|</span> <span class="UIDENT">Application_gzip</span> <span class="MINUSGREATER">-&gt;</span> <span class="STRING">&quot;application/gzip&quot;</span><span class="EOL">
+</span>  <span class="BAR">|</span> <span class="UIDENT">Image_gif</span> <span class="MINUSGREATER">-&gt;</span> <span class="STRING">&quot;image/gif&quot;</span><span class="EOL">
+</span>  <span class="BAR">|</span> <span class="UIDENT">Text_html</span> <span class="MINUSGREATER">-&gt;</span> <span class="STRING">&quot;text/html&quot;</span><span class="EOL">
+</span>  <span class="BAR">|</span> <span class="UIDENT">Image_vnd_microsoft_icon</span> <span class="MINUSGREATER">-&gt;</span> <span class="STRING">&quot;image/vnd.microsoft.icon&quot;</span><span class="EOL">
+</span>  <span class="BAR">|</span> <span class="UIDENT">Text_calendar</span> <span class="MINUSGREATER">-&gt;</span> <span class="STRING">&quot;text/calendar&quot;</span><span class="EOL">
+</span>  <span class="BAR">|</span> <span class="UIDENT">Application_java_archive</span> <span class="MINUSGREATER">-&gt;</span> <span class="STRING">&quot;application/java-archive&quot;</span><span class="EOL">
+</span>  <span class="BAR">|</span> <span class="UIDENT">Image_jpeg</span> <span class="MINUSGREATER">-&gt;</span> <span class="STRING">&quot;image/jpeg&quot;</span><span class="EOL">
+</span>  <span class="BAR">|</span> <span class="UIDENT">Text_javascript</span> <span class="MINUSGREATER">-&gt;</span> <span class="STRING">&quot;text/javascript&quot;</span><span class="EOL">
+</span>  <span class="BAR">|</span> <span class="UIDENT">Application_json</span> <span class="MINUSGREATER">-&gt;</span> <span class="STRING">&quot;application/json&quot;</span><span class="EOL">
+</span>  <span class="BAR">|</span> <span class="UIDENT">Application_ld_json</span> <span class="MINUSGREATER">-&gt;</span> <span class="STRING">&quot;application/ld+json&quot;</span><span class="EOL">
+</span>  <span class="BAR">|</span> <span class="UIDENT">Audio_midi</span> <span class="MINUSGREATER">-&gt;</span> <span class="STRING">&quot;audio/midi&quot;</span><span class="EOL">
+</span>  <span class="BAR">|</span> <span class="UIDENT">Audio_x_midi</span> <span class="MINUSGREATER">-&gt;</span> <span class="STRING">&quot;audio/x-midi&quot;</span><span class="EOL">
+</span>  <span class="BAR">|</span> <span class="UIDENT">Audio_mpeg</span> <span class="MINUSGREATER">-&gt;</span> <span class="STRING">&quot;audio/mpeg&quot;</span><span class="EOL">
+</span>  <span class="BAR">|</span> <span class="UIDENT">Video_mp4</span> <span class="MINUSGREATER">-&gt;</span> <span class="STRING">&quot;video/mp4&quot;</span><span class="EOL">
+</span>  <span class="BAR">|</span> <span class="UIDENT">Video_mpeg</span> <span class="MINUSGREATER">-&gt;</span> <span class="STRING">&quot;video/mpeg&quot;</span><span class="EOL">
+</span>  <span class="BAR">|</span> <span class="UIDENT">Application_vnd_apple_installer_xml</span> <span class="MINUSGREATER">-&gt;</span> <span class="STRING">&quot;application/vnd.apple.installer+xml&quot;</span><span class="EOL">
+</span>  <span class="BAR">|</span> <span class="UIDENT">Application_vnd_oasis_opendocument_presentation</span> <span class="MINUSGREATER">-&gt;</span><span class="EOL">
+</span>      <span class="STRING">&quot;application/vnd.oasis.opendocument.presentation&quot;</span><span class="EOL">
+</span>  <span class="BAR">|</span> <span class="UIDENT">Application_vnd_oasis_opendocument_spreadsheet</span> <span class="MINUSGREATER">-&gt;</span><span class="EOL">
+</span>      <span class="STRING">&quot;application/vnd.oasis.opendocument.spreadsheet&quot;</span><span class="EOL">
+</span>  <span class="BAR">|</span> <span class="UIDENT">Application_vnd_oasis_opendocument_text</span> <span class="MINUSGREATER">-&gt;</span><span class="EOL">
+</span>      <span class="STRING">&quot;application/vnd.oasis.opendocument.text&quot;</span><span class="EOL">
+</span>  <span class="BAR">|</span> <span class="UIDENT">Audio_ogg</span> <span class="MINUSGREATER">-&gt;</span> <span class="STRING">&quot;audio/ogg&quot;</span><span class="EOL">
+</span>  <span class="BAR">|</span> <span class="UIDENT">Video_ogg</span> <span class="MINUSGREATER">-&gt;</span> <span class="STRING">&quot;video/ogg&quot;</span><span class="EOL">
+</span>  <span class="BAR">|</span> <span class="UIDENT">Application_ogg</span> <span class="MINUSGREATER">-&gt;</span> <span class="STRING">&quot;application/ogg&quot;</span><span class="EOL">
+</span>  <span class="BAR">|</span> <span class="UIDENT">Audio_opus</span> <span class="MINUSGREATER">-&gt;</span> <span class="STRING">&quot;audio/opus&quot;</span><span class="EOL">
+</span>  <span class="BAR">|</span> <span class="UIDENT">Font_otf</span> <span class="MINUSGREATER">-&gt;</span> <span class="STRING">&quot;font/otf&quot;</span><span class="EOL">
+</span>  <span class="BAR">|</span> <span class="UIDENT">Image_png</span> <span class="MINUSGREATER">-&gt;</span> <span class="STRING">&quot;image/png&quot;</span><span class="EOL">
+</span>  <span class="BAR">|</span> <span class="UIDENT">Application_pdf</span> <span class="MINUSGREATER">-&gt;</span> <span class="STRING">&quot;application/pdf&quot;</span><span class="EOL">
+</span>  <span class="BAR">|</span> <span class="UIDENT">Application_x_httpd_php</span> <span class="MINUSGREATER">-&gt;</span> <span class="STRING">&quot;application/x-httpd-php&quot;</span><span class="EOL">
+</span>  <span class="BAR">|</span> <span class="UIDENT">Application_vnd_ms_powerpoint</span> <span class="MINUSGREATER">-&gt;</span> <span class="STRING">&quot;application/vnd.ms-powerpoint&quot;</span><span class="EOL">
+</span>  <span class="BAR">|</span> <span class="UIDENT">Application_vnd_openxmlformats_officedocument_presentationml_presentation</span> <span class="MINUSGREATER">-&gt;</span><span class="EOL">
+</span>      <span class="STRING">&quot;application/vnd.openxmlformats-officedocument.presentationml.presentation&quot;</span><span class="EOL">
+</span>  <span class="BAR">|</span> <span class="UIDENT">Application_vnd_rar</span> <span class="MINUSGREATER">-&gt;</span> <span class="STRING">&quot;application/vnd.rar&quot;</span><span class="EOL">
+</span>  <span class="BAR">|</span> <span class="UIDENT">Application_rtf</span> <span class="MINUSGREATER">-&gt;</span> <span class="STRING">&quot;application/rtf&quot;</span><span class="EOL">
+</span>  <span class="BAR">|</span> <span class="UIDENT">Application_x_sh</span> <span class="MINUSGREATER">-&gt;</span> <span class="STRING">&quot;application/x-sh&quot;</span><span class="EOL">
+</span>  <span class="BAR">|</span> <span class="UIDENT">Image_svg_xml</span> <span class="MINUSGREATER">-&gt;</span> <span class="STRING">&quot;image/svg+xml&quot;</span><span class="EOL">
+</span>  <span class="BAR">|</span> <span class="UIDENT">Application_x_shockwave_flash</span> <span class="MINUSGREATER">-&gt;</span> <span class="STRING">&quot;application/x-shockwave-flash&quot;</span><span class="EOL">
+</span>  <span class="BAR">|</span> <span class="UIDENT">Application_x_tar</span> <span class="MINUSGREATER">-&gt;</span> <span class="STRING">&quot;application/x-tar&quot;</span><span class="EOL">
+</span>  <span class="BAR">|</span> <span class="UIDENT">Image_tiff</span> <span class="MINUSGREATER">-&gt;</span> <span class="STRING">&quot;image/tiff&quot;</span><span class="EOL">
+</span>  <span class="BAR">|</span> <span class="UIDENT">Video_mp2T</span> <span class="MINUSGREATER">-&gt;</span> <span class="STRING">&quot;video/mp2t&quot;</span><span class="EOL">
+</span>  <span class="BAR">|</span> <span class="UIDENT">Font_ttf</span> <span class="MINUSGREATER">-&gt;</span> <span class="STRING">&quot;font/ttf&quot;</span><span class="EOL">
+</span>  <span class="BAR">|</span> <span class="UIDENT">Text_plain</span> <span class="MINUSGREATER">-&gt;</span> <span class="STRING">&quot;text/plain&quot;</span><span class="EOL">
+</span>  <span class="BAR">|</span> <span class="UIDENT">Application_vnd_visio</span> <span class="MINUSGREATER">-&gt;</span> <span class="STRING">&quot;application/vnd.visio&quot;</span><span class="EOL">
+</span>  <span class="BAR">|</span> <span class="UIDENT">Audio_wav</span> <span class="MINUSGREATER">-&gt;</span> <span class="STRING">&quot;audio/wav&quot;</span><span class="EOL">
+</span>  <span class="BAR">|</span> <span class="UIDENT">Audio_webm</span> <span class="MINUSGREATER">-&gt;</span> <span class="STRING">&quot;audio/webm&quot;</span><span class="EOL">
+</span>  <span class="BAR">|</span> <span class="UIDENT">Video_webm</span> <span class="MINUSGREATER">-&gt;</span> <span class="STRING">&quot;video/webm&quot;</span><span class="EOL">
+</span>  <span class="BAR">|</span> <span class="UIDENT">Image_webp</span> <span class="MINUSGREATER">-&gt;</span> <span class="STRING">&quot;image/webp&quot;</span><span class="EOL">
+</span>  <span class="BAR">|</span> <span class="UIDENT">Font_woff</span> <span class="MINUSGREATER">-&gt;</span> <span class="STRING">&quot;font/woff&quot;</span><span class="EOL">
+</span>  <span class="BAR">|</span> <span class="UIDENT">Font_woff2</span> <span class="MINUSGREATER">-&gt;</span> <span class="STRING">&quot;font/woff2&quot;</span><span class="EOL">
+</span>  <span class="BAR">|</span> <span class="UIDENT">Application_xhtml_xml</span> <span class="MINUSGREATER">-&gt;</span> <span class="STRING">&quot;application/xhtml+xml&quot;</span><span class="EOL">
+</span>  <span class="BAR">|</span> <span class="UIDENT">Application_vnd_ms_excel</span> <span class="MINUSGREATER">-&gt;</span> <span class="STRING">&quot;application/vnd.ms-excel&quot;</span><span class="EOL">
+</span>  <span class="BAR">|</span> <span class="UIDENT">Application_vnd_openxmlformats_officedocument_spreadsheetml_sheet</span> <span class="MINUSGREATER">-&gt;</span><span class="EOL">
+</span>      <span class="STRING">&quot;application/vnd.openxmlformats-officedocument.spreadsheetml.sheet&quot;</span><span class="EOL">
+</span>  <span class="BAR">|</span> <span class="UIDENT">Application_xml</span> <span class="MINUSGREATER">-&gt;</span> <span class="STRING">&quot;application/xml &quot;</span><span class="EOL">
+</span>  <span class="BAR">|</span> <span class="UIDENT">Text_xml</span> <span class="MINUSGREATER">-&gt;</span> <span class="STRING">&quot;text/xml&quot;</span><span class="EOL">
+</span>  <span class="BAR">|</span> <span class="UIDENT">Application_vnd_mozilla_xul_xml</span> <span class="MINUSGREATER">-&gt;</span> <span class="STRING">&quot;application/vnd.mozilla.xul+xml&quot;</span><span class="EOL">
+</span>  <span class="BAR">|</span> <span class="UIDENT">Application_zip</span> <span class="MINUSGREATER">-&gt;</span> <span class="STRING">&quot;application/zip&quot;</span><span class="EOL">
+</span>  <span class="BAR">|</span> <span class="UIDENT">Video_3Gpp</span> <span class="MINUSGREATER">-&gt;</span> <span class="STRING">&quot;video/3gpp&quot;</span><span class="EOL">
+</span>  <span class="BAR">|</span> <span class="UIDENT">Audio_3Gpp</span> <span class="MINUSGREATER">-&gt;</span> <span class="STRING">&quot;audio/3gpp&quot;</span><span class="EOL">
+</span>  <span class="BAR">|</span> <span class="UIDENT">Video_3Gpp2</span> <span class="MINUSGREATER">-&gt;</span> <span class="STRING">&quot;video/3gpp2&quot;</span><span class="EOL">
+</span>  <span class="BAR">|</span> <span class="UIDENT">Audio_3Gpp2</span> <span class="MINUSGREATER">-&gt;</span> <span class="STRING">&quot;audio/3gpp2&quot;</span><span class="EOL">
+</span>  <span class="BAR">|</span> <span class="UIDENT">Application_x_7Z_compressed</span> <span class="MINUSGREATER">-&gt;</span> <span class="STRING">&quot;application/x-7z-compressed&quot;</span><span class="EOL">
+</span></span></code></pre></body></html>

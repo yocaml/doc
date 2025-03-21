@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"><head><title>Source: ssh.ml (yocaml_git.src.yocaml_git)</title><meta charset="utf-8"/><link rel="stylesheet" href="../../../odoc.css"/><meta name="generator" content="odoc 3.0.0"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/></head><body class="odoc-src"><nav class="odoc-nav"><a href="../index.html">Up</a> – <a href="../../../index.html">Package index</a> &#x00BB; <a href="../../index.html">yocaml_git</a> &#x00BB; <a href="../index.html">Sources</a> &#x00BB; yocaml_git &#x00BB; ssh.ml</nav><header class="odoc-preamble"><h1>Source file <code><span>ssh.ml</span></code></h1></header><div class="odoc-tocs"><nav class="odoc-toc odoc-global-toc"><ul><li><a href="../../index.html">yocaml_git</a><ul><li>Library <code>yocaml_git</code><ul><li><a href="../../yocaml_git/Yocaml_git/index.html">Yocaml_git</a></li></ul></li><li><a href="../index.html">Sources</a><ul><li>yocaml_git<ul><li><a href="runtime.ml.html">runtime.ml</a></li><li><a href="#" class="current_unit">ssh.ml</a></li><li><a href="yocaml_git.ml.html">yocaml_git.ml</a></li><li><a href="yocaml_git__.ml.html">yocaml_git__.ml</a></li></ul></li></ul></li></ul></li></ul></nav></div><pre class="source_container"><code class="source_line_column"><a id="L1" class="source_line" href="#L1">1</a>
+<a id="L2" class="source_line" href="#L2">2</a>
+<a id="L3" class="source_line" href="#L3">3</a>
+<a id="L4" class="source_line" href="#L4">4</a>
+<a id="L5" class="source_line" href="#L5">5</a>
+<a id="L6" class="source_line" href="#L6">6</a>
+<a id="L7" class="source_line" href="#L7">7</a>
+<a id="L8" class="source_line" href="#L8">8</a>
+<a id="L9" class="source_line" href="#L9">9</a>
+<a id="L10" class="source_line" href="#L10">10</a>
+<a id="L11" class="source_line" href="#L11">11</a>
+<a id="L12" class="source_line" href="#L12">12</a>
+<a id="L13" class="source_line" href="#L13">13</a>
+<a id="L14" class="source_line" href="#L14">14</a>
+<a id="L15" class="source_line" href="#L15">15</a>
+<a id="L16" class="source_line" href="#L16">16</a>
+<a id="L17" class="source_line" href="#L17">17</a>
+<a id="L18" class="source_line" href="#L18">18</a>
+<a id="L19" class="source_line" href="#L19">19</a>
+<a id="L20" class="source_line" href="#L20">20</a>
+<a id="L21" class="source_line" href="#L21">21</a>
+<a id="L22" class="source_line" href="#L22">22</a>
+<a id="L23" class="source_line" href="#L23">23</a>
+<a id="L24" class="source_line" href="#L24">24</a>
+<a id="L25" class="source_line" href="#L25">25</a>
+<a id="L26" class="source_line" href="#L26">26</a>
+<a id="L27" class="source_line" href="#L27">27</a>
+<a id="L28" class="source_line" href="#L28">28</a>
+<a id="L29" class="source_line" href="#L29">29</a>
+<a id="L30" class="source_line" href="#L30">30</a>
+<a id="L31" class="source_line" href="#L31">31</a>
+<a id="L32" class="source_line" href="#L32">32</a>
+<a id="L33" class="source_line" href="#L33">33</a>
+<a id="L34" class="source_line" href="#L34">34</a>
+<a id="L35" class="source_line" href="#L35">35</a>
+<a id="L36" class="source_line" href="#L36">36</a>
+<a id="L37" class="source_line" href="#L37">37</a>
+<a id="L38" class="source_line" href="#L38">38</a>
+<a id="L39" class="source_line" href="#L39">39</a>
+<a id="L40" class="source_line" href="#L40">40</a>
+<a id="L41" class="source_line" href="#L41">41</a>
+<a id="L42" class="source_line" href="#L42">42</a>
+<a id="L43" class="source_line" href="#L43">43</a>
+<a id="L44" class="source_line" href="#L44">44</a>
+<a id="L45" class="source_line" href="#L45">45</a>
+<a id="L46" class="source_line" href="#L46">46</a>
+<a id="L47" class="source_line" href="#L47">47</a>
+<a id="L48" class="source_line" href="#L48">48</a>
+<a id="L49" class="source_line" href="#L49">49</a>
+<a id="L50" class="source_line" href="#L50">50</a>
+<a id="L51" class="source_line" href="#L51">51</a>
+<a id="L52" class="source_line" href="#L52">52</a>
+<a id="L53" class="source_line" href="#L53">53</a>
+<a id="L54" class="source_line" href="#L54">54</a>
+<a id="L55" class="source_line" href="#L55">55</a>
+<a id="L56" class="source_line" href="#L56">56</a>
+<a id="L57" class="source_line" href="#L57">57</a>
+<a id="L58" class="source_line" href="#L58">58</a>
+<a id="L59" class="source_line" href="#L59">59</a>
+<a id="L60" class="source_line" href="#L60">60</a>
+<a id="L61" class="source_line" href="#L61">61</a>
+<a id="L62" class="source_line" href="#L62">62</a>
+<a id="L63" class="source_line" href="#L63">63</a>
+<a id="L64" class="source_line" href="#L64">64</a>
+<a id="L65" class="source_line" href="#L65">65</a>
+<a id="L66" class="source_line" href="#L66">66</a>
+<a id="L67" class="source_line" href="#L67">67</a>
+<a id="L68" class="source_line" href="#L68">68</a>
+<a id="L69" class="source_line" href="#L69">69</a>
+<a id="L70" class="source_line" href="#L70">70</a>
+<a id="L71" class="source_line" href="#L71">71</a>
+<a id="L72" class="source_line" href="#L72">72</a>
+<a id="L73" class="source_line" href="#L73">73</a>
+<a id="L74" class="source_line" href="#L74">74</a>
+<a id="L75" class="source_line" href="#L75">75</a>
+<a id="L76" class="source_line" href="#L76">76</a>
+<a id="L77" class="source_line" href="#L77">77</a>
+<a id="L78" class="source_line" href="#L78">78</a>
+<a id="L79" class="source_line" href="#L79">79</a>
+<a id="L80" class="source_line" href="#L80">80</a>
+<a id="L81" class="source_line" href="#L81">81</a>
+<a id="L82" class="source_line" href="#L82">82</a>
+<a id="L83" class="source_line" href="#L83">83</a>
+<a id="L84" class="source_line" href="#L84">84</a>
+<a id="L85" class="source_line" href="#L85">85</a>
+<a id="L86" class="source_line" href="#L86">86</a>
+<a id="L87" class="source_line" href="#L87">87</a>
+<a id="L88" class="source_line" href="#L88">88</a>
+<a id="L89" class="source_line" href="#L89">89</a>
+<a id="L90" class="source_line" href="#L90">90</a>
+<a id="L91" class="source_line" href="#L91">91</a>
+<a id="L92" class="source_line" href="#L92">92</a>
+<a id="L93" class="source_line" href="#L93">93</a>
+<a id="L94" class="source_line" href="#L94">94</a>
+<a id="L95" class="source_line" href="#L95">95</a>
+<a id="L96" class="source_line" href="#L96">96</a>
+<a id="L97" class="source_line" href="#L97">97</a>
+<a id="L98" class="source_line" href="#L98">98</a>
+<a id="L99" class="source_line" href="#L99">99</a>
+<a id="L100" class="source_line" href="#L100">100</a>
+<a id="L101" class="source_line" href="#L101">101</a>
+<a id="L102" class="source_line" href="#L102">102</a>
+<a id="L103" class="source_line" href="#L103">103</a>
+<a id="L104" class="source_line" href="#L104">104</a>
+<a id="L105" class="source_line" href="#L105">105</a>
+<a id="L106" class="source_line" href="#L106">106</a>
+<a id="L107" class="source_line" href="#L107">107</a>
+<a id="L108" class="source_line" href="#L108">108</a>
+<a id="L109" class="source_line" href="#L109">109</a>
+<a id="L110" class="source_line" href="#L110">110</a>
+<a id="L111" class="source_line" href="#L111">111</a>
+<a id="L112" class="source_line" href="#L112">112</a>
+<a id="L113" class="source_line" href="#L113">113</a>
+<a id="L114" class="source_line" href="#L114">114</a>
+<a id="L115" class="source_line" href="#L115">115</a>
+<a id="L116" class="source_line" href="#L116">116</a>
+<a id="L117" class="source_line" href="#L117">117</a>
+<a id="L118" class="source_line" href="#L118">118</a>
+<a id="L119" class="source_line" href="#L119">119</a>
+</code><code class="source_code"><span><span class="COMMENT">(* YOCaml a static blog generator.
+   Copyright (C) 2024 Romain Calascibetta
+
+   This program is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program.  If not, see &lt;https://www.gnu.org/licenses/&gt;. *)</span><span class="EOL">
+</span><span class="EOL">
+</span><span id="module-Ctx"><span class="MODULE">module</span> <span class="UIDENT">Ctx</span> <span class="EQUAL">=</span> <span class="STRUCT">struct</span><span class="EOL">
+</span>  <span id="module-Ctx.type-error"><span class="TYPE">type</span> <span class="LIDENT">error</span> <span class="EQUAL">=</span> <span class="UIDENT">Unix</span><span class="DOT">.</span><span class="LIDENT">error</span> <span class="STAR">*</span> <span class="LIDENT">string</span> <span class="STAR">*</span> <span class="LIDENT">string</span></span><span class="EOL">
+</span>  <span id="module-Ctx.type-write_error"><span class="TYPE">type</span> <span class="LIDENT">write_error</span> <span class="EQUAL">=</span> <span class="LBRACKET">[</span> <span class="BACKQUOTE">`</span><span class="UIDENT">Closed</span> <span class="BAR">|</span> <span class="BACKQUOTE">`</span><span class="UIDENT">Error</span> <span class="OF">of</span> <span class="UIDENT">Unix</span><span class="DOT">.</span><span class="LIDENT">error</span> <span class="STAR">*</span> <span class="LIDENT">string</span> <span class="STAR">*</span> <span class="LIDENT">string</span> <span class="RBRACKET">]</span></span><span class="EOL">
+</span><span class="EOL">
+</span>  <span class="LET">let</span> <span id="module-Ctx.val-pp_error"><span class="LIDENT">pp_error</span></span> <span id="local_ppf_1"><span class="LIDENT">ppf</span></span> <span class="LPAREN">(</span><span id="local_err_2"><span class="LIDENT">err</span></span><span class="COMMA">,</span> <span id="local_f_3"><span class="LIDENT">f</span></span><span class="COMMA">,</span> <span id="local_v_4"><span class="LIDENT">v</span></span><span class="RPAREN">)</span> <span class="EQUAL">=</span><span class="EOL">
+</span>    <span class="UIDENT">Fmt</span><span class="DOT">.</span><span class="LIDENT">pf</span> <a href="#local_ppf_1"><span class="LIDENT">ppf</span></a> <span class="STRING">&quot;%s(%s): %s&quot;</span> <a href="#local_f_3"><span class="LIDENT">f</span></a> <a href="#local_v_4"><span class="LIDENT">v</span></a> <span class="LPAREN">(</span><span class="UIDENT">Unix</span><span class="DOT">.</span><span class="LIDENT">error_message</span> <a href="#local_err_2"><span class="LIDENT">err</span></a><span class="RPAREN">)</span><span class="EOL">
+</span><span class="EOL">
+</span>  <span class="LET">let</span> <span id="module-Ctx.val-pp_write_error"><span class="LIDENT">pp_write_error</span></span> <span id="local_ppf_5"><span class="LIDENT">ppf</span></span> <span class="EQUAL">=</span> <span class="FUNCTION">function</span><span class="EOL">
+</span>    <span class="BAR">|</span> <span class="BACKQUOTE">`</span><span class="UIDENT">Closed</span> <span class="MINUSGREATER">-&gt;</span> <span class="UIDENT">Fmt</span><span class="DOT">.</span><span class="LIDENT">pf</span> <a href="#local_ppf_5"><span class="LIDENT">ppf</span></a> <span class="STRING">&quot;Connection closed by peer&quot;</span><span class="EOL">
+</span>    <span class="BAR">|</span> <span class="BACKQUOTE">`</span><span class="UIDENT">Error</span> <span class="LPAREN">(</span><span id="local_err_6"><span class="LIDENT">err</span></span><span class="COMMA">,</span> <span id="local_f_7"><span class="LIDENT">f</span></span><span class="COMMA">,</span> <span id="local_v_8"><span class="LIDENT">v</span></span><span class="RPAREN">)</span> <span class="MINUSGREATER">-&gt;</span> <span class="UIDENT">Fmt</span><span class="DOT">.</span><span class="LIDENT">pf</span> <a href="#local_ppf_5"><span class="LIDENT">ppf</span></a> <span class="STRING">&quot;%s(%s): %s&quot;</span> <a href="#local_f_7"><span class="LIDENT">f</span></a> <a href="#local_v_8"><span class="LIDENT">v</span></a> <span class="LPAREN">(</span><span class="UIDENT">Unix</span><span class="DOT">.</span><span class="LIDENT">error_message</span> <a href="#local_err_6"><span class="LIDENT">err</span></a><span class="RPAREN">)</span><span class="EOL">
+</span><span class="EOL">
+</span>  <span id="module-Ctx.type-flow"><span class="TYPE">type</span> <span class="LIDENT">flow</span> <span class="EQUAL">=</span> <span class="LBRACE">{</span> <span id="def_61"><span class="LIDENT">ic</span> <span class="COLON">:</span> <a href="../../../ocaml-compiler/src/stdlib/stdlib.ml.html#type-in_channel"><span class="LIDENT">in_channel</span></a><span class="SEMI">;</span></span> <span id="def_62"><span class="LIDENT">oc</span> <span class="COLON">:</span> <a href="../../../ocaml-compiler/src/stdlib/stdlib.ml.html#type-out_channel"><span class="LIDENT">out_channel</span></a></span> <span class="RBRACE">}</span></span><span class="EOL">
+</span><span class="EOL">
+</span>  <span id="module-Ctx.type-endpoint"><span class="TYPE">type</span> <span class="LIDENT">endpoint</span> <span class="EQUAL">=</span> <span class="LBRACE">{</span><span class="EOL">
+</span>      <span id="def_56"><span class="LIDENT">user</span> <span class="COLON">:</span> <span class="LIDENT">string</span><span class="EOL">
+</span>    <span class="SEMI">;</span></span> <span id="def_57"><span class="LIDENT">path</span> <span class="COLON">:</span> <span class="LIDENT">string</span><span class="EOL">
+</span>    <span class="SEMI">;</span></span> <span id="def_55"><span class="LIDENT">host</span> <span class="COLON">:</span> <span class="LIDENT">string</span><span class="EOL">
+</span>    <span class="SEMI">;</span></span> <span id="def_60"><span class="LIDENT">port</span> <span class="COLON">:</span> <span class="LIDENT">int</span><span class="EOL">
+</span>    <span class="SEMI">;</span></span> <span id="def_58"><span class="LIDENT">mode</span> <span class="COLON">:</span> <span class="LBRACKET">[</span> <span class="BACKQUOTE">`</span><span class="UIDENT">Rd</span> <span class="BAR">|</span> <span class="BACKQUOTE">`</span><span class="UIDENT">Wr</span> <span class="RBRACKET">]</span></span><span class="EOL">
+</span>  <span class="RBRACE">}</span></span><span class="EOL">
+</span><span class="EOL">
+</span>  <span class="LET">let</span> <span id="module-Ctx.val-connect"><span class="LIDENT">connect</span></span> <span class="LBRACE">{</span> <span id="local_user_9"><span class="LIDENT">user</span></span><span class="SEMI">;</span> <span id="local_path_10"><span class="LIDENT">path</span></span><span class="SEMI">;</span> <span id="local_host_11"><span class="LIDENT">host</span></span><span class="SEMI">;</span> <span id="local_port_12"><span class="LIDENT">port</span></span><span class="SEMI">;</span> <span id="local_mode_13"><span class="LIDENT">mode</span></span> <span class="RBRACE">}</span> <span class="EQUAL">=</span><span class="EOL">
+</span>    <span class="LET">let</span> <span id="local_edn_14"><span class="LIDENT">edn</span></span> <span class="EQUAL">=</span> <span class="UIDENT">Fmt</span><span class="DOT">.</span><span class="LIDENT">str</span> <span class="STRING">&quot;%s@%s&quot;</span> <a href="#local_user_9"><span class="LIDENT">user</span></a> <a href="#local_host_11"><span class="LIDENT">host</span></a> <span class="IN">in</span><span class="EOL">
+</span>    <span class="LET">let</span> <span id="local_cmd_15"><span class="LIDENT">cmd</span></span> <span class="EQUAL">=</span><span class="EOL">
+</span>      <span class="MATCH">match</span> <a href="#local_mode_13"><span class="LIDENT">mode</span></a> <span class="WITH">with</span><span class="EOL">
+</span>      <span class="BAR">|</span> <span class="BACKQUOTE">`</span><span class="UIDENT">Wr</span> <span class="MINUSGREATER">-&gt;</span> <span class="UIDENT">Fmt</span><span class="DOT">.</span><span class="LIDENT">str</span> <span class="STRING">{sh|git-receive-pack '%s'|sh}</span> <a href="#local_path_10"><span class="LIDENT">path</span></a><span class="EOL">
+</span>      <span class="BAR">|</span> <span class="BACKQUOTE">`</span><span class="UIDENT">Rd</span> <span class="MINUSGREATER">-&gt;</span> <span class="UIDENT">Fmt</span><span class="DOT">.</span><span class="LIDENT">str</span> <span class="STRING">{sh|git-upload-pack '%s'|sh}</span> <a href="#local_path_10"><span class="LIDENT">path</span></a><span class="EOL">
+</span>    <span class="IN">in</span><span class="EOL">
+</span>    <span class="LET">let</span> <span id="local_cmd_16"><span class="LIDENT">cmd</span></span> <span class="EQUAL">=</span> <span class="UIDENT">Fmt</span><span class="DOT">.</span><span class="LIDENT">str</span> <span class="STRING">&quot;ssh -p %d %s %a&quot;</span> <a href="#local_port_12"><span class="LIDENT">port</span></a> <a href="#local_edn_14"><span class="LIDENT">edn</span></a> <span class="UIDENT">Fmt</span><span class="DOT">.</span><span class="LPAREN">(</span><span class="LIDENT">quote</span> <span class="LIDENT">string</span><span class="RPAREN">)</span> <a href="#local_cmd_15"><span class="LIDENT">cmd</span></a> <span class="IN">in</span><span class="EOL">
+</span>    <span class="TRY">try</span><span class="EOL">
+</span>      <span class="LET">let</span> <span id="def_54"><span id="local_ic_17"><span class="LIDENT">ic</span></span><span class="COMMA">,</span> <span id="local_oc_18"><span class="LIDENT">oc</span></span></span> <span class="EQUAL">=</span> <span class="UIDENT">Unix</span><span class="DOT">.</span><span class="LIDENT">open_process</span> <a href="#local_cmd_16"><span class="LIDENT">cmd</span></a> <span class="IN">in</span><span class="EOL">
+</span>      <a href="../../../lwt/src/lwt/lwt.ml.html#module-Trivial_promises.val-return_ok"><span class="UIDENT">Lwt</span><span class="DOT">.</span><span class="LIDENT">return_ok</span></a> <span class="LBRACE">{</span> <a href="#local_ic_17"><span class="LIDENT">ic</span></a><span class="SEMI">;</span> <a href="#local_oc_18"><span class="LIDENT">oc</span></a> <span class="RBRACE">}</span><span class="EOL">
+</span>    <span class="WITH">with</span> <span class="UIDENT">Unix</span><span class="DOT">.</span><span class="UIDENT">Unix_error</span> <span class="LPAREN">(</span><span id="local_err_19"><span class="LIDENT">err</span></span><span class="COMMA">,</span> <span id="local_f_20"><span class="LIDENT">f</span></span><span class="COMMA">,</span> <span id="local_v_21"><span class="LIDENT">v</span></span><span class="RPAREN">)</span> <span class="MINUSGREATER">-&gt;</span> <a href="../../../lwt/src/lwt/lwt.ml.html#module-Trivial_promises.val-return_error"><span class="UIDENT">Lwt</span><span class="DOT">.</span><span class="LIDENT">return_error</span></a> <span class="LPAREN">(</span><span class="BACKQUOTE">`</span><span class="UIDENT">Error</span> <span class="LPAREN">(</span><a href="#local_err_19"><span class="LIDENT">err</span></a><span class="COMMA">,</span> <a href="#local_f_20"><span class="LIDENT">f</span></a><span class="COMMA">,</span> <a href="#local_v_21"><span class="LIDENT">v</span></a><span class="RPAREN">)</span><span class="RPAREN">)</span><span class="EOL">
+</span><span class="EOL">
+</span>  <span class="LET">let</span> <span id="module-Ctx.val-read"><span class="LIDENT">read</span></span> <span id="local_t_22"><span class="LIDENT">t</span></span> <span class="EQUAL">=</span><span class="EOL">
+</span>    <span class="LET">let</span> <span id="local_tmp_23"><span class="LIDENT">tmp</span></span> <span class="EQUAL">=</span> <a href="../../../ocaml-compiler/src/stdlib/bytes.ml.html#val-create"><span class="UIDENT">Bytes</span><span class="DOT">.</span><span class="LIDENT">create</span></a> <span class="INT">0x1000</span> <span class="IN">in</span><span class="EOL">
+</span>    <span class="TRY">try</span><span class="EOL">
+</span>      <span class="LET">let</span> <span id="local_len_24"><span class="LIDENT">len</span></span> <span class="EQUAL">=</span> <a href="../../../ocaml-compiler/src/stdlib/stdlib.ml.html#val-input"><span class="LIDENT">input</span></a> <a href="#local_t_22"><span class="LIDENT">t</span></a><span class="DOT">.</span><span class="LIDENT">ic</span> <a href="#local_tmp_23"><span class="LIDENT">tmp</span></a> <span class="INT">0</span> <span class="INT">0x1000</span> <span class="IN">in</span><span class="EOL">
+</span>      <span class="IF">if</span> <a href="#local_len_24"><span class="LIDENT">len</span></a> <a href="../../../ocaml-compiler/src/stdlib/stdlib.ml.html#val-(=)"><span class="EQUAL">=</span></a> <span class="INT">0</span> <span class="THEN">then</span> <a href="../../../lwt/src/lwt/lwt.ml.html#module-Trivial_promises.val-return_ok"><span class="UIDENT">Lwt</span><span class="DOT">.</span><span class="LIDENT">return_ok</span></a> <span class="BACKQUOTE">`</span><span class="UIDENT">Eof</span><span class="EOL">
+</span>      <span class="ELSE">else</span> <a href="../../../lwt/src/lwt/lwt.ml.html#module-Trivial_promises.val-return_ok"><span class="UIDENT">Lwt</span><span class="DOT">.</span><span class="LIDENT">return_ok</span></a> <span class="LPAREN">(</span><span class="BACKQUOTE">`</span><span class="UIDENT">Data</span> <span class="LPAREN">(</span><a href="../../../cstruct/src/cstruct/cstruct.ml.html#val-of_bytes"><span class="UIDENT">Cstruct</span><span class="DOT">.</span><span class="LIDENT">of_bytes</span></a> <a href="#local_tmp_23"><span class="LIDENT">tmp</span></a> <span class="LABEL">~off:</span><span class="INT">0</span> <span class="TILDE">~</span><a href="#local_len_24"><span class="LIDENT">len</span></a><span class="RPAREN">)</span><span class="RPAREN">)</span><span class="EOL">
+</span>    <span class="WITH">with</span> <span class="UIDENT">Unix</span><span class="DOT">.</span><span class="UIDENT">Unix_error</span> <span class="LPAREN">(</span><span id="local_err_25"><span class="LIDENT">err</span></span><span class="COMMA">,</span> <span id="local_f_26"><span class="LIDENT">f</span></span><span class="COMMA">,</span> <span id="local_v_27"><span class="LIDENT">v</span></span><span class="RPAREN">)</span> <span class="MINUSGREATER">-&gt;</span> <a href="../../../lwt/src/lwt/lwt.ml.html#module-Trivial_promises.val-return_error"><span class="UIDENT">Lwt</span><span class="DOT">.</span><span class="LIDENT">return_error</span></a> <span class="LPAREN">(</span><a href="#local_err_25"><span class="LIDENT">err</span></a><span class="COMMA">,</span> <a href="#local_f_26"><span class="LIDENT">f</span></a><span class="COMMA">,</span> <a href="#local_v_27"><span class="LIDENT">v</span></a><span class="RPAREN">)</span><span class="EOL">
+</span><span class="EOL">
+</span>  <span class="LET">let</span> <span id="module-Ctx.val-write"><span class="LIDENT">write</span></span> <span id="local_t_28"><span class="LIDENT">t</span></span> <span id="local_cs_29"><span class="LIDENT">cs</span></span> <span class="EQUAL">=</span><span class="EOL">
+</span>    <span class="LET">let</span> <span id="local_str_30"><span class="LIDENT">str</span></span> <span class="EQUAL">=</span> <a href="../../../cstruct/src/cstruct/cstruct.ml.html#val-to_string"><span class="UIDENT">Cstruct</span><span class="DOT">.</span><span class="LIDENT">to_string</span></a> <a href="#local_cs_29"><span class="LIDENT">cs</span></a> <span class="IN">in</span><span class="EOL">
+</span>    <span class="TRY">try</span><span class="EOL">
+</span>      <a href="../../../ocaml-compiler/src/stdlib/stdlib.ml.html#val-output_string"><span class="LIDENT">output_string</span></a> <a href="#local_t_28"><span class="LIDENT">t</span></a><span class="DOT">.</span><span class="LIDENT">oc</span> <a href="#local_str_30"><span class="LIDENT">str</span></a><span class="SEMI">;</span><span class="EOL">
+</span>      <a href="../../../ocaml-compiler/src/stdlib/stdlib.ml.html#val-flush"><span class="LIDENT">flush</span></a> <a href="#local_t_28"><span class="LIDENT">t</span></a><span class="DOT">.</span><span class="LIDENT">oc</span><span class="SEMI">;</span><span class="EOL">
+</span>      <a href="../../../lwt/src/lwt/lwt.ml.html#module-Trivial_promises.val-return_ok"><span class="UIDENT">Lwt</span><span class="DOT">.</span><span class="LIDENT">return_ok</span></a> <span class="LPAREN">(</span><span class="RPAREN">)</span><span class="EOL">
+</span>    <span class="WITH">with</span> <span class="UIDENT">Unix</span><span class="DOT">.</span><span class="UIDENT">Unix_error</span> <span class="LPAREN">(</span><span id="local_err_31"><span class="LIDENT">err</span></span><span class="COMMA">,</span> <span id="local_f_32"><span class="LIDENT">f</span></span><span class="COMMA">,</span> <span id="local_v_33"><span class="LIDENT">v</span></span><span class="RPAREN">)</span> <span class="MINUSGREATER">-&gt;</span> <a href="../../../lwt/src/lwt/lwt.ml.html#module-Trivial_promises.val-return_error"><span class="UIDENT">Lwt</span><span class="DOT">.</span><span class="LIDENT">return_error</span></a> <span class="LPAREN">(</span><span class="BACKQUOTE">`</span><span class="UIDENT">Error</span> <span class="LPAREN">(</span><a href="#local_err_31"><span class="LIDENT">err</span></a><span class="COMMA">,</span> <a href="#local_f_32"><span class="LIDENT">f</span></a><span class="COMMA">,</span> <a href="#local_v_33"><span class="LIDENT">v</span></a><span class="RPAREN">)</span><span class="RPAREN">)</span><span class="EOL">
+</span><span class="EOL">
+</span>  <span class="LET">let</span> <span id="module-Ctx.val-writev"><span class="LIDENT">writev</span></span> <span id="local_t_34"><span class="LIDENT">t</span></span> <span id="local_css_35"><span class="LIDENT">css</span></span> <span class="EQUAL">=</span><span class="EOL">
+</span>    <span class="LET">let</span> <span class="REC">rec</span> <span id="local_go_36"><span class="LIDENT">go</span></span> <span id="local_t_37"><span class="LIDENT">t</span></span> <span class="EQUAL">=</span> <span class="FUNCTION">function</span><span class="EOL">
+</span>      <span class="BAR">|</span> <span class="LBRACKET">[</span><span class="RBRACKET">]</span> <span class="MINUSGREATER">-&gt;</span> <a href="../../../lwt/src/lwt/lwt.ml.html#module-Trivial_promises.val-return_ok"><span class="UIDENT">Lwt</span><span class="DOT">.</span><span class="LIDENT">return_ok</span></a> <span class="LPAREN">(</span><span class="RPAREN">)</span><span class="EOL">
+</span>      <span class="BAR">|</span> <span id="local_x_38"><span class="LIDENT">x</span></span> <span class="COLONCOLON">::</span> <span id="local_r_39"><span class="LIDENT">r</span></span> <span class="MINUSGREATER">-&gt;</span> <span class="LPAREN">(</span><span class="EOL">
+</span>          <span class="LET">let</span> <span class="OPEN">open</span> <a href="../../../lwt/src/lwt/lwt.ml.html#module-Infix"><span class="UIDENT">Lwt</span><span class="DOT">.</span><span class="UIDENT">Infix</span></a> <span class="IN">in</span><span class="EOL">
+</span>          <span class="LIDENT">write</span> <a href="#local_t_37"><span class="LIDENT">t</span></a> <a href="#local_x_38"><span class="LIDENT">x</span></a> <a href="../../../lwt/src/lwt/lwt.ml.html#module-Infix.val-(&gt;&gt;=)"><span class="INFIXOP0">&gt;&gt;=</span></a> <span class="FUNCTION">function</span><span class="EOL">
+</span>          <span class="BAR">|</span> <span class="UIDENT">Ok</span> <span class="LPAREN">(</span><span class="RPAREN">)</span> <span class="MINUSGREATER">-&gt;</span> <a href="#local_go_36"><span class="LIDENT">go</span></a> <a href="#local_t_37"><span class="LIDENT">t</span></a> <a href="#local_r_39"><span class="LIDENT">r</span></a><span class="EOL">
+</span>          <span class="BAR">|</span> <span class="UIDENT">Error</span> <span class="UNDERSCORE">_</span> <span class="AS">as</span> <span id="local_err_40"><span class="LIDENT">err</span></span> <span class="MINUSGREATER">-&gt;</span> <a href="../../../lwt/src/lwt/lwt.ml.html#module-Trivial_promises.val-return"><span class="UIDENT">Lwt</span><span class="DOT">.</span><span class="LIDENT">return</span></a> <a href="#local_err_40"><span class="LIDENT">err</span></a><span class="RPAREN">)</span><span class="EOL">
+</span>    <span class="IN">in</span><span class="EOL">
+</span>    <a href="#local_go_36"><span class="LIDENT">go</span></a> <a href="#local_t_34"><span class="LIDENT">t</span></a> <a href="#local_css_35"><span class="LIDENT">css</span></a><span class="EOL">
+</span><span class="EOL">
+</span>  <span class="LET">let</span> <span id="module-Ctx.val-close"><span class="LIDENT">close</span></span> <span id="local_t_41"><span class="LIDENT">t</span></span> <span class="EQUAL">=</span><span class="EOL">
+</span>    <a href="../../../ocaml-compiler/src/stdlib/stdlib.ml.html#val-close_in"><span class="LIDENT">close_in</span></a> <a href="#local_t_41"><span class="LIDENT">t</span></a><span class="DOT">.</span><span class="LIDENT">ic</span><span class="SEMI">;</span><span class="EOL">
+</span>    <a href="../../../ocaml-compiler/src/stdlib/stdlib.ml.html#val-close_out"><span class="LIDENT">close_out</span></a> <a href="#local_t_41"><span class="LIDENT">t</span></a><span class="DOT">.</span><span class="LIDENT">oc</span><span class="SEMI">;</span><span class="EOL">
+</span>    <a href="../../../lwt/src/lwt/lwt.ml.html#module-Trivial_promises.val-return_unit"><span class="UIDENT">Lwt</span><span class="DOT">.</span><span class="LIDENT">return_unit</span></a><span class="EOL">
+</span><span class="EOL">
+</span>  <span class="LET">let</span> <span id="module-Ctx.val-shutdown"><span class="LIDENT">shutdown</span></span> <span id="local_t_42"><span class="LIDENT">t</span></span> <span class="EQUAL">=</span> <span class="FUNCTION">function</span><span class="EOL">
+</span>    <span class="BAR">|</span> <span class="BACKQUOTE">`</span><span class="LIDENT">read</span> <span class="MINUSGREATER">-&gt;</span><span class="EOL">
+</span>        <a href="../../../ocaml-compiler/src/stdlib/stdlib.ml.html#val-close_in"><span class="LIDENT">close_in</span></a> <a href="#local_t_42"><span class="LIDENT">t</span></a><span class="DOT">.</span><span class="LIDENT">ic</span><span class="SEMI">;</span><span class="EOL">
+</span>        <a href="../../../lwt/src/lwt/lwt.ml.html#module-Trivial_promises.val-return_unit"><span class="UIDENT">Lwt</span><span class="DOT">.</span><span class="LIDENT">return_unit</span></a><span class="EOL">
+</span>    <span class="BAR">|</span> <span class="BACKQUOTE">`</span><span class="LIDENT">write</span> <span class="MINUSGREATER">-&gt;</span><span class="EOL">
+</span>        <a href="../../../ocaml-compiler/src/stdlib/stdlib.ml.html#val-close_out"><span class="LIDENT">close_out</span></a> <a href="#local_t_42"><span class="LIDENT">t</span></a><span class="DOT">.</span><span class="LIDENT">oc</span><span class="SEMI">;</span><span class="EOL">
+</span>        <a href="../../../lwt/src/lwt/lwt.ml.html#module-Trivial_promises.val-return_unit"><span class="UIDENT">Lwt</span><span class="DOT">.</span><span class="LIDENT">return_unit</span></a><span class="EOL">
+</span>    <span class="BAR">|</span> <span class="BACKQUOTE">`</span><span class="LIDENT">read_write</span> <span class="MINUSGREATER">-&gt;</span> <span class="LIDENT">close</span> <a href="#local_t_42"><span class="LIDENT">t</span></a><span class="EOL">
+</span><span class="END">end</span></span><span class="EOL">
+</span><span class="EOL">
+</span><span class="LET">let</span> <span id="val-register"><span class="LIDENT">register</span></span> <span class="QUESTION">?</span><span id="local_priority_43"><span class="LIDENT">priority</span></span> <span class="QUESTION">?</span><span class="LPAREN">(</span><span id="local_name_44"><span class="LIDENT">name</span></span> <span class="EQUAL">=</span> <span class="STRING">&quot;ssh&quot;</span><span class="RPAREN">)</span> <span class="LPAREN">(</span><span class="RPAREN">)</span> <span class="EQUAL">=</span><span class="EOL">
+</span>  <a href="../../../mimic/src/mimic/mimic.ml.html#val-register"><span class="UIDENT">Mimic</span><span class="DOT">.</span><span class="LIDENT">register</span></a> <span class="QUESTION">?</span><a href="#local_priority_43"><span class="LIDENT">priority</span></a> <span class="TILDE">~</span><a href="#local_name_44"><span class="LIDENT">name</span></a> <span class="LPAREN">(</span><span class="MODULE">module</span> <span class="UIDENT">Ctx</span><span class="RPAREN">)</span><span class="EOL">
+</span><span class="EOL">
+</span><span class="LET">let</span> <span id="val-context"><span class="LIDENT">context</span></span> <span class="LPAREN">(</span><span class="RPAREN">)</span> <span class="EQUAL">=</span><span class="EOL">
+</span>  <span class="LET">let</span> <span id="def_59"><span id="local_ssh_edn_45"><span class="LIDENT">ssh_edn</span></span><span class="COMMA">,</span> <span class="UNDERSCORE">_</span></span> <span class="EQUAL">=</span> <span class="LIDENT">register</span> <span class="LPAREN">(</span><span class="RPAREN">)</span> <span class="IN">in</span><span class="EOL">
+</span>  <span class="LET">let</span> <span id="local_k_46"><span class="LIDENT">k</span></span> <span id="local_scheme_47"><span class="LIDENT">scheme</span></span> <span id="local_user_48"><span class="LIDENT">user</span></span> <span id="local_path_49"><span class="LIDENT">path</span></span> <span id="local_host_50"><span class="LIDENT">host</span></span> <span id="local_port_51"><span class="LIDENT">port</span></span> <span id="local_mode_52"><span class="LIDENT">mode</span></span> <span class="EQUAL">=</span><span class="EOL">
+</span>    <span class="MATCH">match</span> <a href="#local_scheme_47"><span class="LIDENT">scheme</span></a> <span class="WITH">with</span><span class="EOL">
+</span>    <span class="BAR">|</span> <span class="BACKQUOTE">`</span><span class="UIDENT">SSH</span> <span class="MINUSGREATER">-&gt;</span> <a href="../../../lwt/src/lwt/lwt.ml.html#module-Trivial_promises.val-return_some"><span class="UIDENT">Lwt</span><span class="DOT">.</span><span class="LIDENT">return_some</span></a> <span class="LBRACE">{</span> <a href="#local_user_48"><span class="UIDENT">Ctx</span><span class="DOT">.</span><span class="LIDENT">user</span></a><span class="SEMI">;</span> <a href="#local_path_49"><span class="LIDENT">path</span></a><span class="SEMI">;</span> <a href="#local_host_50"><span class="LIDENT">host</span></a><span class="SEMI">;</span> <a href="#local_port_51"><span class="LIDENT">port</span></a><span class="SEMI">;</span> <a href="#local_mode_52"><span class="LIDENT">mode</span></a> <span class="RBRACE">}</span><span class="EOL">
+</span>    <span class="BAR">|</span> <span class="UNDERSCORE">_</span> <span class="MINUSGREATER">-&gt;</span> <a href="../../../lwt/src/lwt/lwt.ml.html#module-Trivial_promises.val-return_none"><span class="UIDENT">Lwt</span><span class="DOT">.</span><span class="LIDENT">return_none</span></a><span class="EOL">
+</span>  <span class="IN">in</span><span class="EOL">
+</span>  <span class="LET">let</span> <span class="OPEN">open</span> <a href="../../../lwt/src/lwt/lwt.ml.html#module-Syntax"><span class="UIDENT">Lwt</span><span class="DOT">.</span><span class="UIDENT">Syntax</span></a> <span class="IN">in</span><span class="EOL">
+</span>  <span class="LETOP">let+</span> <span id="local_context_53"><span class="LIDENT">context</span></span> <span class="EQUAL">=</span> <a href="../../../git-unix/src/git-unix/git_unix.ml.html#val-ctx"><span class="UIDENT">Git_unix</span><span class="DOT">.</span><span class="LIDENT">ctx</span></a> <span class="INFIXOP1">@@</span> <a href="../../../happy-eyeballs-lwt/src/happy-eyeballs-lwt/happy_eyeballs_lwt.ml.html#val-create"><span class="UIDENT">Happy_eyeballs_lwt</span><span class="DOT">.</span><span class="LIDENT">create</span></a> <span class="LPAREN">(</span><span class="RPAREN">)</span> <span class="IN">in</span><span class="EOL">
+</span>  <a href="#local_context_53"><span class="LIDENT">context</span></a><span class="EOL">
+</span>  <span class="INFIXOP0">|&gt;</span> <a href="../../../mimic/src/mimic/mimic.ml.html#val-fold"><span class="UIDENT">Mimic</span><span class="DOT">.</span><span class="LIDENT">fold</span></a> <a href="../../../git/src/git.nss.git/smart_git.ml.html#val-git_transmission"><span class="UIDENT">Smart_git</span><span class="DOT">.</span><span class="LIDENT">git_transmission</span></a><span class="EOL">
+</span>       <a href="../../../mimic/src/mimic/mimic.ml.html#module-Fun"><span class="UIDENT">Mimic</span><span class="DOT">.</span><span class="UIDENT">Fun</span></a><span class="DOT">.</span><span class="LBRACKET">[</span> <a href="../../../mimic/src/mimic/mimic.ml.html#module-Fun.val-req"><span class="LIDENT">req</span></a> <a href="../../../git/src/git.nss.git/smart_git.ml.html#val-git_scheme"><span class="UIDENT">Smart_git</span><span class="DOT">.</span><span class="LIDENT">git_scheme</span></a> <span class="RBRACKET">]</span><span class="EOL">
+</span>       <span class="LABEL">~k:</span><span class="LPAREN">(</span><span class="FUNCTION">function</span> <span class="BACKQUOTE">`</span><span class="UIDENT">SSH</span> <span class="MINUSGREATER">-&gt;</span> <a href="../../../lwt/src/lwt/lwt.ml.html#module-Trivial_promises.val-return_some"><span class="UIDENT">Lwt</span><span class="DOT">.</span><span class="LIDENT">return_some</span></a> <span class="BACKQUOTE">`</span><span class="UIDENT">Exec</span> <span class="BAR">|</span> <span class="UNDERSCORE">_</span> <span class="MINUSGREATER">-&gt;</span> <a href="../../../lwt/src/lwt/lwt.ml.html#module-Trivial_promises.val-return_none"><span class="UIDENT">Lwt</span><span class="DOT">.</span><span class="LIDENT">return_none</span></a><span class="RPAREN">)</span><span class="EOL">
+</span>  <span class="INFIXOP0">|&gt;</span> <a href="../../../mimic/src/mimic/mimic.ml.html#val-fold"><span class="UIDENT">Mimic</span><span class="DOT">.</span><span class="LIDENT">fold</span></a> <a href="#local_ssh_edn_45"><span class="LIDENT">ssh_edn</span></a><span class="EOL">
+</span>       <a href="../../../mimic/src/mimic/mimic.ml.html#module-Fun"><span class="UIDENT">Mimic</span><span class="DOT">.</span><span class="UIDENT">Fun</span></a><span class="DOT">.</span><span class="EOL">
+</span>         <span class="LBRACKET">[</span><span class="EOL">
+</span>           <a href="../../../mimic/src/mimic/mimic.ml.html#module-Fun.val-req"><span class="LIDENT">req</span></a> <a href="../../../git/src/git.nss.git/smart_git.ml.html#val-git_scheme"><span class="UIDENT">Smart_git</span><span class="DOT">.</span><span class="LIDENT">git_scheme</span></a><span class="EOL">
+</span>         <span class="SEMI">;</span> <a href="../../../mimic/src/mimic/mimic.ml.html#module-Fun.val-req"><span class="LIDENT">req</span></a> <a href="../../../git/src/git.nss.git/smart_git.ml.html#val-git_ssh_user"><span class="UIDENT">Smart_git</span><span class="DOT">.</span><span class="LIDENT">git_ssh_user</span></a><span class="EOL">
+</span>         <span class="SEMI">;</span> <a href="../../../mimic/src/mimic/mimic.ml.html#module-Fun.val-req"><span class="LIDENT">req</span></a> <a href="../../../git/src/git.nss.git/smart_git.ml.html#val-git_path"><span class="UIDENT">Smart_git</span><span class="DOT">.</span><span class="LIDENT">git_path</span></a><span class="EOL">
+</span>         <span class="SEMI">;</span> <a href="../../../mimic/src/mimic/mimic.ml.html#module-Fun.val-req"><span class="LIDENT">req</span></a> <a href="../../../git/src/git.nss.git/smart_git.ml.html#val-git_hostname"><span class="UIDENT">Smart_git</span><span class="DOT">.</span><span class="LIDENT">git_hostname</span></a><span class="EOL">
+</span>         <span class="SEMI">;</span> <a href="../../../mimic/src/mimic/mimic.ml.html#module-Fun.val-dft"><span class="LIDENT">dft</span></a> <a href="../../../git/src/git.nss.git/smart_git.ml.html#val-git_port"><span class="UIDENT">Smart_git</span><span class="DOT">.</span><span class="LIDENT">git_port</span></a> <span class="INT">22</span><span class="EOL">
+</span>         <span class="SEMI">;</span> <a href="../../../mimic/src/mimic/mimic.ml.html#module-Fun.val-req"><span class="LIDENT">req</span></a> <a href="../../../git/src/git.nss.git/smart_git.ml.html#val-git_capabilities"><span class="UIDENT">Smart_git</span><span class="DOT">.</span><span class="LIDENT">git_capabilities</span></a><span class="EOL">
+</span>         <span class="RBRACKET">]</span><span class="EOL">
+</span>       <span class="TILDE">~</span><a href="#local_k_46"><span class="LIDENT">k</span></a><span class="EOL">
+</span></span></code></pre></body></html>

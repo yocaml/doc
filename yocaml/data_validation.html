@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"><head><title>data_validation (yocaml.data_validation)</title><meta charset="utf-8"/><link rel="stylesheet" href="../odoc.css"/><meta name="generator" content="odoc 3.0.0"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/><script src="../highlight.pack.js"></script><script>hljs.initHighlightingOnLoad();</script><script>let base_url = '../';
+let search_urls = ['sherlodoc_db.js','../sherlodoc.js'];
+</script><script src="../odoc_search.js" defer="defer"></script></head><body class="odoc"><nav class="odoc-nav"><a href="index.html">Up</a> – <a href="../index.html">Package index</a> &#x00BB; <a href="index.html">YOCaml</a> &#x00BB; Generic validation of structured data</nav><div class="odoc-search"><div class="search-inner"><input class="search-bar" placeholder="🔎 Type '/' to search..."/><div class="search-snake"></div><div class="search-result"></div></div></div><header class="odoc-preamble"><h1 id="generic-validation-of-structured-data"><a href="#generic-validation-of-structured-data" class="anchor"></a>Generic validation of structured data</h1><p>YOCaml is a <b>framework for building static site generators</b> (a very small build-system, biased towards building web applications), and not a static site generator. It therefore needs to be as versatile as possible to allow <i>plugins</i> capable of adapting to its delivery model to be associated with it later. A key point is the arbitrary management of data associated with a dependency used to construct an artefact. For example, we would like to be able to associate metadata with articles or pages.</p><p>In this tutorial, we'll look at how YOCaml can generically handle data sources in various formats (for example <code>Yaml</code>, <code>Json</code> or <code>Toml</code>) and how to build validators capable of transforming these data into OCaml values, to make them more comfortable to use.</p><p>This document is written in <i>literate programming</i> (using <a href="https://github.com/realworldocaml/mdx">MDX</a>) and the examples are executed (and enrich the unit test base by means of expectation tests).</p><p>In this guide, we will first see how YOCaml attempts to be generic about the data format describing metadata (associated with sources or injected into templates), however, in this guide, we will only focus on the <b>validation</b> part.</p></header><div class="odoc-tocs"><nav class="odoc-toc odoc-local-toc"><ul><li><a href="#description-of-a-generic-data-model">Description of a generic data model</a></li><li><a href="#modules-organisation">Modules Organisation</a></li><li><a href="#implementation-of-validation-function">Implementation of validation function</a><ul><li><a href="#validating-simple-shapes">Validating simple shapes</a><ul><li><a href="#the-special-case-of-strings">The special case of strings</a></li></ul></li><li><a href="#dealing-with-list">Dealing with list</a></li><li><a href="#dealing-with-records">Dealing with records</a></li><li><a href="#additional-validators">Additional Validators</a><ul><li><a href="#dealing-with-options">Dealing with options</a></li><li><a href="#dealing-with-products">Dealing with products</a></li><li><a href="#dealing-with-sums">Dealing with sums</a></li></ul></li><li><a href="#create-a-low-level-validator">Create a low-level validator</a></li><li><a href="#fine-grained-validators">Fine-grained validators</a><ul><li><a href="#mapping">Mapping</a></li><li><a href="#sequential-application">sequential application</a></li><li><a href="#alternatives">Alternatives</a></li></ul></li></ul></li><li><a href="#executing-preconditions/postconditions">Executing preconditions/postconditions</a></li></ul></nav><nav class="odoc-toc odoc-global-toc"><ul><li><a href="index.html">YOCaml</a><ul><li><a href="#" class="current_unit">Generic validation of structured data</a></li><li><a href="effect.html">Effect abstraction</a></li><li>Library <code>yocaml</code><ul><li><a href="yocaml/Yocaml/index.html">Yocaml</a></li></ul></li><li><a href="src/index.html">Sources</a></li></ul></li></ul></nav></div><div class="odoc-content"><h2 id="description-of-a-generic-data-model"><a href="#description-of-a-generic-data-model" class="anchor"></a>Description of a generic data model</h2><p>In the first version of YOCaml, we built validation functions based on visitors and which took first-class modules as arguments, as handlers, to describe the validation strategy for a format describing metadata. This approach works (and has been used in YOCaml blogs) but it was still <b>very verbose</b>, requiring each validation function to take a module as an argument (and making the composition of validation functions laborious).</p><p>The new approach describes an <b>intermediate representation</b> described by the type <a href="yocaml/Yocaml/Data/index.html#type-t"><code>Yocaml.Data.t</code></a> (and <a href="yocaml/Yocaml/Data/index.html#type-t"><code>Yocaml.Data.t</code></a>). The representation chosen is very similar to that chosen by <a href="https://github.com/mirage/ezjsonm">Ezjsonm</a>, which is used as the basis for many serialisation/deserialisation libraries (ie: <a href="https://github.com/avsm/ocaml-yaml">ocaml-yaml</a>). The idea is to offer this data transformation flow:</p><pre>                      Template variables
+                              ▲
+        Yaml ◄─┐    ┌─────────┘        ┌─►Article.metadata
+               │    │                  │
+        Json ◄─┤    │  ┌──►validation  ├─►string list
+               │    │  │            │  │
+        Toml ◄─┼───► Yocaml.Data.t  └─►├─►user option
+               │     ▲                 │
+        Sexp ◄─┤     └─projection ◄────┼─►Index.t
+               │                       │
+        ...  ◄─┘                       └─►...</pre><p><b>Adding support for a metadata format</b> in YOCaml basically consists of providing a <code>my_format -&gt; Yocaml.Data.t</code> function and providing injection into a template consists of providing a <code>Yocaml.Data.t -&gt; my_template_format</code> function.</p><p>And a <b>validation function</b> is a simple function <code>Yocaml.Data.t -&gt; ('a,'errors) result</code>. So who tries to convert a value of type <a href="yocaml/Yocaml/Data/index.html#type-t"><code>Yocaml.Data.t</code></a> into an arbitrary OCaml value.</p><p>Relying on a common format for parsing data and injecting data into templates offers several benefits, primarily centered around convenience, efficiency, and maintainability. It also facilitates flexibility in adapting to changing requirements, particularly regarding the desired format of the data.</p><h2 id="modules-organisation"><a href="#modules-organisation" class="anchor"></a>Modules Organisation</h2><ul class="modules"><li><a href="yocaml/Yocaml/Data/index.html"><code>Yocaml.Data</code></a> <span class="synopsis">Describes an mostly compatible <a href="https://github.com/mirage/ezjsonm/blob/master/lib/ezjsonm.ml#L18">Ezjsonm</a> AST that acts as a generic AST for describing metadata that can be exchanged between source documents and templates. To summarise, source metadata is ultimately projected into a value of type <a href="yocaml/Yocaml/Data/index.html#type-t"><code>Yocaml.Data.t</code></a> and data injected into templates is projected from values of type <a href="yocaml/Yocaml/Data/index.html#type-t"><code>Yocaml.Data.t</code></a>.</span></li><li><a href="yocaml/Yocaml/Data/Validation/index.html"><code>Yocaml.Data.Validation</code></a> <span class="synopsis">Used to validate data described by type <a href="yocaml/Yocaml/Data/index.html#type-t"><code>Yocaml.Data.t</code></a> to build validation pipelines. The aim of this module is to produce combinators for building validation pipelines that support nesting and that can transform any value described by the AST in <code>Data</code> into arbitrary OCaml values.</span></li></ul><p>The set of tools for describing data lives in the module <a href="yocaml/Yocaml/Data/index.html"><code>Yocaml.Data</code></a>, and the set of tools for validating schemas lives in the module <a href="yocaml/Yocaml/Data/Validation/index.html"><code>Yocaml.Data.Validation</code></a>. Let's take a few shortcuts to make the article easier to read:</p><pre class="language-ocaml"><code>module D = Yocaml.Data
+module V = Yocaml.Data.Validation</code></pre><p><code>D</code> will be used to describe values to be validated. And <code>V</code> is used to access the validation functions.</p><p>In many cases, there is a symmetry between the functions described in <a href="yocaml/Yocaml/Data/index.html"><code>Yocaml.Data</code></a> and <a href="yocaml/Yocaml/Data/Validation/index.html"><code>Yocaml.Data.Validation</code></a>. For example, <a href="yocaml/Yocaml/Data/index.html#val-option"><code>Yocaml.Data.option</code></a> is used to describe a value of type <code>option</code> and <a href="yocaml/Yocaml/Data/Validation/index.html#val-option"><code>Yocaml.Data.Validation.option</code></a> is used to validate a value of type <code>option</code>.</p><h2 id="implementation-of-validation-function"><a href="#implementation-of-validation-function" class="anchor"></a>Implementation of validation function</h2><p>The purpose of a validation function is to convert a value of type <a href="yocaml/Yocaml/Data/index.html#type-t"><code>Yocaml.Data.t</code></a> to an arbitrary OCaml value by applying, potentially, the verification of certain preconditions. <a href="yocaml/Yocaml/Data/index.html#type-t"><code>Yocaml.Data.t</code></a> relay on some primitive types (that should be sufficient for dealing with arbitrary values): <a href="yocaml/Yocaml/Data/index.html#val-null"><code>Yocaml.Data.null</code></a>, <a href="yocaml/Yocaml/Data/index.html#val-bool"><code>Yocaml.Data.bool</code></a>, <a href="yocaml/Yocaml/Data/index.html#val-int"><code>Yocaml.Data.int</code></a>, <a href="yocaml/Yocaml/Data/index.html#val-float"><code>Yocaml.Data.float</code></a>, <a href="yocaml/Yocaml/Data/index.html#val-string"><code>Yocaml.Data.string</code></a>, <a href="yocaml/Yocaml/Data/index.html#val-list"><code>Yocaml.Data.list</code></a> and <a href="yocaml/Yocaml/Data/index.html#val-record"><code>Yocaml.Data.record</code></a>.</p><h3 id="validating-simple-shapes"><a href="#validating-simple-shapes" class="anchor"></a>Validating simple shapes</h3><p>Validating a <i>&quot;shape&quot;</i> consists of checking that a value of type <a href="yocaml/Yocaml/Data/index.html#type-t"><code>Yocaml.Data.t</code></a> (which is opaque overall) corresponds to an expected structure. For example, let's try to validate the value <code>float 32.56</code> as a <code>float</code>:</p><pre class="language-ocaml"><code># V.float (D.float 32.56) ;;
+- : float V.validated_value = Ok 32.56</code></pre><p>As you can see, the function returns a validated value (a result) with the value <code>Ok 32.56</code>. We gave it a value of type <a href="yocaml/Yocaml/Data/index.html#type-t"><code>Yocaml.Data.t</code></a> and <a href="yocaml/Yocaml/Data/Validation/index.html#val-float"><code>Yocaml.Data.Validation.float</code></a> tries to convert it into a float.</p><p>Let's try to validate an incorrect entry. For example, let's try to treat a <code>Boolean</code> as if it were an <code>Integer</code>:</p><pre class="language-ocaml"><code># V.int (D.bool true) ;;
+- : int V.validated_value =
+Error (V.Invalid_shape {V.expected = &quot;int&quot;; given = Yocaml.Data.Bool true})</code></pre><p>As you can see, <a href="yocaml/Yocaml/Data/Validation/index.html#val-bool"><code>Yocaml.Data.Validation.bool</code></a> refuses to consider a number described as an integer to be validated. The error may seem a bit verbose, but in principle it is only used by the core of Yocaml, for reporting purposes.</p><p>To sum up, simple types are validated using a function that corresponds to them in the <a href="yocaml/Yocaml/Data/Validation/index.html"><code>Yocaml.Data.Validation</code></a> module, which is easy, isn't it? We could generalise a shape validation function in this way: <code>Data.t -&gt; 'a Data.Validation.validated_value</code>.</p><h4 id="the-special-case-of-strings"><a href="#the-special-case-of-strings" class="anchor"></a>The special case of strings</h4><p>The validator for character strings works like the others, but it is possible to pass it an optional argument <code>strict</code>, which is a boolean that allows other shapes (<code>int, bool, float</code> to be considered as strings). By default, the flag is set to <code>true</code>, so the validation does not handle other shapes. As with the other shapes, it's easy to validate that a data item is indeed a string:</p><pre class="language-ocaml"><code># V.string (D.string &quot;hello world&quot;) ;;
+- : string V.validated_value = Ok &quot;hello world&quot;</code></pre><p>And if you decide to set the <code>strict</code> flag to <code>true</code>, it doesn't change the behaviour of the function :</p><pre class="language-ocaml"><code># V.string ~strict:true (D.string &quot;hello world&quot;) ;;
+- : string V.validated_value = Ok &quot;hello world&quot;</code></pre><p>As we're trying to validate a string, changing the flag to <code>false</code> doesn't change the behaviour either :</p><pre class="language-ocaml"><code># V.string ~strict:false (D.string &quot;hello world&quot;) ;;
+- : string V.validated_value = Ok &quot;hello world&quot;</code></pre><p>The impact of this flag can be seen when we try to process shapes that are not strings but could easily behave like one. For example, let's try to validate a boolean as a string:</p><pre class="language-ocaml"><code># V.string (D.bool true) ;;
+- : string V.validated_value =
+Error
+ (V.Invalid_shape
+   {V.expected = &quot;strict-string&quot;; given = Yocaml.Data.Bool true})</code></pre><p>However, if you validate the boolean as a non-strict string, it will be converted to a string and validated correctly:</p><pre class="language-ocaml"><code># V.string ~strict:false (D.bool true) ;;
+- : string V.validated_value = Ok &quot;true&quot;</code></pre><p>This behaviour may seem strange, I grant you, but it is explained by the fact that it is often a third-party library that will produce a parsed representation of data and that it is this parsed data that will be converted into data described by <a href="yocaml/Yocaml/Data/index.html#type-t"><code>Yocaml.Data.t</code></a>. However, we will see later in the guide that it is also possible to manage this type of case using <b>composition of validators</b>.</p><h3 id="dealing-with-list"><a href="#dealing-with-list" class="anchor"></a>Dealing with list</h3><p>The first <i>&quot;complex type&quot;</i> is lists. But in fact, it works in exactly the same way as the previous ones, except that it is parameterised by a validator. By default, list validation imposes the same restrictions as OCaml's parametric polymorphism: all elements must be of the same type, so the validation function <a href="yocaml/Yocaml/Data/Validation/index.html#val-list_of"><code>Yocaml.Data.Validation.list_of</code></a> is used. For example, to validate a list of strings :</p><pre class="language-ocaml"><code># V.(list_of string) (D.(list [string &quot;hello&quot;; string &quot;world&quot;])) ;;
+- : string list V.validated_value = Ok [&quot;hello&quot;; &quot;world&quot;]</code></pre><p>Now let's try to validate an invalid list!</p><pre class="language-ocaml"><code>let valid_string_list = V.(list_of string)
+let invalid_list =
+  let open D in
+  list [
+    string &quot;hello&quot;
+  ; int 42
+  ; string &quot;world&quot;
+  ; bool false
+  ]</code></pre><p>Now that we have a peculiar list, we can attempt to validate it:</p><pre class="language-ocaml"><code># valid_string_list invalid_list ;;
+- : string list V.validated_value =
+Error
+ (V.Invalid_list
+   {V.errors =
+     Yocaml__.Nel.(::)
+      ((3,
+        V.Invalid_shape
+         {V.expected = &quot;strict-string&quot;; given = Yocaml.Data.Bool false}),
+      [(1,
+        V.Invalid_shape
+         {V.expected = &quot;strict-string&quot;; given = Yocaml.Data.Int 42})]);
+    given =
+     [Yocaml.Data.String &quot;hello&quot;; Yocaml.Data.Int 42;
+      Yocaml.Data.String &quot;world&quot;; Yocaml.Data.Bool false]})</code></pre><p>Holy Moly, the error is quite frightening! As mentioned earlier in the guide, errors essentially serve YOCaml in building quality reporting when executing tasks. Therefore, errors are somewhat verbose to maintain as much structure as possible (but also remain relatively generic). Here, we can observe that the validate function provides us with two things:</p><ul><li><code>given</code>: which is the list we attempted to validate</li><li><code>errors</code>: which is a non-empty list (<a href="yocaml/Yocaml/Nel/index.html"><code>Yocaml.Nel</code></a>) of errors and their positions in the list. Collecting all invalid cells may seem peculiar. However, from our perspective, this allows, in case of an error, to provide feedback to the user about all the cells they need to modify.</li></ul><p>Regardless, the purpose of the validation framework is to be generic enough so that, ideally, one shouldn't have to worry about errors except during the reporting phase!</p><h3 id="dealing-with-records"><a href="#dealing-with-records" class="anchor"></a>Dealing with records</h3><p>Now, let's focus on records which require a bit more work to validate. We will use a type <code>user</code> as the validation subject, here is its specification:</p><pre class="language-ocaml"><code>type user = {
+  username: string
+; age: int
+; nouns: string list
+; email: string option
+}</code></pre><p>We can see that the fields <code>username</code> and <code>age</code> are required, and we can assume that the fields <code>nouns</code> and <code>email</code> are optional. (If no <code>noun</code> is given, it can be represented by an empty list).</p><p>The validation of such a structure uses the <a href="yocaml/Yocaml/Data/Validation/index.html#val-record"><code>Yocaml.Data.Validation.record</code></a> function (which is a validation function, similar to the ones we have seen previously), as well as the <a href="yocaml/Yocaml/Data/Validation/index.html#val-required"><code>Yocaml.Data.Validation.required</code></a>, <a href="yocaml/Yocaml/Data/Validation/index.html#val-optional"><code>Yocaml.Data.Validation.optional</code></a>, and potentially <a href="yocaml/Yocaml/Data/Validation/index.html#val-optional_or"><code>Yocaml.Data.Validation.optional_or</code></a> functions, along with the operators described in <a href="yocaml/Yocaml/Data/Validation/Syntax/index.html"><code>Yocaml.Data.Validation.Syntax</code></a>.</p><p>Let's write a validation function for our type <code>user</code>:</p><pre class="language-ocaml"><code>let user_validation =
+  let open Yocaml.Data.Validation in
+  record (fun fields -&gt;
+    let+ username = required fields &quot;username&quot; string
+    and+ age = required fields &quot;age&quot; int
+    and+ nouns = optional_or  ~default:[] fields &quot;nouns&quot; (list_of string)
+    and+ email = optional fields &quot;email&quot; string
+    in
+      { username; age; nouns; email }
+  )</code></pre><p>We can typecheck the function in order to see if it seems good.</p><pre class="language-ocaml"><code># user_validation;;
+- : D.t -&gt; user Yocaml.Data.Validation.validated_value = &lt;fun&gt;</code></pre><p>Let's use our function to represent several scenarios. Let's start with the happy path, when all the data is valid:</p><pre class="language-ocaml"><code># user_validation D.(record [
+    &quot;username&quot;, string &quot;JohnDoe42&quot;
+  ; &quot;age&quot;, int 42
+  ; &quot;nouns&quot;, list_of string [&quot;he&quot;; &quot;him&quot;; &quot;his&quot;; &quot;himself&quot;]
+  ; &quot;email&quot;, string &quot;jdoe@name.com&quot;
+  ]) ;;
+- : user Yocaml.Data.Validation.validated_value =
+Ok
+ {username = &quot;JohnDoe42&quot;; age = 42; nouns = [&quot;he&quot;; &quot;him&quot;; &quot;his&quot;; &quot;himself&quot;];
+  email = Some &quot;jdoe@name.com&quot;}</code></pre><p>Let's continue our exploration by setting aside the optional arguments for now:</p><pre class="language-ocaml"><code># user_validation D.(record [
+    &quot;username&quot;, string &quot;JohnDoe42&quot;
+  ; &quot;age&quot;, int 42
+  ]) ;;
+- : user Yocaml.Data.Validation.validated_value =
+Ok {username = &quot;JohnDoe42&quot;; age = 42; nouns = []; email = None}</code></pre><p>Let's make several mistakes now to see if all errors are properly collected:</p><pre class="language-ocaml"><code>let a_very_malformed_user =
+  user_validation D.(record [
+      &quot;usernme&quot;, string &quot;JohnDoe42&quot;
+    ; &quot;age&quot;, bool true
+    ; &quot;nouns&quot;, list_of int [1;2;3;4]
+    ])</code></pre><p>Here, there is a typo in <code>usernme</code> (missing <code>a</code>), <code>age</code> has the wrong type, and neither does the list of nouns... what a mess! The error might be a bit verbose!</p><pre class="language-ocaml"><code># a_very_malformed_user ;;
+- : user Yocaml.Data.Validation.validated_value =
+Error
+ (Yocaml.Data.Validation.Invalid_record
+   {Yocaml.Data.Validation.errors =
+     Yocaml__.Nel.(::)
+      (Yocaml.Data.Validation.Missing_field
+        {Yocaml.Data.Validation.field = &quot;username&quot;},
+      [Yocaml.Data.Validation.Invalid_field
+        {Yocaml.Data.Validation.given = Yocaml.Data.Bool true; field = &quot;age&quot;;
+         error =
+          Yocaml.Data.Validation.Invalid_shape
+           {Yocaml.Data.Validation.expected = &quot;int&quot;;
+            given = Yocaml.Data.Bool true}};
+       Yocaml.Data.Validation.Invalid_field
+        {Yocaml.Data.Validation.given =
+          Yocaml.Data.List
+           [Yocaml.Data.Int 1; Yocaml.Data.Int 2; Yocaml.Data.Int 3;
+            Yocaml.Data.Int 4];
+         field = &quot;nouns&quot;;
+         error =
+          Yocaml.Data.Validation.Invalid_list
+           {Yocaml.Data.Validation.errors =
+             Yocaml__.Nel.(::)
+              ((3,
+                Yocaml.Data.Validation.Invalid_shape
+                 {Yocaml.Data.Validation.expected = &quot;strict-string&quot;;
+                  given = Yocaml.Data.Int 4}),
+              [(2,
+                Yocaml.Data.Validation.Invalid_shape
+                 {Yocaml.Data.Validation.expected = &quot;strict-string&quot;;
+                  given = Yocaml.Data.Int 3});
+               (1,
+                Yocaml.Data.Validation.Invalid_shape
+                 {Yocaml.Data.Validation.expected = &quot;strict-string&quot;;
+                  given = Yocaml.Data.Int 2});
+               (0,
+                Yocaml.Data.Validation.Invalid_shape
+                 {Yocaml.Data.Validation.expected = &quot;strict-string&quot;;
+                  given = Yocaml.Data.Int 1})]);
+            given =
+             [Yocaml.Data.Int 1; Yocaml.Data.Int 2; Yocaml.Data.Int 3;
+              Yocaml.Data.Int 4]}}]);
+    given =
+     [(&quot;usernme&quot;, Yocaml.Data.String &quot;JohnDoe42&quot;);
+      (&quot;age&quot;, Yocaml.Data.Bool true);
+      (&quot;nouns&quot;,
+       Yocaml.Data.List
+        [Yocaml.Data.Int 1; Yocaml.Data.Int 2; Yocaml.Data.Int 3;
+         Yocaml.Data.Int 4])]})</code></pre><p>We have seen how to use regular validation shapes, and moreover, we have seen that it is possible to use, in the validation of records, the previous validators, but the reverse is also true, for example:</p><pre class="language-ocaml"><code># V.list_of user_validation ;;
+- : D.t -&gt; user list V.validated_value = &lt;fun&gt;</code></pre><p>Build a validator for lists of users! Excellent! It is partly for this reason that errors are so complex; they must be nestable and handle increasingly complex cases to ensure the reusability of validators.</p><h3 id="additional-validators"><a href="#additional-validators" class="anchor"></a>Additional Validators</h3><p>There are other additional validators that fit with common OCaml types. For example, the ability to compose, at validator level (and not at field validator level) with values of type option using <a href="yocaml/Yocaml/Data/Validation/index.html#val-option"><code>Yocaml.Data.Validation.option</code></a>.</p><h4 id="dealing-with-options"><a href="#dealing-with-options" class="anchor"></a>Dealing with options</h4><p>If our value can be an option of <code>int</code>, it can be expressed by the following validator:</p><pre class="language-ocaml"><code>let option_int = V.(option int)</code></pre><p>Which validates data that is either <code>int</code> or <code>null</code>. So validating <code>null</code> leads to the result <code>Ok None</code>:</p><pre class="language-ocaml"><code># option_int D.null ;;
+- : int option V.validated_value = Ok None</code></pre><p>Validating <code>int 10</code> leads to the result <code>Ok (Some 15)</code>:</p><pre class="language-ocaml"><code># option_int (D.int 15) ;;
+- : int option V.validated_value = Ok (Some 15)</code></pre><p>An trying to validate something invalid leads to an error:</p><pre class="language-ocaml"><code># option_int (D.string &quot;15&quot;) ;;
+- : int option V.validated_value =
+Error (V.Invalid_shape {V.expected = &quot;int&quot;; given = Yocaml.Data.String &quot;15&quot;})</code></pre><h4 id="dealing-with-products"><a href="#dealing-with-products" class="anchor"></a>Dealing with products</h4><p>We can also work with product types, for example, we can validate a pair of <code>string</code> and <code>int</code> in this way:</p><pre class="language-ocaml"><code># V.(pair string int) D.(pair string int (&quot;foo&quot;, 12)) ;;
+- : (string * int) V.validated_value = Ok (&quot;foo&quot;, 12)</code></pre><p>And as with the other validators, we can see that they are relatively well composed, For example, let's take a look at this rather complicated validator:</p><pre class="language-ocaml"><code>let complicated_validator =
+  let open Yocaml.Data.Validation in
+  pair
+    (option (list_of (pair int bool)))
+    (list_of (option (pair bool int)))</code></pre><p>Let's test it with a set of data, which is also very complicated!</p><pre class="language-ocaml"><code>#  D.(
+    (pair
+      (option (list_of (pair int bool)))
+      (list_of (option (pair bool int))))
+      (Some [1, true; 2, false], [Some (false, 1);
+       None; Some (true, 10)]))
+    |&gt; complicated_validator ;;
+- : ((int * bool) list option * (bool * int) option list)
+    Yocaml.Data.Validation.validated_value
+= Ok (Some [(1, true); (2, false)], [Some (false, 1); None; Some (true, 10)])</code></pre><p>And in the same way, let's try to validate a pair that is invalid!</p><pre class="language-ocaml"><code># V.(pair string int) D.(pair bool string (false, &quot;foo&quot;)) ;;
+- : (string * int) V.validated_value =
+Error
+ (V.Invalid_record
+   {V.errors =
+     Yocaml__.Nel.(::)
+      (V.Invalid_field
+        {V.given = Yocaml.Data.Bool false; field = &quot;fst&quot;;
+         error =
+          V.Invalid_shape
+           {V.expected = &quot;strict-string&quot;; given = Yocaml.Data.Bool false}},
+      [V.Invalid_field
+        {V.given = Yocaml.Data.String &quot;foo&quot;; field = &quot;snd&quot;;
+         error =
+          V.Invalid_shape
+           {V.expected = &quot;int&quot;; given = Yocaml.Data.String &quot;foo&quot;}}]);
+    given =
+     [(&quot;fst&quot;, Yocaml.Data.Bool false); (&quot;snd&quot;, Yocaml.Data.String &quot;foo&quot;)]})</code></pre><p>Which gives us some information about how the products are encoded under the bonnet! In fact, a product is encoded as a record which has strictly only two fields, <code>fst</code> and <code>snd</code>. It is therefore important to use the functions in the <a href="yocaml/Yocaml/Data/index.html"><code>Yocaml.Data</code></a> module to build data sets (and this is why the AST of <a href="yocaml/Yocaml/Data/index.html"><code>Yocaml.Data</code></a> is private).</p><p>There are also <a href="yocaml/Yocaml/Data/Validation/index.html#val-triple"><code>Yocaml.Data.Validation.triple</code></a> and <a href="yocaml/Yocaml/Data/Validation/index.html#val-quad"><code>Yocaml.Data.Validation.quad</code></a> (but they are defined in terms of <code>even</code>, using the fact that <code>a, b, c</code> can be described as a pair: <code>a, [b, c]</code>` etc.). If, for example, you wanted to describe a validator for the type <code>'a * 'b * 'c * 'd * 'e</code> you could proceed as follows:</p><pre class="language-ocaml"><code># let quint v1 v2 v3 v4 v5 my_value =
+    let open Yocaml.Data.Validation in
+    my_value
+    |&gt; pair v1 (pair v2 (pair v3 (pair v4 v5)))
+    |&gt; Result.map (fun (x1, (x2, (x3, (x4, x5)))) -&gt;
+         x1, x2, x3, x4, x5
+       )
+val quint :
+  (D.t -&gt; 'a Yocaml.Data.Validation.validated_value) -&gt;
+  (D.t -&gt; 'b Yocaml.Data.Validation.validated_value) -&gt;
+  (D.t -&gt; 'c Yocaml.Data.Validation.validated_value) -&gt;
+  (D.t -&gt; 'd Yocaml.Data.Validation.validated_value) -&gt;
+  (D.t -&gt; 'e Yocaml.Data.Validation.validated_value) -&gt;
+  D.t -&gt; ('a * 'b * 'c * 'd * 'e, V.value_error) result = &lt;fun&gt;</code></pre><p>This is also how the <code>tripl</code> and <code>quad</code> functions mentioned above are implemented. Now that we can process products (including records), we can move on to describing sums!</p><h4 id="dealing-with-sums"><a href="#dealing-with-sums" class="anchor"></a>Dealing with sums</h4><p>Now that we can describe products, let's move on to describing sums. Firstly, there's a dedicated function for validating values of type <code>either</code>, which, like the type <code>('a * 'b)</code> which is the canonical product (the one used to describe all the other products, as we saw in the implementation of <code>triple</code> and <code>quad</code>), <code>either</code> is the canonical sum. The <a href="yocaml/Yocaml/Data/Validation/index.html#val-either"><code>Yocaml.Data.Validation.either</code></a> validator is very similar to the <a href="yocaml/Yocaml/Data/Validation/index.html#val-pair"><code>Yocaml.Data.Validation.pair</code></a> validator. It takes two other validators and applies the first in the case of <code>left</code>, the second in the case of <code>right</code>:</p><pre class="language-ocaml"><code># let int_or_string = V.(either int string) ;;
+val int_or_string : D.t -&gt; (int, string) Either.t V.validated_value = &lt;fun&gt;</code></pre><p>Let's look at how it's used, first with the <code>Left int</code> case:</p><pre class="language-ocaml"><code># int_or_string D.(either int string (Either.left 10)) ;;
+- : (int, string) Either.t V.validated_value = Ok (Either.Left 10)</code></pre><p>Let's try the <code>Right string</code> case:</p><pre class="language-ocaml"><code># int_or_string D.(either int string (Either.right &quot;foo&quot;)) ;;
+- : (int, string) Either.t V.validated_value = Ok (Either.Right &quot;foo&quot;)</code></pre><p>No surprise, now let's look at a validation error, trying to validate an <code>option</code> as an <code>either</code>, to understand the representation of sums, under the hood:</p><pre class="language-ocaml"><code># int_or_string D.(option string (Some &quot;foo&quot;)) ;;
+- : (int, string) Either.t V.validated_value =
+Error
+ (V.Invalid_shape
+   {V.expected = &quot;Left &lt;abstr&gt; | Right &lt;abstr&gt;&quot;;
+    given = Yocaml.Data.String &quot;foo&quot;})</code></pre><p>by trying to validate an <code>option</code> as an <code>either</code> doesn't give us much information about how sums are represented, but it does tell us that the validator seems to be quite aware of the different constructors that can be envisaged for a sum.</p><p>In fact, like pairs, <a href="yocaml/Yocaml/Data/index.html"><code>Yocaml.Data</code></a> uses an internal representation of constructors that respects this form: <code>{&quot;constr&quot;: constr_key; value: Yocaml.Data.t}</code>. This makes it possible to build validators for arbitrary sums, without having to build a trick à la <code>pair/triple/quad</code>, using <a href="yocaml/Yocaml/Data/Validation/index.html#val-sum"><code>Yocaml.Data.Validation.sum</code></a>. Let's try to build a validator for the following type...unnecessarily complicated:</p><pre class="language-ocaml"><code>type a_complicated_type =
+  | Aaf
+  | Bcwrz of int * float
+  | Krups of string option
+  | Kalco of (bool, string) Either.t
+  | Piou of float list
+  | Xxxx of string * int * (int list option)
+  | Zzzz</code></pre><p>First, let's build a function to easily lift values from our complicated type to <a href="yocaml/Yocaml/Data/index.html#type-t"><code>Yocaml.Data.t</code></a>. This demonstrates the symmetrical representation of the sum to &quot;build&quot; data:</p><pre class="language-ocaml"><code>let a_complicated_type  =
+  let open Yocaml.Data in
+  sum (function
+    | Aaf             -&gt; &quot;aaf&quot;,   null
+    | Bcwrz (a, b)    -&gt; &quot;bcwrz&quot;, pair int float (a, b)
+    | Krups x         -&gt; &quot;krups&quot;, option string x
+    | Kalco x         -&gt; &quot;kalco&quot;, either bool string x
+    | Piou  x         -&gt; &quot;piou&quot;,  list_of float x
+    | Xxxx  (a, b, c) -&gt; &quot;xxxx&quot;,  triple string int (option @@ list_of int) (a, b, c)
+    | Zzzz            -&gt; &quot;zzzz&quot;,  null
+  )</code></pre><p>It's the responsibility of the person building the represented sum to choose the representation of each constructor (and unfortunately, nothing is enforced) but as YOCaml is a static site generator, we assume that the consistency between produced and verified constructors live in the same repo, and are easy to check.</p><p>Writing a validator for this type is largely similar to writing the projection function. We will construct a list which associates a constructor (a string) with a validation function:</p><pre class="language-ocaml"><code># let validate_complicated_type  =
+    let open Yocaml.Data.Validation in
+    let the_long_triple =
+      triple string int (option @@ list_of int)
+    in
+    sum [
+      &quot;aaf&quot;,   null               $ (fun () -&gt; Aaf)
+    ; &quot;bcwrz&quot;, pair int float     $ (fun (a, b) -&gt; Bcwrz (a, b))
+    ; &quot;krups&quot;, option string      $ (fun x -&gt; Krups x)
+    ; &quot;kalco&quot;, either bool string $ (fun x -&gt; Kalco x)
+    ; &quot;piou&quot;,  list_of float      $ (fun x -&gt; Piou x)
+    ; &quot;xxxx&quot;,  the_long_triple    $ (fun (a, b, c) -&gt; Xxxx (a, b, c))
+    ; &quot;zzzz&quot;,  null               $ (fun () -&gt; Zzzz)
+    ] ;;
+val validate_complicated_type :
+  D.t -&gt; a_complicated_type Yocaml.Data.Validation.validated_value = &lt;fun&gt;</code></pre><p>We can see the symmetry, the <code>$</code> operator is just an alias on map, which allows, once the branch has been validated, to project it into the correct constructor. Let's construct a value, via our previous function (which should therefore, by default, be valid) and play with our validation function!</p><pre class="language-ocaml"><code># V.list_of (validate_complicated_type) (
+     D.list_of a_complicated_type [
+       Zzzz
+     ; Aaf
+     ; Piou [1.2; 54.89]
+     ; Bcwrz (42, 24.42)
+     ; Kalco (Either.Left true)
+     ; Krups None
+     ; Krups (Some &quot;Foo Bar&quot;)
+     ; Xxxx (&quot;hello&quot;, 10, Some [1234; 87665])
+     ]
+  ) ;;
+- : a_complicated_type list V.validated_value =
+Ok
+ [Zzzz; Aaf; Piou [1.2; 54.89]; Bcwrz (42, 24.42); Kalco (Either.Left true);
+  Krups None; Krups (Some &quot;Foo Bar&quot;); Xxxx (&quot;hello&quot;, 10, Some [1234; 87665])]</code></pre><p>And just out of curiosity, let's try to validate an unacceptable value!</p><pre class="language-ocaml"><code># validate_complicated_type (D.int 64) ;;
+- : a_complicated_type Yocaml.Data.Validation.validated_value =
+Error
+ (Yocaml.Data.Validation.Invalid_shape
+   {Yocaml.Data.Validation.expected =
+     &quot;Aaf &lt;abstr&gt; | Bcwrz &lt;abstr&gt; | Krups &lt;abstr&gt; | Kalco &lt;abstr&gt; | Piou &lt;abstr&gt; | Xxxx &lt;abstr&gt; | Zzzz &lt;abstr&gt;&quot;;
+    given = Yocaml.Data.Int 64})</code></pre><p>And let's observe an invalid constructor, we learn more about the representation of constructors:</p><pre class="language-ocaml"><code># validate_complicated_type (D.sum (function _ -&gt; &quot;arf&quot;, D.int 10) []) ;;
+- : a_complicated_type Yocaml.Data.Validation.validated_value =
+Error
+ (Yocaml.Data.Validation.Invalid_shape
+   {Yocaml.Data.Validation.expected =
+     &quot;Aaf &lt;abstr&gt; | Bcwrz &lt;abstr&gt; | Krups &lt;abstr&gt; | Kalco &lt;abstr&gt; | Piou &lt;abstr&gt; | Xxxx &lt;abstr&gt; | Zzzz &lt;abstr&gt;&quot;;
+    given =
+     Yocaml.Data.Record
+      [(&quot;constr&quot;, Yocaml.Data.String &quot;arf&quot;); (&quot;value&quot;, Yocaml.Data.Int 10)]})</code></pre><p>The validation of the sums is a little less secure than one might hope because they do not rely solely on invariants described by the AST of <a href="yocaml/Yocaml/Data/index.html"><code>Yocaml.Data</code></a>, and ask the user to define the representation of constructors, this is why we recommend relying as much as possible on generic representations like <code>either</code> to deal with sums.</p><p>But yes, the declaration/validation module allows the expression and validation of arbitrary sums and as the description of the sum is based on pattern matching and arbitrary identifiers, the sums also make it possible to encode sums &quot;encoded with objects or records&quot; (erg) or polymorphic variants.</p><h3 id="create-a-low-level-validator"><a href="#create-a-low-level-validator" class="anchor"></a>Create a low-level validator</h3><p>Even if it seems to us that the combinators presented are sufficient to generically describe key-value structures, as, although private, the AST is not abstract, it is perfectly possible to create your own validator using pattern matching, and the function <a href="yocaml/Yocaml/Data/Validation/index.html#val-fail_with"><code>Yocaml.Data.Validation.fail_with</code></a> can be used to propagate an error. For example, let's implement a validator that only accepts booleans <code>true</code>:</p><pre class="language-ocaml"><code># let only_true = function
+    | Yocaml.Data.Bool true -&gt; Ok ()
+    | other -&gt;
+        Yocaml.Data.Validation.fail_with
+           ~given:&quot;Not a true value&quot;
+           &quot;the value has to be true&quot;
+  ;;
+val only_true : D.t -&gt; unit Yocaml.Data.Validation.validated_value = &lt;fun&gt;</code></pre><p>We may be surprised that the <code>given</code> argument is a character string, but this is to allow the developer of a validator to choose the mode of representation of the observed structure. But hey, as there are validators for all the roots of the AST, the previous function is rewritten in terms of combinations.</p><p>You can also extend the <a href="yocaml/Yocaml/Data/Validation/index.html#type-custom_error"><code>Yocaml.Data.Validation.custom_error</code></a> type and use the <a href="yocaml/Yocaml/Data/Validation/index.html#val-fail_with_custom"><code>Yocaml.Data.Validation.fail_with_custom</code></a> function to build specific validation pipelines with precise handling of additional errors.</p><h3 id="fine-grained-validators"><a href="#fine-grained-validators" class="anchor"></a>Fine-grained validators</h3><p>For the moment, we've mainly seen validators that transform <a href="yocaml/Yocaml/Data/index.html#type-t"><code>Yocaml.Data.t</code></a> values into regular OCaml values. We also sketched out a slightly richer form of composition using the <code>$</code> operator, which allowed us to apply a function to the <i>valid</i> result of a validator.</p><p>The Infix module, which is included in <a href="yocaml/Yocaml/Data/Validation/index.html"><code>Yocaml.Data.Validation</code></a>, offers several small operators for building richer, more precise validation functions:</p><ul class="modules"><li><a href="yocaml/Yocaml/Data/Validation/Infix/index.html"><code>Yocaml.Data.Validation.Infix</code></a> <span class="synopsis">Infix operators are essentially used to compose data validators (unlike binding operators, which are used to compose record validation fragments).</span></li></ul><p>The operators described in this module can be used to manage three different scenarios: <b>mapping</b>, <b>sequential application</b> and <b>alternative</b>.</p><h4 id="mapping"><a href="#mapping" class="anchor"></a>Mapping</h4><p>Mapping is the most obvious: it applies a function to the result of a validation sequence. If, for example, I want to validate an integer, but want to convert it to a string, I can easily use <code>$</code>:</p><pre class="language-ocaml"><code># V.(int $ string_of_int) (D.int 23) ;;
+- : string V.validated_value = Ok &quot;23&quot;</code></pre><p>We used <code>$</code> to transform a validated value and project it into the desired constructor.</p><h4 id="sequential-application"><a href="#sequential-application" class="anchor"></a>sequential application</h4><p>Sequential application, using the <code>&amp;</code> operator, can be summarized as executing a first validator, and then executing a second one, passing it the result of the first. For example, in the <a href="yocaml/Yocaml/Data/Validation/index.html"><code>Yocaml.Data.Validation</code></a> module, there are a number of utility functions that validate data fragments, here are just a few of them: <a href="yocaml/Yocaml/Data/Validation/index.html#val-positive"><code>Yocaml.Data.Validation.positive</code></a>, <a href="yocaml/Yocaml/Data/Validation/index.html#val-equal"><code>Yocaml.Data.Validation.equal</code></a>, <a href="yocaml/Yocaml/Data/Validation/index.html#val-where"><code>Yocaml.Data.Validation.where</code></a>.</p><p>Let's build a validator that validates only even positive integers :</p><pre class="language-ocaml"><code>let positive_and_even =
+    let open Yocaml.Data.Validation in
+    int &amp; positive &amp; where (fun x -&gt; x mod 2 = 0)</code></pre><p>Let's try it with an integer that doesn't respect the expectation:</p><pre class="language-ocaml"><code># positive_and_even (D.int (-23)) ;;
+- : int Yocaml.Data.Validation.validated_value =
+Error
+ (Yocaml.Data.Validation.With_message
+   {Yocaml.Data.Validation.given = &quot;-23&quot;; message = &quot;should be positive&quot;})</code></pre><p>Let's try it with an integer that doesn't respect the expectation for other reason:</p><pre class="language-ocaml"><code># positive_and_even (D.int 25) ;;
+- : int Yocaml.Data.Validation.validated_value =
+Error
+ (Yocaml.Data.Validation.With_message
+   {Yocaml.Data.Validation.given = &quot;*&quot;; message = &quot;unsatisfied predicate&quot;})</code></pre><p>And let's finally try it with a valid integer!</p><pre class="language-ocaml"><code># positive_and_even (D.int 24) ;;
+- : int Yocaml.Data.Validation.validated_value = Ok 24</code></pre><p>The sequential application lets you chain validators to build validation pipelines.</p><h4 id="alternatives"><a href="#alternatives" class="anchor"></a>Alternatives</h4><p>Alternatives, represented by the <code>/</code> operator, can be used to execute a second validator if the first has failed. For example, let's imagine this scenario, I want to retrieve a string of characters or an integer that I consider to be a string of characters:</p><pre class="language-ocaml"><code>let my_v =
+  let open Yocaml.Data.Validation in
+  string / (int $ string_of_int)</code></pre><p>And it can be used with const in the event of absolute valis failure :</p><pre class="language-ocaml"><code># V.(my_v / const &quot;erf&quot;) (D.string &quot;Hello&quot;) ;;
+- : string V.validated_value = Ok &quot;Hello&quot;</code></pre><pre class="language-ocaml"><code># V.(my_v / const &quot;erf&quot;) (D.int 1234) ;;
+- : string V.validated_value = Ok &quot;1234&quot;</code></pre><pre class="language-ocaml"><code># V.(my_v / const &quot;erf&quot;) D.(list_of string [&quot;Hello&quot;]) ;;
+- : string V.validated_value = Ok &quot;erf&quot;</code></pre><p>With the support of alternatives, we've seen all the ways to build increasingly expressive validators, enabling us to capture as many scenarios as possible to describe metadata.</p><h2 id="executing-preconditions/postconditions"><a href="#executing-preconditions/postconditions" class="anchor"></a>Executing preconditions/postconditions</h2><p>In some cases, you may want to build data under certain conditions. You can use the <code>let*</code> operator to describe pre/post-conditions. For example, let's modify our user validation function to allow validation only if registrations are open:</p><pre class="language-ocaml"><code>let user_validation registration_open user =
+  let open Yocaml.Data.Validation in
+  let* () =
+     if registration_open then Ok ()
+     else fail_with ~given:&quot;false&quot; &quot;registration are closed&quot;
+  in
+  record (fun fields -&gt;
+    let+ username = required fields &quot;username&quot; string
+    and+ age = required fields &quot;age&quot; int
+    and+ nouns = optional_or  ~default:[] fields &quot;nouns&quot; (list_of string)
+    and+ email = optional fields &quot;email&quot; string
+    in
+      { username; age; nouns; email }
+  ) user</code></pre><p>If you use validation with registration open, validation behaves correctly:</p><pre class="language-ocaml"><code># user_validation true D.(record [
+    &quot;username&quot;, string &quot;JohnDoe42&quot;
+  ; &quot;age&quot;, int 42
+  ; &quot;nouns&quot;, list_of string [&quot;he&quot;; &quot;him&quot;; &quot;his&quot;; &quot;himself&quot;]
+  ; &quot;email&quot;, string &quot;jdoe@name.com&quot;
+  ]) ;;
+- : (user, V.value_error) result =
+Result.Ok
+ {username = &quot;JohnDoe42&quot;; age = 42; nouns = [&quot;he&quot;; &quot;him&quot;; &quot;his&quot;; &quot;himself&quot;];
+  email = Some &quot;jdoe@name.com&quot;}</code></pre><p>But if you close the registrations, the validation will fail (without executing the record validation):</p><pre class="language-ocaml"><code># user_validation false D.(record [
+    &quot;username&quot;, string &quot;JohnDoe42&quot;
+  ; &quot;age&quot;, int 42
+  ; &quot;nouns&quot;, list_of string [&quot;he&quot;; &quot;him&quot;; &quot;his&quot;; &quot;himself&quot;]
+  ; &quot;email&quot;, string &quot;jdoe@name.com&quot;
+  ]) ;;
+- : (user, V.value_error) result =
+Result.Error
+ (Yocaml.Data.Validation.With_message
+   {Yocaml.Data.Validation.given = &quot;false&quot;;
+    message = &quot;registration are closed&quot;})</code></pre><p>We can also describe preconditions that construct values on which a ‘next’ validation sequence will depend (and performing postcondition). Here, we will assume that we want the user to provide confirmation of their name, which must be equal to the username they have provided:</p><pre class="language-ocaml"><code>let user_validation registration_open user =
+  let open Yocaml.Data.Validation in
+  let* validated_user =
+    record (fun fields -&gt;
+      let+ username = required fields &quot;username&quot; string
+      and+ age = required fields &quot;age&quot; int
+      and+ nouns = optional_or  ~default:[] fields &quot;nouns&quot; (list_of string)
+      and+ email = optional fields &quot;email&quot; string
+      in
+        { username; age; nouns; email }
+    ) user
+  in
+  let* () =
+    record (fun fields -&gt;
+      let+ _ =
+        required fields &quot;username_confirmation&quot;
+          (string
+             &amp; equal ~equal:String.equal
+                ~pp:Format.pp_print_string
+                validated_user.username)
+      in ()
+     ) user
+  in Ok validated_user</code></pre><p>If our confirmation is correct, the validation process will run smoothly!</p><pre class="language-ocaml"><code># user_validation true D.(record [
+    &quot;username&quot;, string &quot;JohnDoe42&quot;
+  ; &quot;age&quot;, int 42
+  ; &quot;nouns&quot;, list_of string [&quot;he&quot;; &quot;him&quot;; &quot;his&quot;; &quot;himself&quot;]
+  ; &quot;email&quot;, string &quot;jdoe@name.com&quot;
+  ; &quot;username_confirmation&quot;, string &quot;JohnDoe42&quot;
+  ]) ;;
+- : (user, V.value_error) result =
+Result.Ok
+ {username = &quot;JohnDoe42&quot;; age = 42; nouns = [&quot;he&quot;; &quot;him&quot;; &quot;his&quot;; &quot;himself&quot;];
+  email = Some &quot;jdoe@name.com&quot;}</code></pre><p>On the other hand, if the confirmation is wrong:</p><pre class="language-ocaml"><code># user_validation true D.(record [
+    &quot;username&quot;, string &quot;JohnDoe42&quot;
+  ; &quot;age&quot;, int 42
+  ; &quot;nouns&quot;, list_of string [&quot;he&quot;; &quot;him&quot;; &quot;his&quot;; &quot;himself&quot;]
+  ; &quot;email&quot;, string &quot;jdoe@name.com&quot;
+  ; &quot;username_confirmation&quot;, string &quot;JohnDoe43&quot;
+  ]) ;;
+- : (user, V.value_error) result =
+Result.Error
+ (Yocaml.Data.Validation.Invalid_record
+   {Yocaml.Data.Validation.errors =
+     Yocaml__.Nel.(::)
+      (Yocaml.Data.Validation.Invalid_field
+        {Yocaml.Data.Validation.given = Yocaml.Data.String &quot;JohnDoe43&quot;;
+         field = &quot;username_confirmation&quot;;
+         error =
+          Yocaml.Data.Validation.With_message
+           {Yocaml.Data.Validation.given = &quot;JohnDoe43&quot;;
+            message = &quot;should be equal to JohnDoe42&quot;}},
+      []);
+    given =
+     [(&quot;username&quot;, Yocaml.Data.String &quot;JohnDoe42&quot;);
+      (&quot;age&quot;, Yocaml.Data.Int 42);
+      (&quot;nouns&quot;,
+       Yocaml.Data.List
+        [Yocaml.Data.String &quot;he&quot;; Yocaml.Data.String &quot;him&quot;;
+         Yocaml.Data.String &quot;his&quot;; Yocaml.Data.String &quot;himself&quot;]);
+      (&quot;email&quot;, Yocaml.Data.String &quot;jdoe@name.com&quot;);
+      (&quot;username_confirmation&quot;, Yocaml.Data.String &quot;JohnDoe43&quot;)]})</code></pre><p>In some cases, dependent validation makes it possible to construct increasingly complex situations, so it should only be used when really necessary.</p></div></body></html>

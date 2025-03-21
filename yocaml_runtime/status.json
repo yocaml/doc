@@ -1,0 +1,20 @@
+{
+  "name": "yocaml_runtime",
+  "version": "dev",
+  "files": [
+    "src/yocaml_runtime/yocaml_runtime.ml.html",
+    "src/yocaml_runtime/error.ml.html", "src/yocaml_runtime/hash.ml.html",
+    "src/yocaml_runtime/log.ml.html", "src/yocaml_runtime/server.ml.html",
+    "src/index.html", "yocaml_runtime/Yocaml_runtime/Error/index.html",
+    "yocaml_runtime/Yocaml_runtime/Server/Pages/index.html",
+    "yocaml_runtime/Yocaml_runtime/Server/Kind/index.html",
+    "yocaml_runtime/Yocaml_runtime/Server/Request_path/index.html",
+    "yocaml_runtime/Yocaml_runtime/Server/index.html",
+    "yocaml_runtime/Yocaml_runtime/Hash/index.html",
+    "yocaml_runtime/Yocaml_runtime/Log/index.html",
+    "yocaml_runtime/Yocaml_runtime/index.html", "yocaml_runtime/index.html",
+    "index.html"
+  ],
+  "failed": false,
+  "redirections": []
+}

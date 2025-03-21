@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"><head><title>Source: yocaml_unix.ml (yocaml_unix.src.yocaml_unix)</title><meta charset="utf-8"/><link rel="stylesheet" href="../../../odoc.css"/><meta name="generator" content="odoc 3.0.0"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/></head><body class="odoc-src"><nav class="odoc-nav"><a href="../index.html">Up</a> – <a href="../../../index.html">Package index</a> &#x00BB; <a href="../../index.html">yocaml_unix</a> &#x00BB; <a href="../index.html">Sources</a> &#x00BB; yocaml_unix &#x00BB; yocaml_unix.ml</nav><header class="odoc-preamble"><h1>Source file <code><span>yocaml_unix.ml</span></code></h1></header><div class="odoc-tocs"><nav class="odoc-toc odoc-global-toc"><ul><li><a href="../../index.html">yocaml_unix</a><ul><li>Library <code>yocaml_unix</code><ul><li><a href="../../yocaml_unix/Yocaml_unix/index.html">Yocaml_unix</a></li></ul></li><li><a href="../index.html">Sources</a><ul><li>yocaml_unix<ul><li><a href="runner.ml.html">runner.ml</a></li><li><a href="runtime.ml.html">runtime.ml</a></li><li><a href="server.ml.html">server.ml</a></li><li><a href="#" class="current_unit">yocaml_unix.ml</a></li><li><a href="yocaml_unix__.ml.html">yocaml_unix__.ml</a></li></ul></li></ul></li></ul></li></ul></nav></div><pre class="source_container"><code class="source_line_column"><a id="L1" class="source_line" href="#L1">1</a>
+<a id="L2" class="source_line" href="#L2">2</a>
+<a id="L3" class="source_line" href="#L3">3</a>
+<a id="L4" class="source_line" href="#L4">4</a>
+<a id="L5" class="source_line" href="#L5">5</a>
+<a id="L6" class="source_line" href="#L6">6</a>
+<a id="L7" class="source_line" href="#L7">7</a>
+<a id="L8" class="source_line" href="#L8">8</a>
+<a id="L9" class="source_line" href="#L9">9</a>
+<a id="L10" class="source_line" href="#L10">10</a>
+<a id="L11" class="source_line" href="#L11">11</a>
+<a id="L12" class="source_line" href="#L12">12</a>
+<a id="L13" class="source_line" href="#L13">13</a>
+<a id="L14" class="source_line" href="#L14">14</a>
+<a id="L15" class="source_line" href="#L15">15</a>
+<a id="L16" class="source_line" href="#L16">16</a>
+<a id="L17" class="source_line" href="#L17">17</a>
+<a id="L18" class="source_line" href="#L18">18</a>
+<a id="L19" class="source_line" href="#L19">19</a>
+<a id="L20" class="source_line" href="#L20">20</a>
+<a id="L21" class="source_line" href="#L21">21</a>
+<a id="L22" class="source_line" href="#L22">22</a>
+<a id="L23" class="source_line" href="#L23">23</a>
+<a id="L24" class="source_line" href="#L24">24</a>
+<a id="L25" class="source_line" href="#L25">25</a>
+</code><code class="source_code"><span><span class="COMMENT">(* YOCaml a static blog generator.
+   Copyright (C) 2024 The Funkyworkers and The YOCaml's developers
+
+   This program is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program.  If not, see &lt;https://www.gnu.org/licenses/&gt;. *)</span><span class="EOL">
+</span><span class="EOL">
+</span><span class="LET">let</span> <span id="val-run"><span class="LIDENT">run</span></span> <span class="QUESTION">?</span><span id="local_level_1"><span class="LIDENT">level</span></span> <span class="QUESTION">?</span><span id="local_custom_error_handler_2"><span class="LIDENT">custom_error_handler</span></span> <span id="local_program_3"><span class="LIDENT">program</span></span> <span class="EQUAL">=</span><span class="EOL">
+</span>  <span class="LET">let</span> <span class="LPAREN">(</span><span class="RPAREN">)</span> <span class="EQUAL">=</span> <a href="../../../yocaml_runtime/src/yocaml_runtime/log.ml.html#val-setup"><span class="UIDENT">Yocaml_runtime</span><span class="DOT">.</span><span class="UIDENT">Log</span><span class="DOT">.</span><span class="LIDENT">setup</span></a> <span class="QUESTION">?</span><a href="#local_level_1"><span class="LIDENT">level</span></a> <span class="LPAREN">(</span><span class="RPAREN">)</span> <span class="IN">in</span><span class="EOL">
+</span>  <a href="../../../yocaml/src/yocaml/runtime.ml.html#module-Make.val-run"><span class="UIDENT">Runner</span><span class="DOT">.</span><span class="LIDENT">run</span></a> <span class="QUESTION">?</span><a href="#local_custom_error_handler_2"><span class="LIDENT">custom_error_handler</span></a> <a href="#local_program_3"><span class="LIDENT">program</span></a><span class="EOL">
+</span><span class="EOL">
+</span><span class="LET">let</span> <span id="val-serve"><span class="LIDENT">serve</span></span> <span class="QUESTION">?</span><span id="local_level_4"><span class="LIDENT">level</span></span> <span class="QUESTION">?</span><span id="local_custom_error_handler_5"><span class="LIDENT">custom_error_handler</span></span> <span class="TILDE">~</span><span id="local_target_6"><span class="LIDENT">target</span></span> <span class="TILDE">~</span><span id="local_port_7"><span class="LIDENT">port</span></span> <span id="local_program_8"><span class="LIDENT">program</span></span> <span class="EQUAL">=</span><span class="EOL">
+</span>  <span class="LET">let</span> <span class="LPAREN">(</span><span class="RPAREN">)</span> <span class="EQUAL">=</span> <a href="../../../yocaml_runtime/src/yocaml_runtime/log.ml.html#val-setup"><span class="UIDENT">Yocaml_runtime</span><span class="DOT">.</span><span class="UIDENT">Log</span><span class="DOT">.</span><span class="LIDENT">setup</span></a> <span class="QUESTION">?</span><a href="#local_level_4"><span class="LIDENT">level</span></a> <span class="LPAREN">(</span><span class="RPAREN">)</span> <span class="IN">in</span><span class="EOL">
+</span>  <a href="server.ml.html#val-run"><span class="UIDENT">Server</span><span class="DOT">.</span><span class="LIDENT">run</span></a> <span class="QUESTION">?</span><a href="#local_custom_error_handler_5"><span class="LIDENT">custom_error_handler</span></a> <a href="#local_target_6"><span class="LIDENT">target</span></a> <a href="#local_port_7"><span class="LIDENT">port</span></a> <a href="#local_program_8"><span class="LIDENT">program</span></a><span class="EOL">
+</span><span class="EOL">
+</span><span id="module-Runtime"><span class="MODULE">module</span> <span class="UIDENT">Runtime</span> <span class="EQUAL">=</span> <a href="runtime.ml.html"><span class="UIDENT">Runtime</span></a></span><span class="EOL">
+</span></span></code></pre></body></html>

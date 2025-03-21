@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"><head><title>Source: generator.ml (yocaml_syndication.src.yocaml_syndication)</title><meta charset="utf-8"/><link rel="stylesheet" href="../../../odoc.css"/><meta name="generator" content="odoc 3.0.0"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/></head><body class="odoc-src"><nav class="odoc-nav"><a href="../index.html">Up</a> – <a href="../../../index.html">Package index</a> &#x00BB; <a href="../../index.html">yocaml_syndication</a> &#x00BB; <a href="../index.html">Sources</a> &#x00BB; yocaml_syndication &#x00BB; generator.ml</nav><header class="odoc-preamble"><h1>Source file <code><span>generator.ml</span></code></h1></header><div class="odoc-tocs"><nav class="odoc-toc odoc-global-toc"><ul><li><a href="../../index.html">yocaml_syndication</a><ul><li>Library <code>yocaml_syndication</code><ul><li><a href="../../yocaml_syndication/Yocaml_syndication/index.html">Yocaml_syndication</a></li></ul></li><li><a href="../index.html">Sources</a><ul><li>yocaml_syndication<ul><li><a href="atom.ml.html">atom.ml</a></li><li><a href="category.ml.html">category.ml</a></li><li><a href="datetime.ml.html">datetime.ml</a></li><li><a href="#" class="current_unit">generator.ml</a></li><li><a href="lang.ml.html">lang.ml</a></li><li><a href="media_type.ml.html">media_type.ml</a></li><li><a href="opml.ml.html">opml.ml</a></li><li><a href="person.ml.html">person.ml</a></li><li><a href="rss1.ml.html">rss1.ml</a></li><li><a href="rss2.ml.html">rss2.ml</a></li><li><a href="text_input.ml.html">text_input.ml</a></li><li><a href="tz.ml.html">tz.ml</a></li><li><a href="xml.ml.html">xml.ml</a></li><li><a href="yocaml_syndication.ml.html">yocaml_syndication.ml</a></li><li><a href="yocaml_syndication__.ml.html">yocaml_syndication__.ml</a></li></ul></li></ul></li></ul></li></ul></nav></div><pre class="source_container"><code class="source_line_column"><a id="L1" class="source_line" href="#L1">1</a>
+<a id="L2" class="source_line" href="#L2">2</a>
+<a id="L3" class="source_line" href="#L3">3</a>
+<a id="L4" class="source_line" href="#L4">4</a>
+<a id="L5" class="source_line" href="#L5">5</a>
+<a id="L6" class="source_line" href="#L6">6</a>
+<a id="L7" class="source_line" href="#L7">7</a>
+<a id="L8" class="source_line" href="#L8">8</a>
+<a id="L9" class="source_line" href="#L9">9</a>
+<a id="L10" class="source_line" href="#L10">10</a>
+<a id="L11" class="source_line" href="#L11">11</a>
+<a id="L12" class="source_line" href="#L12">12</a>
+<a id="L13" class="source_line" href="#L13">13</a>
+<a id="L14" class="source_line" href="#L14">14</a>
+<a id="L15" class="source_line" href="#L15">15</a>
+<a id="L16" class="source_line" href="#L16">16</a>
+<a id="L17" class="source_line" href="#L17">17</a>
+<a id="L18" class="source_line" href="#L18">18</a>
+<a id="L19" class="source_line" href="#L19">19</a>
+<a id="L20" class="source_line" href="#L20">20</a>
+<a id="L21" class="source_line" href="#L21">21</a>
+<a id="L22" class="source_line" href="#L22">22</a>
+<a id="L23" class="source_line" href="#L23">23</a>
+<a id="L24" class="source_line" href="#L24">24</a>
+<a id="L25" class="source_line" href="#L25">25</a>
+<a id="L26" class="source_line" href="#L26">26</a>
+<a id="L27" class="source_line" href="#L27">27</a>
+<a id="L28" class="source_line" href="#L28">28</a>
+<a id="L29" class="source_line" href="#L29">29</a>
+<a id="L30" class="source_line" href="#L30">30</a>
+<a id="L31" class="source_line" href="#L31">31</a>
+<a id="L32" class="source_line" href="#L32">32</a>
+<a id="L33" class="source_line" href="#L33">33</a>
+</code><code class="source_code"><span><span class="COMMENT">(* YOCaml a static blog generator.
+   Copyright (C) 2024 The Funkyworkers and The YOCaml's developers
+
+   This program is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program.  If not, see &lt;https://www.gnu.org/licenses/&gt;. *)</span><span class="EOL">
+</span><span class="EOL">
+</span><span id="type-t"><span class="TYPE">type</span> <span class="LIDENT">t</span> <span class="EQUAL">=</span> <span class="LBRACE">{</span> <span id="def_11"><span class="LIDENT">name</span> <span class="COLON">:</span> <span class="LIDENT">string</span><span class="SEMI">;</span></span> <span id="def_13"><span class="LIDENT">uri</span> <span class="COLON">:</span> <span class="LIDENT">string</span> <span class="LIDENT">option</span><span class="SEMI">;</span></span> <span id="def_12"><span class="LIDENT">version</span> <span class="COLON">:</span> <span class="LIDENT">string</span> <span class="LIDENT">option</span></span> <span class="RBRACE">}</span></span><span class="EOL">
+</span><span class="EOL">
+</span><span class="LET">let</span> <span id="val-make"><span class="LIDENT">make</span></span> <span class="QUESTION">?</span><span id="local_uri_1"><span class="LIDENT">uri</span></span> <span class="QUESTION">?</span><span id="local_version_2"><span class="LIDENT">version</span></span> <span id="local_name_3"><span class="LIDENT">name</span></span> <span class="EQUAL">=</span> <span class="LBRACE">{</span> <a href="#local_name_3"><span class="LIDENT">name</span></a><span class="SEMI">;</span> <a href="#local_uri_1"><span class="LIDENT">uri</span></a><span class="SEMI">;</span> <a href="#local_version_2"><span class="LIDENT">version</span></a> <span class="RBRACE">}</span><span class="EOL">
+</span><span class="EOL">
+</span><span class="LET">let</span> <span id="val-to_atom"><span class="LIDENT">to_atom</span></span> <span class="LBRACE">{</span> <span id="local_name_4"><span class="LIDENT">name</span></span><span class="SEMI">;</span> <span id="local_uri_5"><span class="LIDENT">uri</span></span><span class="SEMI">;</span> <span id="local_version_6"><span class="LIDENT">version</span></span> <span class="RBRACE">}</span> <span class="EQUAL">=</span><span class="EOL">
+</span>  <span class="LET">let</span> <span id="local_attr_7"><span class="LIDENT">attr</span></span> <span class="EQUAL">=</span><span class="EOL">
+</span>    <span class="LET">let</span> <span class="OPEN">open</span> <a href="xml.ml.html#module-Attr"><span class="UIDENT">Xml</span><span class="DOT">.</span><span class="UIDENT">Attr</span></a> <span class="IN">in</span><span class="EOL">
+</span>    <span class="LET">let</span> <span id="local_uri_8"><span class="LIDENT">uri</span></span> <span class="EQUAL">=</span> <a href="../../../ocaml-compiler/src/stdlib/option.ml.html"><span class="UIDENT">Option</span></a><span class="DOT">.</span><span class="LPAREN">(</span><a href="#local_uri_5"><span class="LIDENT">uri</span></a> <span class="INFIXOP0">|&gt;</span> <a href="../../../ocaml-compiler/src/stdlib/option.ml.html#val-map"><span class="LIDENT">map</span></a> <span class="LPAREN">(</span><a href="xml.ml.html#module-Attr.val-string"><span class="LIDENT">string</span></a> <span class="LABEL">~key:</span><span class="STRING">&quot;uri&quot;</span><span class="RPAREN">)</span> <span class="INFIXOP0">|&gt;</span> <a href="../../../ocaml-compiler/src/stdlib/option.ml.html#val-to_list"><span class="LIDENT">to_list</span></a><span class="RPAREN">)</span> <span class="IN">in</span><span class="EOL">
+</span>    <span class="LET">let</span> <span id="local_version_9"><span class="LIDENT">version</span></span> <span class="EQUAL">=</span> <a href="../../../ocaml-compiler/src/stdlib/option.ml.html"><span class="UIDENT">Option</span></a><span class="DOT">.</span><span class="LPAREN">(</span><a href="#local_version_6"><span class="LIDENT">version</span></a> <span class="INFIXOP0">|&gt;</span> <a href="../../../ocaml-compiler/src/stdlib/option.ml.html#val-map"><span class="LIDENT">map</span></a> <span class="LPAREN">(</span><a href="xml.ml.html#module-Attr.val-escaped"><span class="LIDENT">escaped</span></a> <span class="LABEL">~key:</span><span class="STRING">&quot;version&quot;</span><span class="RPAREN">)</span> <span class="INFIXOP0">|&gt;</span> <a href="../../../ocaml-compiler/src/stdlib/option.ml.html#val-to_list"><span class="LIDENT">to_list</span></a><span class="RPAREN">)</span> <span class="IN">in</span><span class="EOL">
+</span>    <a href="#local_uri_8"><span class="LIDENT">uri</span></a> <a href="../../../ocaml-compiler/src/stdlib/stdlib.ml.html#val-(@)"><span class="INFIXOP1">@</span></a> <a href="#local_version_9"><span class="LIDENT">version</span></a><span class="EOL">
+</span>  <span class="IN">in</span><span class="EOL">
+</span>  <a href="xml.ml.html#val-leaf"><span class="UIDENT">Xml</span><span class="DOT">.</span><span class="LIDENT">leaf</span></a> <span class="LABEL">~name:</span><span class="STRING">&quot;generator&quot;</span> <span class="TILDE">~</span><a href="#local_attr_7"><span class="LIDENT">attr</span></a> <span class="LPAREN">(</span><a href="xml.ml.html#val-escape"><span class="UIDENT">Xml</span><span class="DOT">.</span><span class="LIDENT">escape</span></a> <a href="#local_name_4"><span class="LIDENT">name</span></a><span class="RPAREN">)</span><span class="EOL">
+</span><span class="EOL">
+</span><span class="LET">let</span> <span id="val-to_rss2"><span class="LIDENT">to_rss2</span></span> <span class="LBRACE">{</span> <span id="local_name_10"><span class="LIDENT">name</span></span><span class="SEMI">;</span> <span class="UNDERSCORE">_</span> <span class="RBRACE">}</span> <span class="EQUAL">=</span> <a href="xml.ml.html#val-leaf"><span class="UIDENT">Xml</span><span class="DOT">.</span><span class="LIDENT">leaf</span></a> <span class="LABEL">~name:</span><span class="STRING">&quot;generator&quot;</span> <span class="LPAREN">(</span><span class="UIDENT">Some</span> <a href="#local_name_10"><span class="LIDENT">name</span></a><span class="RPAREN">)</span><span class="EOL">
+</span><span class="EOL">
+</span><span class="LET">let</span> <span id="val-yocaml"><span class="LIDENT">yocaml</span></span> <span class="EQUAL">=</span><span class="EOL">
+</span>  <span class="LIDENT">make</span> <span class="LABEL">~uri:</span><span class="STRING">&quot;https://github.com/xhtmlboi/yocaml&quot;</span> <span class="LABEL">~version:</span><span class="STRING">&quot;2&quot;</span> <span class="STRING">&quot;YOCaml&quot;</span><span class="EOL">
+</span></span></code></pre></body></html>

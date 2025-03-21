@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"><head><title>Source: yocaml_git.ml (yocaml_git.src.yocaml_git)</title><meta charset="utf-8"/><link rel="stylesheet" href="../../../odoc.css"/><meta name="generator" content="odoc 3.0.0"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/></head><body class="odoc-src"><nav class="odoc-nav"><a href="../index.html">Up</a> – <a href="../../../index.html">Package index</a> &#x00BB; <a href="../../index.html">yocaml_git</a> &#x00BB; <a href="../index.html">Sources</a> &#x00BB; yocaml_git &#x00BB; yocaml_git.ml</nav><header class="odoc-preamble"><h1>Source file <code><span>yocaml_git.ml</span></code></h1></header><div class="odoc-tocs"><nav class="odoc-toc odoc-global-toc"><ul><li><a href="../../index.html">yocaml_git</a><ul><li>Library <code>yocaml_git</code><ul><li><a href="../../yocaml_git/Yocaml_git/index.html">Yocaml_git</a></li></ul></li><li><a href="../index.html">Sources</a><ul><li>yocaml_git<ul><li><a href="runtime.ml.html">runtime.ml</a></li><li><a href="ssh.ml.html">ssh.ml</a></li><li><a href="#" class="current_unit">yocaml_git.ml</a></li><li><a href="yocaml_git__.ml.html">yocaml_git__.ml</a></li></ul></li></ul></li></ul></li></ul></nav></div><pre class="source_container"><code class="source_line_column"><a id="L1" class="source_line" href="#L1">1</a>
+<a id="L2" class="source_line" href="#L2">2</a>
+<a id="L3" class="source_line" href="#L3">3</a>
+<a id="L4" class="source_line" href="#L4">4</a>
+<a id="L5" class="source_line" href="#L5">5</a>
+<a id="L6" class="source_line" href="#L6">6</a>
+<a id="L7" class="source_line" href="#L7">7</a>
+<a id="L8" class="source_line" href="#L8">8</a>
+<a id="L9" class="source_line" href="#L9">9</a>
+<a id="L10" class="source_line" href="#L10">10</a>
+<a id="L11" class="source_line" href="#L11">11</a>
+<a id="L12" class="source_line" href="#L12">12</a>
+<a id="L13" class="source_line" href="#L13">13</a>
+<a id="L14" class="source_line" href="#L14">14</a>
+<a id="L15" class="source_line" href="#L15">15</a>
+<a id="L16" class="source_line" href="#L16">16</a>
+<a id="L17" class="source_line" href="#L17">17</a>
+<a id="L18" class="source_line" href="#L18">18</a>
+<a id="L19" class="source_line" href="#L19">19</a>
+<a id="L20" class="source_line" href="#L20">20</a>
+<a id="L21" class="source_line" href="#L21">21</a>
+<a id="L22" class="source_line" href="#L22">22</a>
+<a id="L23" class="source_line" href="#L23">23</a>
+<a id="L24" class="source_line" href="#L24">24</a>
+<a id="L25" class="source_line" href="#L25">25</a>
+<a id="L26" class="source_line" href="#L26">26</a>
+<a id="L27" class="source_line" href="#L27">27</a>
+<a id="L28" class="source_line" href="#L28">28</a>
+<a id="L29" class="source_line" href="#L29">29</a>
+<a id="L30" class="source_line" href="#L30">30</a>
+<a id="L31" class="source_line" href="#L31">31</a>
+<a id="L32" class="source_line" href="#L32">32</a>
+<a id="L33" class="source_line" href="#L33">33</a>
+<a id="L34" class="source_line" href="#L34">34</a>
+<a id="L35" class="source_line" href="#L35">35</a>
+<a id="L36" class="source_line" href="#L36">36</a>
+<a id="L37" class="source_line" href="#L37">37</a>
+<a id="L38" class="source_line" href="#L38">38</a>
+<a id="L39" class="source_line" href="#L39">39</a>
+<a id="L40" class="source_line" href="#L40">40</a>
+<a id="L41" class="source_line" href="#L41">41</a>
+<a id="L42" class="source_line" href="#L42">42</a>
+<a id="L43" class="source_line" href="#L43">43</a>
+<a id="L44" class="source_line" href="#L44">44</a>
+<a id="L45" class="source_line" href="#L45">45</a>
+<a id="L46" class="source_line" href="#L46">46</a>
+<a id="L47" class="source_line" href="#L47">47</a>
+<a id="L48" class="source_line" href="#L48">48</a>
+<a id="L49" class="source_line" href="#L49">49</a>
+</code><code class="source_code"><span><span class="COMMENT">(* YOCaml a static blog generator.
+   Copyright (C) 2024 The Funkyworkers and The YOCaml's developers
+
+   This program is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program.  If not, see &lt;https://www.gnu.org/licenses/&gt;. *)</span><span class="EOL">
+</span><span class="EOL">
+</span><span id="module-Required"><span class="MODULE">module</span> <span class="UIDENT">Required</span> <span class="EQUAL">=</span> <span class="UIDENT">Required</span></span><span class="EOL">
+</span><span class="EOL">
+</span><span class="LET">let</span> <span id="val-run"><span class="LIDENT">run</span></span> <span class="LPAREN">(</span><span class="MODULE">module</span> <span id="local_Source_1"><span class="UIDENT">Source</span></span> <span class="COLON">:</span> <span class="UIDENT">Required</span><span class="DOT">.</span><span class="UIDENT">SOURCE</span><span class="RPAREN">)</span> <span class="TILDE">~</span><span id="local_context_2"><span class="LIDENT">context</span></span> <span class="QUESTION">?</span><span id="local_author_3"><span class="LIDENT">author</span></span> <span class="QUESTION">?</span><span id="local_email_4"><span class="LIDENT">email</span></span> <span class="QUESTION">?</span><span id="local_message_5"><span class="LIDENT">message</span></span><span class="EOL">
+</span>    <span class="TILDE">~</span><span id="local_remote_6"><span class="LIDENT">remote</span></span> <span class="QUESTION">?</span><span id="local_level_7"><span class="LIDENT">level</span></span> <span class="QUESTION">?</span><span id="local_custom_error_handler_8"><span class="LIDENT">custom_error_handler</span></span> <span id="local_program_9"><span class="LIDENT">program</span></span> <span class="EQUAL">=</span><span class="EOL">
+</span>  <span class="LET">let</span> <span class="OPEN">open</span> <a href="../../../lwt/src/lwt/lwt.ml.html#module-Syntax"><span class="UIDENT">Lwt</span><span class="DOT">.</span><span class="UIDENT">Syntax</span></a> <span class="IN">in</span><span class="EOL">
+</span>  <span class="LET">let</span> <span class="LPAREN">(</span><span class="RPAREN">)</span> <span class="EQUAL">=</span> <a href="../../../mirage-crypto-rng/src/mirage-crypto-rng.unix/mirage_crypto_rng_unix.ml.html#val-use_default"><span class="UIDENT">Mirage_crypto_rng_unix</span><span class="DOT">.</span><span class="LIDENT">use_default</span></a> <span class="LPAREN">(</span><span class="RPAREN">)</span> <span class="IN">in</span><span class="EOL">
+</span>  <span class="LETOP">let*</span> <span id="local_context_10"><span class="LIDENT">context</span></span> <span class="EQUAL">=</span> <span class="MATCH">match</span> <a href="#local_context_2"><span class="LIDENT">context</span></a> <span class="WITH">with</span> <span class="BACKQUOTE">`</span><span class="UIDENT">SSH</span> <span class="MINUSGREATER">-&gt;</span> <a href="ssh.ml.html#val-context"><span class="UIDENT">Ssh</span><span class="DOT">.</span><span class="LIDENT">context</span></a> <span class="LPAREN">(</span><span class="RPAREN">)</span> <span class="IN">in</span><span class="EOL">
+</span>  <span class="LETOP">let*</span> <span id="local_store_11"><span class="LIDENT">store</span></span> <span class="EQUAL">=</span> <a href="../../../git-kv/src/git-kv/git_kv.ml.html#val-connect"><span class="UIDENT">Git_kv</span><span class="DOT">.</span><span class="LIDENT">connect</span></a> <a href="#local_context_10"><span class="LIDENT">context</span></a> <a href="#local_remote_6"><span class="LIDENT">remote</span></a> <span class="IN">in</span><span class="EOL">
+</span>  <span class="LET">let</span> <span class="MODULE">module</span> <span class="UIDENT">Store</span> <span class="EQUAL">=</span> <span class="STRUCT">struct</span><span class="EOL">
+</span>    <span class="INCLUDE">include</span> <a href="../../../git-kv/src/git-kv/git_kv.ml.html"><span class="UIDENT">Git_kv</span></a><span class="EOL">
+</span><span class="EOL">
+</span>    <span class="COMMENT">(* last_modified and change_and_push have a weird interaction;
+       so we show the old last_modified *)</span><span class="EOL">
+</span>    <span class="LET">let</span> <span id="local_last_modified_12"><span class="LIDENT">last_modified</span></span> <span id="local_new_store_13"><span class="LIDENT">new_store</span></span> <span id="local_key_14"><span class="LIDENT">key</span></span> <span class="EQUAL">=</span><span class="EOL">
+</span>      <span class="LETOP">let*</span> <span id="local_r_15"><span class="LIDENT">r</span></span> <span class="EQUAL">=</span> <span class="LIDENT">last_modified</span> <a href="#local_store_11"><span class="LIDENT">store</span></a> <a href="#local_key_14"><span class="LIDENT">key</span></a> <span class="IN">in</span><span class="EOL">
+</span>      <span class="MATCH">match</span> <a href="#local_r_15"><span class="LIDENT">r</span></a> <span class="WITH">with</span><span class="EOL">
+</span>      <span class="BAR">|</span> <span class="UIDENT">Error</span> <span class="LPAREN">(</span><span class="BACKQUOTE">`</span><span class="UIDENT">Not_found</span> <span class="UNDERSCORE">_</span><span class="RPAREN">)</span> <span class="MINUSGREATER">-&gt;</span> <span class="LIDENT">last_modified</span> <a href="#local_new_store_13"><span class="LIDENT">new_store</span></a> <a href="#local_key_14"><span class="LIDENT">key</span></a><span class="EOL">
+</span>      <span class="BAR">|</span> <span class="UNDERSCORE">_</span> <span class="MINUSGREATER">-&gt;</span> <a href="../../../lwt/src/lwt/lwt.ml.html#module-Trivial_promises.val-return"><span class="UIDENT">Lwt</span><span class="DOT">.</span><span class="LIDENT">return</span></a> <a href="#local_r_15"><span class="LIDENT">r</span></a><span class="EOL">
+</span>  <span class="END">end</span> <span class="IN">in</span><span class="EOL">
+</span>  <span class="UIDENT">Store</span><span class="DOT">.</span><span class="LIDENT">change_and_push</span> <span class="QUESTION">?</span><a href="#local_author_3"><span class="LIDENT">author</span></a> <span class="OPTLABEL">?author_email:</span><a href="#local_email_4"><span class="LIDENT">email</span></a> <span class="QUESTION">?</span><a href="#local_message_5"><span class="LIDENT">message</span></a> <a href="#local_store_11"><span class="LIDENT">store</span></a> <span class="LPAREN">(</span><span class="FUN">fun</span> <span id="local_store_16"><span class="LIDENT">store</span></span> <span class="MINUSGREATER">-&gt;</span><span class="EOL">
+</span>      <span class="LET">let</span> <span class="MODULE">module</span> <span class="UIDENT">Config</span> <span class="EQUAL">=</span> <span class="STRUCT">struct</span><span class="EOL">
+</span>        <span class="LET">let</span> <span id="local_store_17"><span class="LIDENT">store</span></span> <span class="EQUAL">=</span> <a href="#local_store_16"><span class="LIDENT">store</span></a><span class="EOL">
+</span>      <span class="END">end</span> <span class="IN">in</span><span class="EOL">
+</span>      <span class="LET">let</span> <span class="MODULE">module</span> <span class="UIDENT">Runtime</span> <span class="EQUAL">=</span> <a href="runtime.ml.html#module-Make"><span class="UIDENT">Runtime</span><span class="DOT">.</span><span class="UIDENT">Make</span></a> <span class="LPAREN">(</span><a href="#local_Source_1"><span class="UIDENT">Source</span></a><span class="RPAREN">)</span> <span class="LPAREN">(</span><span class="UIDENT">Config</span><span class="RPAREN">)</span> <span class="LPAREN">(</span><span class="UIDENT">Store</span><span class="RPAREN">)</span> <span class="IN">in</span><span class="EOL">
+</span>      <span class="LET">let</span> <span class="LPAREN">(</span><span class="RPAREN">)</span> <span class="EQUAL">=</span> <a href="../../../yocaml_runtime/src/yocaml_runtime/log.ml.html#val-setup"><span class="UIDENT">Yocaml_runtime</span><span class="DOT">.</span><span class="UIDENT">Log</span><span class="DOT">.</span><span class="LIDENT">setup</span></a> <span class="QUESTION">?</span><a href="#local_level_7"><span class="LIDENT">level</span></a> <span class="LPAREN">(</span><span class="RPAREN">)</span> <span class="IN">in</span><span class="EOL">
+</span>      <span class="UIDENT">Runtime</span><span class="DOT">.</span><span class="UIDENT">Runner</span><span class="DOT">.</span><span class="LIDENT">run</span> <span class="QUESTION">?</span><a href="#local_custom_error_handler_8"><span class="LIDENT">custom_error_handler</span></a> <a href="#local_program_9"><span class="LIDENT">program</span></a><span class="RPAREN">)</span><span class="EOL">
+</span><span class="EOL">
+</span><span id="module-From_identity"><span class="MODULE">module</span> <span class="UIDENT">From_identity</span> <span class="LPAREN">(</span><span class="UIDENT">Source</span> <span class="COLON">:</span> <span class="UIDENT">Yocaml</span><span class="DOT">.</span><span class="UIDENT">Required</span><span class="DOT">.</span><span class="UIDENT">RUNTIME</span> <span class="WITH">with</span> <span id="def_19"><span class="TYPE">type</span> <span class="QUOTE">'</span><span class="LIDENT">a</span> <span class="LIDENT">t</span> <span class="EQUAL">=</span> <span class="QUOTE">'</span><span class="LIDENT">a</span></span><span class="RPAREN">)</span> <span class="EQUAL">=</span><span class="EOL">
+</span><span class="STRUCT">struct</span><span class="EOL">
+</span>  <span class="INCLUDE">include</span> <span class="UIDENT">Source</span><span class="EOL">
+</span><span class="EOL">
+</span>  <span class="LET">let</span> <span id="module-From_identity.val-lift"><span class="LIDENT">lift</span></span> <span id="local_x_18"><span class="LIDENT">x</span></span> <span class="EQUAL">=</span> <a href="../../../lwt/src/lwt/lwt.ml.html#module-Trivial_promises.val-return"><span class="UIDENT">Lwt</span><span class="DOT">.</span><span class="LIDENT">return</span></a> <a href="#local_x_18"><span class="LIDENT">x</span></a><span class="EOL">
+</span><span class="END">end</span></span><span class="EOL">
+</span></span></code></pre></body></html>

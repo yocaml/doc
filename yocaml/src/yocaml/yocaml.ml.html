@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"><head><title>Source: yocaml.ml (yocaml.src.yocaml)</title><meta charset="utf-8"/><link rel="stylesheet" href="../../../odoc.css"/><meta name="generator" content="odoc 3.0.0"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/></head><body class="odoc-src"><nav class="odoc-nav"><a href="../index.html">Up</a> – <a href="../../../index.html">Package index</a> &#x00BB; <a href="../../index.html">YOCaml</a> &#x00BB; <a href="../index.html">Sources</a> &#x00BB; yocaml &#x00BB; yocaml.ml</nav><header class="odoc-preamble"><h1>Source file <code><span>yocaml.ml</span></code></h1></header><div class="odoc-tocs"><nav class="odoc-toc odoc-global-toc"><ul><li><a href="../../index.html">YOCaml</a><ul><li><a href="../../data_validation.html">Generic validation of structured data</a></li><li><a href="../../effect.html">Effect abstraction</a></li><li>Library <code>yocaml</code><ul><li><a href="../../yocaml/Yocaml/index.html">Yocaml</a></li></ul></li><li><a href="../index.html">Sources</a><ul><li>yocaml<ul><li><a href="action.ml.html">action.ml</a></li><li><a href="archetype.ml.html">archetype.ml</a></li><li><a href="cache.ml.html">cache.ml</a></li><li><a href="cmd.ml.html">cmd.ml</a></li><li><a href="data.ml.html">data.ml</a></li><li><a href="deps.ml.html">deps.ml</a></li><li><a href="diagnostic.ml.html">diagnostic.ml</a></li><li><a href="eff.ml.html">eff.ml</a></li><li><a href="lexicon.ml.html">lexicon.ml</a></li><li><a href="make.ml.html">make.ml</a></li><li><a href="markup.ml.html">markup.ml</a></li><li><a href="metadata.ml.html">metadata.ml</a></li><li><a href="nel.ml.html">nel.ml</a></li><li><a href="path.ml.html">path.ml</a></li><li><a href="pipeline.ml.html">pipeline.ml</a></li><li><a href="reader.ml.html">reader.ml</a></li><li><a href="runtime.ml.html">runtime.ml</a></li><li><a href="sexp.ml.html">sexp.ml</a></li><li><a href="sexp_provider.ml.html">sexp_provider.ml</a></li><li><a href="slug.ml.html">slug.ml</a></li><li><a href="task.ml.html">task.ml</a></li><li><a href="#" class="current_unit">yocaml.ml</a></li><li><a href="yocaml__.ml.html">yocaml__.ml</a></li></ul></li></ul></li></ul></li></ul></nav></div><pre class="source_container"><code class="source_line_column"><a id="L1" class="source_line" href="#L1">1</a>
+<a id="L2" class="source_line" href="#L2">2</a>
+<a id="L3" class="source_line" href="#L3">3</a>
+<a id="L4" class="source_line" href="#L4">4</a>
+<a id="L5" class="source_line" href="#L5">5</a>
+<a id="L6" class="source_line" href="#L6">6</a>
+<a id="L7" class="source_line" href="#L7">7</a>
+<a id="L8" class="source_line" href="#L8">8</a>
+<a id="L9" class="source_line" href="#L9">9</a>
+<a id="L10" class="source_line" href="#L10">10</a>
+<a id="L11" class="source_line" href="#L11">11</a>
+<a id="L12" class="source_line" href="#L12">12</a>
+<a id="L13" class="source_line" href="#L13">13</a>
+<a id="L14" class="source_line" href="#L14">14</a>
+<a id="L15" class="source_line" href="#L15">15</a>
+<a id="L16" class="source_line" href="#L16">16</a>
+<a id="L17" class="source_line" href="#L17">17</a>
+<a id="L18" class="source_line" href="#L18">18</a>
+<a id="L19" class="source_line" href="#L19">19</a>
+<a id="L20" class="source_line" href="#L20">20</a>
+<a id="L21" class="source_line" href="#L21">21</a>
+<a id="L22" class="source_line" href="#L22">22</a>
+<a id="L23" class="source_line" href="#L23">23</a>
+<a id="L24" class="source_line" href="#L24">24</a>
+<a id="L25" class="source_line" href="#L25">25</a>
+<a id="L26" class="source_line" href="#L26">26</a>
+<a id="L27" class="source_line" href="#L27">27</a>
+<a id="L28" class="source_line" href="#L28">28</a>
+<a id="L29" class="source_line" href="#L29">29</a>
+<a id="L30" class="source_line" href="#L30">30</a>
+<a id="L31" class="source_line" href="#L31">31</a>
+<a id="L32" class="source_line" href="#L32">32</a>
+<a id="L33" class="source_line" href="#L33">33</a>
+<a id="L34" class="source_line" href="#L34">34</a>
+<a id="L35" class="source_line" href="#L35">35</a>
+<a id="L36" class="source_line" href="#L36">36</a>
+<a id="L37" class="source_line" href="#L37">37</a>
+<a id="L38" class="source_line" href="#L38">38</a>
+<a id="L39" class="source_line" href="#L39">39</a>
+<a id="L40" class="source_line" href="#L40">40</a>
+<a id="L41" class="source_line" href="#L41">41</a>
+<a id="L42" class="source_line" href="#L42">42</a>
+<a id="L43" class="source_line" href="#L43">43</a>
+</code><code class="source_code"><span><span class="COMMENT">(* YOCaml a static blog generator.
+   Copyright (C) 2024 The Funkyworkers and The YOCaml's developers
+
+   This program is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program.  If not, see &lt;https://www.gnu.org/licenses/&gt;. *)</span><span class="EOL">
+</span><span class="EOL">
+</span><span id="module-Data"><span class="MODULE">module</span> <span class="UIDENT">Data</span> <span class="EQUAL">=</span> <a href="data.ml.html"><span class="UIDENT">Data</span></a></span><span class="EOL">
+</span><span id="module-Nel"><span class="MODULE">module</span> <span class="UIDENT">Nel</span> <span class="EQUAL">=</span> <a href="nel.ml.html"><span class="UIDENT">Nel</span></a></span><span class="EOL">
+</span><span id="module-Path"><span class="MODULE">module</span> <span class="UIDENT">Path</span> <span class="EQUAL">=</span> <a href="path.ml.html"><span class="UIDENT">Path</span></a></span><span class="EOL">
+</span><span id="module-Cache"><span class="MODULE">module</span> <span class="UIDENT">Cache</span> <span class="EQUAL">=</span> <a href="cache.ml.html"><span class="UIDENT">Cache</span></a></span><span class="EOL">
+</span><span id="module-Eff"><span class="MODULE">module</span> <span class="UIDENT">Eff</span> <span class="EQUAL">=</span> <a href="eff.ml.html"><span class="UIDENT">Eff</span></a></span><span class="EOL">
+</span><span id="module-Deps"><span class="MODULE">module</span> <span class="UIDENT">Deps</span> <span class="EQUAL">=</span> <a href="deps.ml.html"><span class="UIDENT">Deps</span></a></span><span class="EOL">
+</span><span id="module-Task"><span class="MODULE">module</span> <span class="UIDENT">Task</span> <span class="EQUAL">=</span> <a href="task.ml.html"><span class="UIDENT">Task</span></a></span><span class="EOL">
+</span><span id="module-Pipeline"><span class="MODULE">module</span> <span class="UIDENT">Pipeline</span> <span class="EQUAL">=</span> <a href="pipeline.ml.html"><span class="UIDENT">Pipeline</span></a></span><span class="EOL">
+</span><span id="module-Action"><span class="MODULE">module</span> <span class="UIDENT">Action</span> <span class="EQUAL">=</span> <a href="action.ml.html"><span class="UIDENT">Action</span></a></span><span class="EOL">
+</span><span id="module-Required"><span class="MODULE">module</span> <span class="UIDENT">Required</span> <span class="EQUAL">=</span> <span class="UIDENT">Required</span></span><span class="EOL">
+</span><span id="module-Metadata"><span class="MODULE">module</span> <span class="UIDENT">Metadata</span> <span class="EQUAL">=</span> <a href="metadata.ml.html"><span class="UIDENT">Metadata</span></a></span><span class="EOL">
+</span><span id="module-Archetype"><span class="MODULE">module</span> <span class="UIDENT">Archetype</span> <span class="EQUAL">=</span> <a href="archetype.ml.html"><span class="UIDENT">Archetype</span></a></span><span class="EOL">
+</span><span id="module-Diagnostic"><span class="MODULE">module</span> <span class="UIDENT">Diagnostic</span> <span class="EQUAL">=</span> <a href="diagnostic.ml.html"><span class="UIDENT">Diagnostic</span></a></span><span class="EOL">
+</span><span id="module-Cmd"><span class="MODULE">module</span> <span class="UIDENT">Cmd</span> <span class="EQUAL">=</span> <a href="cmd.ml.html"><span class="UIDENT">Cmd</span></a></span><span class="EOL">
+</span><span id="module-Slug"><span class="MODULE">module</span> <span class="UIDENT">Slug</span> <span class="EQUAL">=</span> <a href="slug.ml.html"><span class="UIDENT">Slug</span></a></span><span class="EOL">
+</span><span id="module-Reader"><span class="MODULE">module</span> <span class="UIDENT">Reader</span> <span class="EQUAL">=</span> <a href="reader.ml.html"><span class="UIDENT">Reader</span></a></span><span class="EOL">
+</span><span id="module-Make"><span class="MODULE">module</span> <span class="UIDENT">Make</span> <span class="EQUAL">=</span> <a href="make.ml.html"><span class="UIDENT">Make</span></a></span><span class="EOL">
+</span><span id="module-Markup"><span class="MODULE">module</span> <span class="UIDENT">Markup</span> <span class="EQUAL">=</span> <a href="markup.ml.html"><span class="UIDENT">Markup</span></a></span><span class="EOL">
+</span><span id="module-Toc"><span class="MODULE">module</span> <span class="UIDENT">Toc</span> <span class="EQUAL">=</span> <span class="UIDENT">Markup</span><span class="DOT">.</span><span class="UIDENT">Toc</span></span><span class="EOL">
+</span><span id="module-Datetime"><span class="MODULE">module</span> <span class="UIDENT">Datetime</span> <span class="EQUAL">=</span> <span class="UIDENT">Archetype</span><span class="DOT">.</span><span class="UIDENT">Datetime</span></span><span class="EOL">
+</span><span class="EOL">
+</span><span id="module-Sexp"><span class="MODULE">module</span> <span class="UIDENT">Sexp</span> <span class="EQUAL">=</span> <span class="STRUCT">struct</span><span class="EOL">
+</span>  <span class="INCLUDE">include</span> <a href="sexp.ml.html"><span class="UIDENT">Sexp</span></a><span class="EOL">
+</span>  <span id="module-Sexp.module-Provider"><span class="MODULE">module</span> <span class="UIDENT">Provider</span> <span class="EQUAL">=</span> <a href="sexp_provider.ml.html"><span class="UIDENT">Sexp_provider</span></a></span><span class="EOL">
+</span><span class="END">end</span></span><span class="EOL">
+</span><span class="EOL">
+</span><span id="module-Runtime"><span class="MODULE">module</span> <span class="UIDENT">Runtime</span> <span class="EQUAL">=</span> <a href="runtime.ml.html"><span class="UIDENT">Runtime</span></a></span><span class="EOL">
+</span></span></code></pre></body></html>

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"><head><title>Source: hash.ml (yocaml_runtime.src.yocaml_runtime)</title><meta charset="utf-8"/><link rel="stylesheet" href="../../../odoc.css"/><meta name="generator" content="odoc 3.0.0"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/></head><body class="odoc-src"><nav class="odoc-nav"><a href="../index.html">Up</a> – <a href="../../../index.html">Package index</a> &#x00BB; <a href="../../index.html">yocaml_runtime</a> &#x00BB; <a href="../index.html">Sources</a> &#x00BB; yocaml_runtime &#x00BB; hash.ml</nav><header class="odoc-preamble"><h1>Source file <code><span>hash.ml</span></code></h1></header><div class="odoc-tocs"><nav class="odoc-toc odoc-global-toc"><ul><li><a href="../../index.html">yocaml_runtime</a><ul><li>Library <code>yocaml_runtime</code><ul><li><a href="../../yocaml_runtime/Yocaml_runtime/index.html">Yocaml_runtime</a></li></ul></li><li><a href="../index.html">Sources</a><ul><li>yocaml_runtime<ul><li><a href="error.ml.html">error.ml</a></li><li><a href="#" class="current_unit">hash.ml</a></li><li><a href="log.ml.html">log.ml</a></li><li><a href="server.ml.html">server.ml</a></li><li><a href="yocaml_runtime.ml.html">yocaml_runtime.ml</a></li></ul></li></ul></li></ul></li></ul></nav></div><pre class="source_container"><code class="source_line_column"><a id="L1" class="source_line" href="#L1">1</a>
+<a id="L2" class="source_line" href="#L2">2</a>
+<a id="L3" class="source_line" href="#L3">3</a>
+<a id="L4" class="source_line" href="#L4">4</a>
+<a id="L5" class="source_line" href="#L5">5</a>
+<a id="L6" class="source_line" href="#L6">6</a>
+<a id="L7" class="source_line" href="#L7">7</a>
+<a id="L8" class="source_line" href="#L8">8</a>
+<a id="L9" class="source_line" href="#L9">9</a>
+<a id="L10" class="source_line" href="#L10">10</a>
+<a id="L11" class="source_line" href="#L11">11</a>
+<a id="L12" class="source_line" href="#L12">12</a>
+<a id="L13" class="source_line" href="#L13">13</a>
+<a id="L14" class="source_line" href="#L14">14</a>
+<a id="L15" class="source_line" href="#L15">15</a>
+<a id="L16" class="source_line" href="#L16">16</a>
+<a id="L17" class="source_line" href="#L17">17</a>
+<a id="L18" class="source_line" href="#L18">18</a>
+</code><code class="source_code"><span><span class="COMMENT">(* YOCaml a static blog generator.
+   Copyright (C) 2024 The Funkyworkers and The YOCaml's developers
+
+   This program is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program.  If not, see &lt;https://www.gnu.org/licenses/&gt;. *)</span><span class="EOL">
+</span><span class="EOL">
+</span><span class="LET">let</span> <span id="val-content"><span class="LIDENT">content</span></span> <span id="local_value_1"><span class="LIDENT">value</span></span> <span class="EQUAL">=</span><span class="EOL">
+</span>  <a href="#local_value_1"><span class="LIDENT">value</span></a> <span class="INFIXOP0">|&gt;</span> <span class="UIDENT">Digestif</span><span class="DOT">.</span><span class="UIDENT">SHA256</span><span class="DOT">.</span><span class="LIDENT">digest_string</span> <span class="INFIXOP0">|&gt;</span> <span class="UIDENT">Digestif</span><span class="DOT">.</span><span class="UIDENT">SHA256</span><span class="DOT">.</span><span class="LIDENT">to_hex</span><span class="EOL">
+</span></span></code></pre></body></html>
