@@ -2,9 +2,10 @@
   "name": "yocaml_jingoo",
   "version": "dev",
   "files": [
+    "src/yocaml_jingoo/yocaml_jingoo.ml.html", "src/index.html",
     "yocaml_jingoo/Yocaml_jingoo/Pipeline/index.html",
     "yocaml_jingoo/Yocaml_jingoo/index.html", "yocaml_jingoo/index.html",
-    "src/yocaml_jingoo/yocaml_jingoo.ml.html", "src/index.html", "index.html"
+    "index.html"
   ],
   "failed": false,
   "redirections": []

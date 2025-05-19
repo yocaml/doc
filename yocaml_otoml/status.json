@@ -2,10 +2,11 @@
   "name": "yocaml_otoml",
   "version": "dev",
   "files": [
-    "yocaml_otoml/Yocaml_otoml/Eff/index.html",
+    "src/yocaml_otoml/yocaml_otoml.ml.html", "src/index.html",
     "yocaml_otoml/Yocaml_otoml/Pipeline/index.html",
+    "yocaml_otoml/Yocaml_otoml/Eff/index.html",
     "yocaml_otoml/Yocaml_otoml/index.html", "yocaml_otoml/index.html",
-    "src/yocaml_otoml/yocaml_otoml.ml.html", "src/index.html", "index.html"
+    "index.html"
   ],
   "failed": false,
   "redirections": []
