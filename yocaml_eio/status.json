@@ -4,8 +4,8 @@
   "files": [
     "yocaml_eio/Yocaml_eio/Runtime/index.html",
     "yocaml_eio/Yocaml_eio/index.html", "yocaml_eio/index.html",
-    "src/yocaml_eio/yocaml_eio.ml.html", "src/yocaml_eio/runtime.ml.html",
-    "src/yocaml_eio/runner.ml.html", "src/yocaml_eio/server.ml.html",
+    "src/yocaml_eio/server.ml.html", "src/yocaml_eio/runtime.ml.html",
+    "src/yocaml_eio/runner.ml.html", "src/yocaml_eio/yocaml_eio.ml.html",
     "src/yocaml_eio/yocaml_eio__.ml.html", "src/index.html", "index.html"
   ],
   "failed": false,
