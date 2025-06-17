@@ -2,8 +2,8 @@
   "name": "yocaml_omd",
   "version": "dev",
   "files": [
-    "src/yocaml_omd/yocaml_omd.ml.html", "src/index.html",
-    "yocaml_omd/Yocaml_omd/index.html", "yocaml_omd/index.html", "index.html"
+    "yocaml_omd/Yocaml_omd/index.html", "yocaml_omd/index.html",
+    "src/yocaml_omd/yocaml_omd.ml.html", "src/index.html", "index.html"
   ],
   "failed": false,
   "redirections": []
