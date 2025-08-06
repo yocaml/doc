@@ -3,6 +3,7 @@
   "version": "dev",
   "files": [
     "yocaml/Yocaml/Deps/index.html", "yocaml/Yocaml/Path/Map/index.html",
+    "yocaml/Yocaml/Path/Set/index.html",
     "yocaml/Yocaml/Path/Infix/index.html", "yocaml/Yocaml/Path/index.html",
     "yocaml/Yocaml/Reader/Over/argument-1-T/index.html",
     "yocaml/Yocaml/Reader/Over/index.html",
@@ -40,7 +41,7 @@
     "yocaml/Yocaml/Eff/List/index.html",
     "yocaml/Yocaml/Eff/Infix/index.html",
     "yocaml/Yocaml/Eff/Syntax/index.html", "yocaml/Yocaml/Eff/index.html",
-    "yocaml/Yocaml/Cmd/index.html",
+    "yocaml/Yocaml/Batch/index.html", "yocaml/Yocaml/Cmd/index.html",
     "yocaml/Yocaml/Archetype/Article/index.html",
     "yocaml/Yocaml/Archetype/Datetime/Infix/index.html",
     "yocaml/Yocaml/Archetype/Datetime/index.html",
@@ -69,9 +70,10 @@
     "src/yocaml/task.ml.html", "src/yocaml/cmd.ml.html",
     "src/yocaml/diagnostic.ml.html", "src/yocaml/pipeline.ml.html",
     "src/yocaml/yocaml.ml.html", "src/yocaml/sexp_provider.ml.html",
-    "src/yocaml/archetype.ml.html", "src/yocaml/runtime.ml.html",
-    "src/yocaml/sexp.ml.html", "src/yocaml/eff.ml.html", "src/index.html",
-    "index.html", "data_validation.html", "effect.html"
+    "src/yocaml/batch.ml.html", "src/yocaml/archetype.ml.html",
+    "src/yocaml/runtime.ml.html", "src/yocaml/sexp.ml.html",
+    "src/yocaml/eff.ml.html", "src/index.html", "index.html",
+    "data_validation.html", "effect.html"
   ],
   "failed": false,
   "redirections": []

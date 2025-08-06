@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"><head><title>Source: batch.ml (yocaml.src.yocaml)</title><meta charset="utf-8"/><link rel="stylesheet" href="../../../odoc.css"/><meta name="generator" content="odoc 3.1.0"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/></head><body class="odoc-src"><nav class="odoc-nav"><a href="../index.html">Up</a> – <a href="../../../index.html">Package index</a> &#x00BB; <a href="../../index.html">YOCaml</a> &#x00BB; <a href="../index.html">Sources</a> &#x00BB; yocaml &#x00BB; batch.ml</nav><header class="odoc-preamble"><h1>Source file <code><span>batch.ml</span></code></h1></header><div class="odoc-tocs"><nav class="odoc-toc odoc-global-toc"><ul><li><a href="../../index.html">YOCaml</a><ul><li><a href="../../data_validation.html">Generic validation of structured data</a></li><li><a href="../../effect.html">Effect abstraction</a></li><li>Library <code>yocaml</code><ul><li><a href="../../yocaml/Yocaml/index.html">Yocaml</a></li></ul></li><li><a href="../index.html">Sources</a><ul><li>yocaml<ul><li><a href="action.ml.html">action.ml</a></li><li><a href="archetype.ml.html">archetype.ml</a></li><li><a href="#" class="current_unit">batch.ml</a></li><li><a href="cache.ml.html">cache.ml</a></li><li><a href="cmd.ml.html">cmd.ml</a></li><li><a href="data.ml.html">data.ml</a></li><li><a href="deps.ml.html">deps.ml</a></li><li><a href="diagnostic.ml.html">diagnostic.ml</a></li><li><a href="eff.ml.html">eff.ml</a></li><li><a href="lexicon.ml.html">lexicon.ml</a></li><li><a href="make.ml.html">make.ml</a></li><li><a href="markup.ml.html">markup.ml</a></li><li><a href="metadata.ml.html">metadata.ml</a></li><li><a href="nel.ml.html">nel.ml</a></li><li><a href="path.ml.html">path.ml</a></li><li><a href="pipeline.ml.html">pipeline.ml</a></li><li><a href="reader.ml.html">reader.ml</a></li><li><a href="runtime.ml.html">runtime.ml</a></li><li><a href="sexp.ml.html">sexp.ml</a></li><li><a href="sexp_provider.ml.html">sexp_provider.ml</a></li><li><a href="slug.ml.html">slug.ml</a></li><li><a href="task.ml.html">task.ml</a></li><li><a href="yocaml.ml.html">yocaml.ml</a></li><li><a href="yocaml__.ml.html">yocaml__.ml</a></li></ul></li></ul></li></ul></li></ul></nav></div><pre class="source_container"><code class="source_line_column"><a id="L1" class="source_line" href="#L1">1</a>
+<a id="L2" class="source_line" href="#L2">2</a>
+<a id="L3" class="source_line" href="#L3">3</a>
+<a id="L4" class="source_line" href="#L4">4</a>
+<a id="L5" class="source_line" href="#L5">5</a>
+<a id="L6" class="source_line" href="#L6">6</a>
+<a id="L7" class="source_line" href="#L7">7</a>
+<a id="L8" class="source_line" href="#L8">8</a>
+<a id="L9" class="source_line" href="#L9">9</a>
+<a id="L10" class="source_line" href="#L10">10</a>
+<a id="L11" class="source_line" href="#L11">11</a>
+<a id="L12" class="source_line" href="#L12">12</a>
+<a id="L13" class="source_line" href="#L13">13</a>
+<a id="L14" class="source_line" href="#L14">14</a>
+<a id="L15" class="source_line" href="#L15">15</a>
+<a id="L16" class="source_line" href="#L16">16</a>
+<a id="L17" class="source_line" href="#L17">17</a>
+<a id="L18" class="source_line" href="#L18">18</a>
+<a id="L19" class="source_line" href="#L19">19</a>
+<a id="L20" class="source_line" href="#L20">20</a>
+<a id="L21" class="source_line" href="#L21">21</a>
+<a id="L22" class="source_line" href="#L22">22</a>
+<a id="L23" class="source_line" href="#L23">23</a>
+<a id="L24" class="source_line" href="#L24">24</a>
+<a id="L25" class="source_line" href="#L25">25</a>
+<a id="L26" class="source_line" href="#L26">26</a>
+</code><code class="source_code"><span><span class="COMMENT">(* YOCaml a static blog generator.
+   Copyright (C) 2025 The Funkyworkers and The YOCaml's developers
+
+   This program is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program.  If not, see &lt;https://www.gnu.org/licenses/&gt;. *)</span><span class="EOL">
+</span><span class="EOL">
+</span><span class="LET">let</span> <span id="val-iter"><span class="LIDENT">iter</span></span> <span class="EQUAL">=</span> <a href="action.ml.html#val-batch_list"><span class="UIDENT">Action</span><span class="DOT">.</span><span class="LIDENT">batch_list</span></a><span class="EOL">
+</span><span class="LET">let</span> <span id="val-fold"><span class="LIDENT">fold</span></span> <span class="EQUAL">=</span> <a href="action.ml.html#val-fold_list"><span class="UIDENT">Action</span><span class="DOT">.</span><span class="LIDENT">fold_list</span></a><span class="EOL">
+</span><span class="LET">let</span> <span id="val-iter_children"><span class="LIDENT">iter_children</span></span> <span class="EQUAL">=</span> <a href="action.ml.html#val-batch"><span class="UIDENT">Action</span><span class="DOT">.</span><span class="LIDENT">batch</span></a><span class="EOL">
+</span><span class="LET">let</span> <span id="val-fold_children"><span class="LIDENT">fold_children</span></span> <span class="EQUAL">=</span> <a href="action.ml.html#val-fold"><span class="UIDENT">Action</span><span class="DOT">.</span><span class="LIDENT">fold</span></a><span class="EOL">
+</span><span class="LET">let</span> <span id="val-iter_files"><span class="LIDENT">iter_files</span></span> <span class="EQUAL">=</span> <span class="LIDENT">iter_children</span> <span class="LABEL">~only:</span><span class="BACKQUOTE">`</span><span class="UIDENT">Files</span><span class="EOL">
+</span><span class="LET">let</span> <span id="val-iter_directories"><span class="LIDENT">iter_directories</span></span> <span class="EQUAL">=</span> <span class="LIDENT">iter_children</span> <span class="LABEL">~only:</span><span class="BACKQUOTE">`</span><span class="UIDENT">Directories</span><span class="EOL">
+</span><span class="LET">let</span> <span id="val-fold_files"><span class="LIDENT">fold_files</span></span> <span class="QUESTION">?</span><span id="local_where_1"><span class="LIDENT">where</span></span> <span class="TILDE">~</span><span id="local_state_2"><span class="LIDENT">state</span></span> <span class="EQUAL">=</span> <span class="LIDENT">fold_children</span> <span class="LABEL">~only:</span><span class="BACKQUOTE">`</span><span class="UIDENT">Files</span> <span class="QUESTION">?</span><a href="#local_where_1"><span class="LIDENT">where</span></a> <span class="TILDE">~</span><a href="#local_state_2"><span class="LIDENT">state</span></a><span class="EOL">
+</span><span class="EOL">
+</span><span class="LET">let</span> <span id="val-fold_directories"><span class="LIDENT">fold_directories</span></span> <span class="QUESTION">?</span><span id="local_where_3"><span class="LIDENT">where</span></span> <span class="TILDE">~</span><span id="local_state_4"><span class="LIDENT">state</span></span> <span class="EQUAL">=</span><span class="EOL">
+</span>  <span class="LIDENT">fold_children</span> <span class="LABEL">~only:</span><span class="BACKQUOTE">`</span><span class="UIDENT">Directories</span> <span class="QUESTION">?</span><a href="#local_where_3"><span class="LIDENT">where</span></a> <span class="TILDE">~</span><a href="#local_state_4"><span class="LIDENT">state</span></a><span class="EOL">
+</span></span></code></pre></body></html>
