@@ -2,10 +2,11 @@
   "name": "yocaml_yaml",
   "version": "dev",
   "files": [
-    "yocaml_yaml/Yocaml_yaml/Eff/index.html",
+    "src/yocaml_yaml/yocaml_yaml.ml.html", "src/index.html",
     "yocaml_yaml/Yocaml_yaml/Pipeline/index.html",
+    "yocaml_yaml/Yocaml_yaml/Eff/index.html",
     "yocaml_yaml/Yocaml_yaml/index.html", "yocaml_yaml/index.html",
-    "src/yocaml_yaml/yocaml_yaml.ml.html", "src/index.html", "index.html"
+    "index.html"
   ],
   "failed": false,
   "redirections": []
