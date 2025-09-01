@@ -2,10 +2,10 @@
   "name": "yocaml_unix",
   "version": "dev",
   "files": [
-    "src/yocaml_unix/yocaml_unix.ml.html", "src/yocaml_unix/server.ml.html",
-    "src/yocaml_unix/yocaml_unix__.ml.html",
-    "src/yocaml_unix/runner.ml.html", "src/yocaml_unix/runtime.ml.html",
-    "src/index.html", "yocaml_unix/Yocaml_unix/Runtime/index.html",
+    "src/yocaml_unix/runner.ml.html", "src/yocaml_unix/server.ml.html",
+    "src/yocaml_unix/yocaml_unix.ml.html", "src/yocaml_unix/runtime.ml.html",
+    "src/yocaml_unix/yocaml_unix__.ml.html", "src/index.html",
+    "yocaml_unix/Yocaml_unix/Runtime/index.html",
     "yocaml_unix/Yocaml_unix/index.html", "yocaml_unix/index.html",
     "index.html"
   ],
