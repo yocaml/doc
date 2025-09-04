@@ -43,6 +43,9 @@
 <a id="L42" class="source_line" href="#L42">42</a>
 <a id="L43" class="source_line" href="#L43">43</a>
 <a id="L44" class="source_line" href="#L44">44</a>
+<a id="L45" class="source_line" href="#L45">45</a>
+<a id="L46" class="source_line" href="#L46">46</a>
+<a id="L47" class="source_line" href="#L47">47</a>
 </code><code class="source_code"><span><span class="COMMENT">(* YOCaml a static blog generator.
    Copyright (C) 2024 The Funkyworkers and The YOCaml's developers
 
@@ -76,14 +79,17 @@
 </span>    <a href="../../../mustache/src/mustache/mustache.ml.html#module-With_locations.val-render"><span class="UIDENT">Mustache</span><span class="DOT">.</span><span class="LIDENT">render</span></a> <span class="TILDE">~</span><a href="#local_strict_9"><span class="LIDENT">strict</span></a> <a href="#local_layout_12"><span class="LIDENT">layout</span></a> <span class="LPAREN">(</span><span class="BACKQUOTE">`</span><span class="UIDENT">O</span> <a href="#local_parameters_10"><span class="LIDENT">parameters</span></a><span class="RPAREN">)</span><span class="EOL">
 </span><span class="END">end</span></span><span class="EOL">
 </span><span class="EOL">
+</span><span class="LET">let</span> <span id="val-read_template"><span class="LIDENT">read_template</span></span> <span class="QUESTION">?</span><span id="local_snapshot_13"><span class="LIDENT">snapshot</span></span> <span class="QUESTION">?</span><span id="local_strict_14"><span class="LIDENT">strict</span></span> <span id="local_template_15"><span class="LIDENT">template</span></span> <span class="EQUAL">=</span><span class="EOL">
+</span>  <a href="../../../yocaml/src/yocaml/pipeline.ml.html#val-read_template"><span class="UIDENT">Yocaml</span><span class="DOT">.</span><span class="UIDENT">Pipeline</span><span class="DOT">.</span><span class="LIDENT">read_template</span></a> <span class="LPAREN">(</span><span class="MODULE">module</span> <span class="UIDENT">Tpl</span><span class="RPAREN">)</span> <span class="QUESTION">?</span><a href="#local_snapshot_13"><span class="LIDENT">snapshot</span></a> <span class="QUESTION">?</span><a href="#local_strict_14"><span class="LIDENT">strict</span></a> <a href="#local_template_15"><span class="LIDENT">template</span></a><span class="EOL">
+</span><span class="EOL">
 </span><span id="module-Pipeline"><span class="MODULE">module</span> <span class="UIDENT">Pipeline</span> <span class="EQUAL">=</span> <span class="STRUCT">struct</span><span class="EOL">
 </span>  <span class="LET">let</span> <span id="module-Pipeline.val-as_template"><span class="LIDENT">as_template</span></span> <span class="LPAREN">(</span><span class="TYPE">type</span> <span class="LIDENT">a</span><span class="RPAREN">)</span><span class="EOL">
-</span>      <span class="LPAREN">(</span><span class="MODULE">module</span> <span id="local_I_13"><span class="UIDENT">I</span></span> <span class="COLON">:</span> <span class="UIDENT">Yocaml</span><span class="DOT">.</span><span class="UIDENT">Required</span><span class="DOT">.</span><span class="UIDENT">DATA_INJECTABLE</span> <span class="WITH">with</span> <span class="TYPE">type</span> <span class="LIDENT">t</span> <span class="EQUAL">=</span> <span class="LIDENT">a</span><span class="RPAREN">)</span> <span class="QUESTION">?</span><span id="local_snapshot_14"><span class="LIDENT">snapshot</span></span><span class="EOL">
-</span>      <span class="QUESTION">?</span><span id="local_strict_15"><span class="LIDENT">strict</span></span> <span id="local_template_16"><span class="LIDENT">template</span></span> <span class="EQUAL">=</span><span class="EOL">
+</span>      <span class="LPAREN">(</span><span class="MODULE">module</span> <span id="local_I_16"><span class="UIDENT">I</span></span> <span class="COLON">:</span> <span class="UIDENT">Yocaml</span><span class="DOT">.</span><span class="UIDENT">Required</span><span class="DOT">.</span><span class="UIDENT">DATA_INJECTABLE</span> <span class="WITH">with</span> <span class="TYPE">type</span> <span class="LIDENT">t</span> <span class="EQUAL">=</span> <span class="LIDENT">a</span><span class="RPAREN">)</span> <span class="QUESTION">?</span><span id="local_snapshot_17"><span class="LIDENT">snapshot</span></span><span class="EOL">
+</span>      <span class="QUESTION">?</span><span id="local_strict_18"><span class="LIDENT">strict</span></span> <span id="local_template_19"><span class="LIDENT">template</span></span> <span class="EQUAL">=</span><span class="EOL">
 </span>    <a href="../../../yocaml/src/yocaml/pipeline.ml.html#val-as_template"><span class="UIDENT">Yocaml</span><span class="DOT">.</span><span class="UIDENT">Pipeline</span><span class="DOT">.</span><span class="LIDENT">as_template</span></a><span class="EOL">
 </span>      <span class="LPAREN">(</span><span class="MODULE">module</span> <span class="UIDENT">Tpl</span><span class="RPAREN">)</span><span class="EOL">
-</span>      <span class="LPAREN">(</span><span class="MODULE">module</span> <a href="#local_I_13"><span class="UIDENT">I</span></a><span class="RPAREN">)</span><span class="EOL">
-</span>      <span class="QUESTION">?</span><a href="#local_snapshot_14"><span class="LIDENT">snapshot</span></a> <span class="QUESTION">?</span><a href="#local_strict_15"><span class="LIDENT">strict</span></a> <a href="#local_template_16"><span class="LIDENT">template</span></a><span class="EOL">
+</span>      <span class="LPAREN">(</span><span class="MODULE">module</span> <a href="#local_I_16"><span class="UIDENT">I</span></a><span class="RPAREN">)</span><span class="EOL">
+</span>      <span class="QUESTION">?</span><a href="#local_snapshot_17"><span class="LIDENT">snapshot</span></a> <span class="QUESTION">?</span><a href="#local_strict_18"><span class="LIDENT">strict</span></a> <a href="#local_template_19"><span class="LIDENT">template</span></a><span class="EOL">
 </span><span class="END">end</span></span><span class="EOL">
 </span><span class="EOL">
 </span><span class="INCLUDE">include</span> <span class="UIDENT">Tpl</span><span class="EOL">
