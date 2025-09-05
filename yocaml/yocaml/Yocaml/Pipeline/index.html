@@ -25,6 +25,16 @@ let search_urls = ['../../../sherlodoc_db.js','../../../../sherlodoc.js'];
     <span><span class="label">metadata</span>:<span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
     <span>string <span class="arrow">&#45;&gt;</span></span>
     string)</span>
+    <a href="../Task/index.html#type-t">Task.t</a></span></span></code></div><div class="spec-doc"><p>Return a function that apply <code>~metadata</code> and <code>~content</code> to a given template. Made the usage with applicative easier.</p></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-read_templates"><a href="#val-read_templates" class="anchor"></a><a href="../../../src/yocaml/pipeline.ml.html#val-read_templates" class="source_link">Source</a><code><span><span class="keyword">val</span> read_templates : 
+  <span><span>(<span class="keyword">module</span> <a href="../Required/module-type-DATA_TEMPLATE/index.html">Required.DATA_TEMPLATE</a>)</span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="optlabel">?snapshot</span>:bool <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="optlabel">?strict</span>:bool <span class="arrow">&#45;&gt;</span></span>
+  <span><span><a href="../Path/index.html#type-t">Path.t</a> list</span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span>(unit,
+    <span><span>(<span class="keyword">module</span> <a href="../Required/module-type-DATA_INJECTABLE/index.html">Required.DATA_INJECTABLE</a> <span class="keyword">with</span> <span class="keyword">type</span> <a href="../Required/module-type-DATA_INJECTABLE/index.html#type-t">t</a> = <span class="type-var">'a</span>)</span> <span class="arrow">&#45;&gt;</span></span>
+    <span><span class="label">metadata</span>:<span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+    <span>string <span class="arrow">&#45;&gt;</span></span>
+    string)</span>
     <a href="../Task/index.html#type-t">Task.t</a></span></span></code></div><div class="spec-doc"><p>Return a function that apply <code>~metadata</code> and <code>~content</code> to a given template. Made the usage with applicative easier.</p></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-as_template"><a href="#val-as_template" class="anchor"></a><a href="../../../src/yocaml/pipeline.ml.html#val-as_template" class="source_link">Source</a><code><span><span class="keyword">val</span> as_template : 
   <span><span>(<span class="keyword">module</span> <a href="../Required/module-type-DATA_TEMPLATE/index.html">Required.DATA_TEMPLATE</a>)</span> <span class="arrow">&#45;&gt;</span></span>
   <span><span>(<span class="keyword">module</span> <a href="../Required/module-type-DATA_INJECTABLE/index.html">Required.DATA_INJECTABLE</a> <span class="keyword">with</span> <span class="keyword">type</span> <a href="../Required/module-type-DATA_INJECTABLE/index.html#type-t">t</a> = <span class="type-var">'a</span>)</span> <span class="arrow">&#45;&gt;</span></span>
