@@ -1,0 +1,14 @@
+{
+  "name": "yocaml_markdown",
+  "version": "dev",
+  "files": [
+    "src/yocaml_markdown/yocaml_markdown.ml.html", "src/index.html",
+    "yocaml_markdown/Yocaml_markdown/Pipeline/With_metadata/index.html",
+    "yocaml_markdown/Yocaml_markdown/Pipeline/index.html",
+    "yocaml_markdown/Yocaml_markdown/Doc/index.html",
+    "yocaml_markdown/Yocaml_markdown/index.html",
+    "yocaml_markdown/index.html", "index.html"
+  ],
+  "failed": false,
+  "redirections": []
+}

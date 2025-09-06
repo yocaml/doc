@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"><head><title>Source: yocaml_markdown.ml (yocaml_markdown.src.yocaml_markdown)</title><meta charset="utf-8"/><link rel="stylesheet" href="../../../odoc.css"/><meta name="generator" content="odoc 3.1.0"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/></head><body class="odoc-src"><nav class="odoc-nav"><a href="../index.html">Up</a> – <a href="../../../index.html">Package index</a> &#x00BB; <a href="../../index.html">yocaml_markdown</a> &#x00BB; <a href="../index.html">Sources</a> &#x00BB; yocaml_markdown &#x00BB; yocaml_markdown.ml</nav><header class="odoc-preamble"><h1>Source file <code><span>yocaml_markdown.ml</span></code></h1></header><div class="odoc-tocs"><nav class="odoc-toc odoc-global-toc"><ul><li><a href="../../index.html">yocaml_markdown</a><ul><li>Library <code>yocaml_markdown</code><ul><li><a href="../../yocaml_markdown/Yocaml_markdown/index.html">Yocaml_markdown</a></li></ul></li><li><a href="../index.html">Sources</a><ul><li>yocaml_markdown<ul><li><a href="#" class="current_unit">yocaml_markdown.ml</a></li></ul></li></ul></li></ul></li></ul></nav></div><pre class="source_container"><code class="source_line_column"><a id="L1" class="source_line" href="#L1">1</a>
+<a id="L2" class="source_line" href="#L2">2</a>
+<a id="L3" class="source_line" href="#L3">3</a>
+<a id="L4" class="source_line" href="#L4">4</a>
+<a id="L5" class="source_line" href="#L5">5</a>
+<a id="L6" class="source_line" href="#L6">6</a>
+<a id="L7" class="source_line" href="#L7">7</a>
+<a id="L8" class="source_line" href="#L8">8</a>
+<a id="L9" class="source_line" href="#L9">9</a>
+<a id="L10" class="source_line" href="#L10">10</a>
+<a id="L11" class="source_line" href="#L11">11</a>
+<a id="L12" class="source_line" href="#L12">12</a>
+<a id="L13" class="source_line" href="#L13">13</a>
+<a id="L14" class="source_line" href="#L14">14</a>
+<a id="L15" class="source_line" href="#L15">15</a>
+<a id="L16" class="source_line" href="#L16">16</a>
+<a id="L17" class="source_line" href="#L17">17</a>
+<a id="L18" class="source_line" href="#L18">18</a>
+<a id="L19" class="source_line" href="#L19">19</a>
+<a id="L20" class="source_line" href="#L20">20</a>
+<a id="L21" class="source_line" href="#L21">21</a>
+<a id="L22" class="source_line" href="#L22">22</a>
+<a id="L23" class="source_line" href="#L23">23</a>
+<a id="L24" class="source_line" href="#L24">24</a>
+<a id="L25" class="source_line" href="#L25">25</a>
+<a id="L26" class="source_line" href="#L26">26</a>
+<a id="L27" class="source_line" href="#L27">27</a>
+<a id="L28" class="source_line" href="#L28">28</a>
+<a id="L29" class="source_line" href="#L29">29</a>
+<a id="L30" class="source_line" href="#L30">30</a>
+<a id="L31" class="source_line" href="#L31">31</a>
+<a id="L32" class="source_line" href="#L32">32</a>
+<a id="L33" class="source_line" href="#L33">33</a>
+<a id="L34" class="source_line" href="#L34">34</a>
+<a id="L35" class="source_line" href="#L35">35</a>
+<a id="L36" class="source_line" href="#L36">36</a>
+<a id="L37" class="source_line" href="#L37">37</a>
+<a id="L38" class="source_line" href="#L38">38</a>
+<a id="L39" class="source_line" href="#L39">39</a>
+<a id="L40" class="source_line" href="#L40">40</a>
+<a id="L41" class="source_line" href="#L41">41</a>
+<a id="L42" class="source_line" href="#L42">42</a>
+<a id="L43" class="source_line" href="#L43">43</a>
+<a id="L44" class="source_line" href="#L44">44</a>
+<a id="L45" class="source_line" href="#L45">45</a>
+<a id="L46" class="source_line" href="#L46">46</a>
+<a id="L47" class="source_line" href="#L47">47</a>
+<a id="L48" class="source_line" href="#L48">48</a>
+<a id="L49" class="source_line" href="#L49">49</a>
+<a id="L50" class="source_line" href="#L50">50</a>
+<a id="L51" class="source_line" href="#L51">51</a>
+<a id="L52" class="source_line" href="#L52">52</a>
+<a id="L53" class="source_line" href="#L53">53</a>
+<a id="L54" class="source_line" href="#L54">54</a>
+<a id="L55" class="source_line" href="#L55">55</a>
+<a id="L56" class="source_line" href="#L56">56</a>
+<a id="L57" class="source_line" href="#L57">57</a>
+<a id="L58" class="source_line" href="#L58">58</a>
+<a id="L59" class="source_line" href="#L59">59</a>
+<a id="L60" class="source_line" href="#L60">60</a>
+<a id="L61" class="source_line" href="#L61">61</a>
+<a id="L62" class="source_line" href="#L62">62</a>
+<a id="L63" class="source_line" href="#L63">63</a>
+<a id="L64" class="source_line" href="#L64">64</a>
+<a id="L65" class="source_line" href="#L65">65</a>
+<a id="L66" class="source_line" href="#L66">66</a>
+<a id="L67" class="source_line" href="#L67">67</a>
+<a id="L68" class="source_line" href="#L68">68</a>
+<a id="L69" class="source_line" href="#L69">69</a>
+<a id="L70" class="source_line" href="#L70">70</a>
+<a id="L71" class="source_line" href="#L71">71</a>
+<a id="L72" class="source_line" href="#L72">72</a>
+<a id="L73" class="source_line" href="#L73">73</a>
+<a id="L74" class="source_line" href="#L74">74</a>
+<a id="L75" class="source_line" href="#L75">75</a>
+<a id="L76" class="source_line" href="#L76">76</a>
+<a id="L77" class="source_line" href="#L77">77</a>
+<a id="L78" class="source_line" href="#L78">78</a>
+<a id="L79" class="source_line" href="#L79">79</a>
+<a id="L80" class="source_line" href="#L80">80</a>
+<a id="L81" class="source_line" href="#L81">81</a>
+<a id="L82" class="source_line" href="#L82">82</a>
+<a id="L83" class="source_line" href="#L83">83</a>
+<a id="L84" class="source_line" href="#L84">84</a>
+<a id="L85" class="source_line" href="#L85">85</a>
+<a id="L86" class="source_line" href="#L86">86</a>
+<a id="L87" class="source_line" href="#L87">87</a>
+<a id="L88" class="source_line" href="#L88">88</a>
+<a id="L89" class="source_line" href="#L89">89</a>
+<a id="L90" class="source_line" href="#L90">90</a>
+<a id="L91" class="source_line" href="#L91">91</a>
+<a id="L92" class="source_line" href="#L92">92</a>
+<a id="L93" class="source_line" href="#L93">93</a>
+<a id="L94" class="source_line" href="#L94">94</a>
+<a id="L95" class="source_line" href="#L95">95</a>
+<a id="L96" class="source_line" href="#L96">96</a>
+<a id="L97" class="source_line" href="#L97">97</a>
+<a id="L98" class="source_line" href="#L98">98</a>
+<a id="L99" class="source_line" href="#L99">99</a>
+<a id="L100" class="source_line" href="#L100">100</a>
+<a id="L101" class="source_line" href="#L101">101</a>
+<a id="L102" class="source_line" href="#L102">102</a>
+<a id="L103" class="source_line" href="#L103">103</a>
+<a id="L104" class="source_line" href="#L104">104</a>
+<a id="L105" class="source_line" href="#L105">105</a>
+<a id="L106" class="source_line" href="#L106">106</a>
+<a id="L107" class="source_line" href="#L107">107</a>
+<a id="L108" class="source_line" href="#L108">108</a>
+<a id="L109" class="source_line" href="#L109">109</a>
+<a id="L110" class="source_line" href="#L110">110</a>
+<a id="L111" class="source_line" href="#L111">111</a>
+<a id="L112" class="source_line" href="#L112">112</a>
+<a id="L113" class="source_line" href="#L113">113</a>
+<a id="L114" class="source_line" href="#L114">114</a>
+<a id="L115" class="source_line" href="#L115">115</a>
+<a id="L116" class="source_line" href="#L116">116</a>
+<a id="L117" class="source_line" href="#L117">117</a>
+<a id="L118" class="source_line" href="#L118">118</a>
+<a id="L119" class="source_line" href="#L119">119</a>
+<a id="L120" class="source_line" href="#L120">120</a>
+<a id="L121" class="source_line" href="#L121">121</a>
+<a id="L122" class="source_line" href="#L122">122</a>
+<a id="L123" class="source_line" href="#L123">123</a>
+</code><code class="source_code"><span><span class="COMMENT">(* YOCaml a static blog generator.
+   Copyright (C) 2025 The Funkyworkers and The YOCaml's developers
+
+   This program is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program.  If not, see &lt;https://www.gnu.org/licenses/&gt;. *)</span><span class="EOL">
+</span><span class="EOL">
+</span><span id="module-Doc"><span class="MODULE">module</span> <span class="UIDENT">Doc</span> <span class="EQUAL">=</span> <span class="STRUCT">struct</span><span class="EOL">
+</span>  <span class="LET">let</span> <span id="module-Doc.val-from_string"><span class="LIDENT">from_string</span></span> <span class="QUESTION">?</span><span class="LPAREN">(</span><span id="local_strict_1"><span class="LIDENT">strict</span></span> <span class="EQUAL">=</span> <span class="FALSE">false</span><span class="RPAREN">)</span> <span class="QUESTION">?</span><span class="LPAREN">(</span><span id="local_heading_auto_ids_2"><span class="LIDENT">heading_auto_ids</span></span> <span class="EQUAL">=</span> <span class="TRUE">true</span><span class="RPAREN">)</span> <span id="local_content_3"><span class="LIDENT">content</span></span> <span class="EQUAL">=</span><span class="EOL">
+</span>    <a href="../../../cmarkit/src/cmarkit/cmarkit.ml.html#module-Doc.val-of_string"><span class="UIDENT">Cmarkit</span><span class="DOT">.</span><span class="UIDENT">Doc</span><span class="DOT">.</span><span class="LIDENT">of_string</span></a> <span class="TILDE">~</span><a href="#local_strict_1"><span class="LIDENT">strict</span></a> <span class="TILDE">~</span><a href="#local_heading_auto_ids_2"><span class="LIDENT">heading_auto_ids</span></a> <a href="#local_content_3"><span class="LIDENT">content</span></a><span class="EOL">
+</span><span class="EOL">
+</span>  <span class="LET">let</span> <span id="module-Doc.val-default_grammars_set"><span class="LIDENT">default_grammars_set</span></span> <span class="EQUAL">=</span><span class="EOL">
+</span>    <span class="LET">let</span> <span id="local_t_4"><span class="LIDENT">t</span></span> <span class="EQUAL">=</span> <a href="../../../textmate-language/src/textmate-language/common.ml.html#val-create"><span class="UIDENT">TmLanguage</span><span class="DOT">.</span><span class="LIDENT">create</span></a> <span class="LPAREN">(</span><span class="RPAREN">)</span> <span class="IN">in</span><span class="EOL">
+</span>    <span class="LET">let</span> <span class="LPAREN">(</span><span class="RPAREN">)</span> <span class="EQUAL">=</span><span class="EOL">
+</span>      <span class="LBRACKET">[</span><span class="EOL">
+</span>        <a href="../../../hilite/src/hilite/jsons.ml.html#val-ocaml"><span class="UIDENT">Hilite</span><span class="DOT">.</span><span class="UIDENT">Grammars</span><span class="DOT">.</span><span class="LIDENT">ocaml</span></a><span class="EOL">
+</span>      <span class="SEMI">;</span> <a href="../../../hilite/src/hilite/jsons.ml.html#val-ocaml_interface"><span class="UIDENT">Hilite</span><span class="DOT">.</span><span class="UIDENT">Grammars</span><span class="DOT">.</span><span class="LIDENT">ocaml_interface</span></a><span class="EOL">
+</span>      <span class="SEMI">;</span> <a href="../../../hilite/src/hilite/jsons.ml.html#val-dune"><span class="UIDENT">Hilite</span><span class="DOT">.</span><span class="UIDENT">Grammars</span><span class="DOT">.</span><span class="LIDENT">dune</span></a><span class="EOL">
+</span>      <span class="SEMI">;</span> <a href="../../../hilite/src/hilite/jsons.ml.html#val-opam"><span class="UIDENT">Hilite</span><span class="DOT">.</span><span class="UIDENT">Grammars</span><span class="DOT">.</span><span class="LIDENT">opam</span></a><span class="EOL">
+</span>      <span class="SEMI">;</span> <a href="../../../hilite/src/hilite/jsons.ml.html#val-diff"><span class="UIDENT">Hilite</span><span class="DOT">.</span><span class="UIDENT">Grammars</span><span class="DOT">.</span><span class="LIDENT">diff</span></a><span class="EOL">
+</span>      <span class="RBRACKET">]</span><span class="EOL">
+</span>      <span class="INFIXOP0">|&gt;</span> <a href="../../../ocaml-compiler/src/stdlib/list.ml.html#val-iter"><span class="UIDENT">List</span><span class="DOT">.</span><span class="LIDENT">iter</span></a> <span class="LPAREN">(</span><span class="FUN">fun</span> <span id="local_g_5"><span class="LIDENT">g</span></span> <span class="MINUSGREATER">-&gt;</span><span class="EOL">
+</span>             <a href="#local_g_5"><span class="LIDENT">g</span></a> <span class="INFIXOP0">|&gt;</span> <a href="../../../textmate-language/src/textmate-language/reader.ml.html#val-of_yojson_exn"><span class="UIDENT">TmLanguage</span><span class="DOT">.</span><span class="LIDENT">of_yojson_exn</span></a> <span class="INFIXOP0">|&gt;</span> <a href="../../../textmate-language/src/textmate-language/common.ml.html#val-add_grammar"><span class="UIDENT">TmLanguage</span><span class="DOT">.</span><span class="LIDENT">add_grammar</span></a> <a href="#local_t_4"><span class="LIDENT">t</span></a><span class="RPAREN">)</span><span class="EOL">
+</span>    <span class="IN">in</span><span class="EOL">
+</span>    <a href="#local_t_4"><span class="LIDENT">t</span></a><span class="EOL">
+</span><span class="EOL">
+</span>  <span class="LET">let</span> <span id="module-Doc.val-table_of_contents"><span class="LIDENT">table_of_contents</span></span><span class="EOL">
+</span>      <span class="QUESTION">?</span><span class="LPAREN">(</span><span id="local_traverse_table_6"><span class="LIDENT">traverse_table</span></span> <span class="EQUAL">=</span> <a href="../../../yocaml/src/yocaml/markup.ml.html#module-Toc.val-to_html"><span class="UIDENT">Yocaml</span><span class="DOT">.</span><span class="UIDENT">Markup</span><span class="DOT">.</span><span class="UIDENT">Toc</span><span class="DOT">.</span><span class="LIDENT">to_html</span></a> <span class="LABEL">~ol:</span><span class="FALSE">false</span> <a href="../../../ocaml-compiler/src/stdlib/fun.ml.html#val-id"><span class="UIDENT">Fun</span><span class="DOT">.</span><span class="LIDENT">id</span></a><span class="RPAREN">)</span> <span id="local_doc_7"><span class="LIDENT">doc</span></span> <span class="EQUAL">=</span><span class="EOL">
+</span>    <span class="LET">let</span> <span class="OPEN">open</span> <a href="../../../cmarkit/src/cmarkit/cmarkit.ml.html"><span class="UIDENT">Cmarkit</span></a> <span class="IN">in</span><span class="EOL">
+</span>    <span class="LET">let</span> <span id="local_block_8"><span class="LIDENT">block</span></span> <span class="UNDERSCORE">_</span> <span id="local_acc_9"><span class="LIDENT">acc</span></span> <span class="EQUAL">=</span> <span class="FUNCTION">function</span><span class="EOL">
+</span>      <span class="BAR">|</span> <span class="UIDENT">Block</span><span class="DOT">.</span><span class="UIDENT">Heading</span> <span class="LPAREN">(</span><span id="local_heading_10"><span class="LIDENT">heading</span></span><span class="COMMA">,</span> <span class="UNDERSCORE">_</span><span class="RPAREN">)</span> <span class="MINUSGREATER">-&gt;</span><span class="EOL">
+</span>          <span class="LET">let</span> <span id="local_level_11"><span class="LIDENT">level</span></span> <span class="EQUAL">=</span> <a href="../../../cmarkit/src/cmarkit/cmarkit.ml.html#module-Block.module-Heading.val-level"><span class="UIDENT">Block</span><span class="DOT">.</span><span class="UIDENT">Heading</span><span class="DOT">.</span><span class="LIDENT">level</span></a> <a href="#local_heading_10"><span class="LIDENT">heading</span></a> <span class="IN">in</span><span class="EOL">
+</span>          <span class="LET">let</span> <span id="local_inline_12"><span class="LIDENT">inline</span></span> <span class="EQUAL">=</span> <a href="../../../cmarkit/src/cmarkit/cmarkit.ml.html#module-Block.module-Heading.val-inline"><span class="UIDENT">Block</span><span class="DOT">.</span><span class="UIDENT">Heading</span><span class="DOT">.</span><span class="LIDENT">inline</span></a> <a href="#local_heading_10"><span class="LIDENT">heading</span></a> <span class="IN">in</span><span class="EOL">
+</span>          <span class="LET">let</span> <span id="local_text_13"><span class="LIDENT">text</span></span> <span class="EQUAL">=</span><span class="EOL">
+</span>            <a href="#local_inline_12"><span class="LIDENT">inline</span></a><span class="EOL">
+</span>            <span class="INFIXOP0">|&gt;</span> <a href="../../../cmarkit/src/cmarkit/cmarkit.ml.html#module-Inline.val-to_plain_text"><span class="UIDENT">Inline</span><span class="DOT">.</span><span class="LIDENT">to_plain_text</span></a> <span class="LABEL">~break_on_soft:</span><span class="FALSE">false</span><span class="EOL">
+</span>            <span class="INFIXOP0">|&gt;</span> <a href="../../../ocaml-compiler/src/stdlib/list.ml.html#val-map"><span class="UIDENT">List</span><span class="DOT">.</span><span class="LIDENT">map</span></a> <span class="LPAREN">(</span><a href="../../../ocaml-compiler/src/stdlib/string.ml.html#val-concat"><span class="UIDENT">String</span><span class="DOT">.</span><span class="LIDENT">concat</span></a> <span class="STRING">&quot;&quot;</span><span class="RPAREN">)</span><span class="EOL">
+</span>            <span class="INFIXOP0">|&gt;</span> <a href="../../../ocaml-compiler/src/stdlib/string.ml.html#val-concat"><span class="UIDENT">String</span><span class="DOT">.</span><span class="LIDENT">concat</span></a> <span class="STRING">&quot;\n&quot;</span><span class="EOL">
+</span>          <span class="IN">in</span><span class="EOL">
+</span>          <span class="LET">let</span> <span id="local_id_14"><span class="LIDENT">id</span></span> <span class="EQUAL">=</span> <a href="../../../cmarkit/src/cmarkit/cmarkit.ml.html#module-Inline.val-id"><span class="UIDENT">Inline</span><span class="DOT">.</span><span class="LIDENT">id</span></a> <a href="#local_inline_12"><span class="LIDENT">inline</span></a> <span class="IN">in</span><span class="EOL">
+</span>          <a href="../../../cmarkit/src/cmarkit/cmarkit.ml.html#module-Folder.val-ret"><span class="UIDENT">Folder</span><span class="DOT">.</span><span class="LIDENT">ret</span></a> <span class="INFIXOP1">@@</span> <span class="LPAREN">(</span><span class="LPAREN">(</span><a href="#local_level_11"><span class="LIDENT">level</span></a><span class="COMMA">,</span> <span class="LPAREN">(</span><a href="#local_id_14"><span class="LIDENT">id</span></a><span class="COMMA">,</span> <a href="#local_text_13"><span class="LIDENT">text</span></a><span class="RPAREN">)</span><span class="RPAREN">)</span> <span class="COLONCOLON">::</span> <a href="#local_acc_9"><span class="LIDENT">acc</span></a><span class="RPAREN">)</span><span class="EOL">
+</span>      <span class="BAR">|</span> <span class="UNDERSCORE">_</span> <span class="MINUSGREATER">-&gt;</span> <a href="../../../cmarkit/src/cmarkit/cmarkit.ml.html#module-Folder.val-default"><span class="UIDENT">Folder</span><span class="DOT">.</span><span class="LIDENT">default</span></a><span class="EOL">
+</span>    <span class="IN">in</span><span class="EOL">
+</span>    <span class="LET">let</span> <span id="local_folder_15"><span class="LIDENT">folder</span></span> <span class="EQUAL">=</span> <a href="../../../cmarkit/src/cmarkit/cmarkit.ml.html#module-Folder.val-make"><span class="UIDENT">Folder</span><span class="DOT">.</span><span class="LIDENT">make</span></a> <span class="TILDE">~</span><a href="#local_block_8"><span class="LIDENT">block</span></a> <span class="LPAREN">(</span><span class="RPAREN">)</span> <span class="IN">in</span><span class="EOL">
+</span>    <span class="LET">let</span> <span id="local_headers_16"><span class="LIDENT">headers</span></span> <span class="EQUAL">=</span> <a href="../../../cmarkit/src/cmarkit/cmarkit.ml.html#module-Folder.val-fold_doc"><span class="UIDENT">Folder</span><span class="DOT">.</span><span class="LIDENT">fold_doc</span></a> <a href="#local_folder_15"><span class="LIDENT">folder</span></a> <span class="LBRACKET">[</span><span class="RBRACKET">]</span> <a href="#local_doc_7"><span class="LIDENT">doc</span></a> <span class="IN">in</span><span class="EOL">
+</span>    <a href="#local_headers_16"><span class="LIDENT">headers</span></a> <span class="INFIXOP0">|&gt;</span> <a href="../../../ocaml-compiler/src/stdlib/list.ml.html#val-rev"><span class="UIDENT">List</span><span class="DOT">.</span><span class="LIDENT">rev</span></a> <span class="INFIXOP0">|&gt;</span> <a href="../../../yocaml/src/yocaml/markup.ml.html#module-Toc.val-from_list"><span class="UIDENT">Yocaml</span><span class="DOT">.</span><span class="UIDENT">Markup</span><span class="DOT">.</span><span class="UIDENT">Toc</span><span class="DOT">.</span><span class="LIDENT">from_list</span></a> <span class="INFIXOP0">|&gt;</span> <a href="#local_traverse_table_6"><span class="LIDENT">traverse_table</span></a><span class="EOL">
+</span><span class="EOL">
+</span>  <span class="LET">let</span> <span id="module-Doc.val-syntax_highlighting"><span class="LIDENT">syntax_highlighting</span></span> <span class="QUESTION">?</span><span class="LPAREN">(</span><span id="local_skip_unknown_languages_17"><span class="LIDENT">skip_unknown_languages</span></span> <span class="EQUAL">=</span> <span class="TRUE">true</span><span class="RPAREN">)</span><span class="EOL">
+</span>      <span class="QUESTION">?</span><span class="LPAREN">(</span><span id="local_tm_18"><span class="LIDENT">tm</span></span> <span class="EQUAL">=</span> <span class="LIDENT">default_grammars_set</span><span class="RPAREN">)</span> <span class="QUESTION">?</span><span id="local_lookup_method_19"><span class="LIDENT">lookup_method</span></span> <span class="LPAREN">(</span><span class="RPAREN">)</span> <span id="local_document_20"><span class="LIDENT">document</span></span> <span class="EQUAL">=</span><span class="EOL">
+</span>    <a href="#local_document_20"><span class="LIDENT">document</span></a><span class="EOL">
+</span>    <span class="INFIXOP0">|&gt;</span> <a href="../../../hilite/src/hilite.markdown/hilite_markdown.ml.html#val-transform"><span class="UIDENT">Hilite_markdown</span><span class="DOT">.</span><span class="LIDENT">transform</span></a> <span class="TILDE">~</span><a href="#local_skip_unknown_languages_17"><span class="LIDENT">skip_unknown_languages</span></a> <span class="TILDE">~</span><a href="#local_tm_18"><span class="LIDENT">tm</span></a> <span class="QUESTION">?</span><a href="#local_lookup_method_19"><span class="LIDENT">lookup_method</span></a><span class="EOL">
+</span><span class="EOL">
+</span>  <span class="LET">let</span> <span id="module-Doc.val-no_highlighting"><span class="LIDENT">no_highlighting</span></span> <span id="local_x_21"><span class="LIDENT">x</span></span> <span class="EQUAL">=</span> <a href="#local_x_21"><span class="LIDENT">x</span></a><span class="EOL">
+</span><span class="EOL">
+</span>  <span class="LET">let</span> <span id="module-Doc.val-make"><span class="LIDENT">make</span></span> <span class="QUESTION">?</span><span class="LPAREN">(</span><span id="local_strict_22"><span class="LIDENT">strict</span></span> <span class="EQUAL">=</span> <span class="FALSE">false</span><span class="RPAREN">)</span> <span class="QUESTION">?</span><span class="LPAREN">(</span><span id="local_heading_auto_ids_23"><span class="LIDENT">heading_auto_ids</span></span> <span class="EQUAL">=</span> <span class="TRUE">true</span><span class="RPAREN">)</span><span class="EOL">
+</span>      <span class="QUESTION">?</span><span class="LPAREN">(</span><span id="local_highlight_24"><span class="LIDENT">highlight</span></span> <span class="EQUAL">=</span> <span class="LIDENT">syntax_highlighting</span> <span class="LPAREN">(</span><span class="RPAREN">)</span><span class="RPAREN">)</span> <span id="local_content_25"><span class="LIDENT">content</span></span> <span class="EQUAL">=</span><span class="EOL">
+</span>    <a href="#local_content_25"><span class="LIDENT">content</span></a> <span class="INFIXOP0">|&gt;</span> <span class="LIDENT">from_string</span> <span class="TILDE">~</span><a href="#local_strict_22"><span class="LIDENT">strict</span></a> <span class="TILDE">~</span><a href="#local_heading_auto_ids_23"><span class="LIDENT">heading_auto_ids</span></a> <span class="INFIXOP0">|&gt;</span> <a href="#local_highlight_24"><span class="LIDENT">highlight</span></a><span class="EOL">
+</span><span class="EOL">
+</span>  <span class="LET">let</span> <span id="module-Doc.val-to_html"><span class="LIDENT">to_html</span></span> <span class="QUESTION">?</span><span class="LPAREN">(</span><span id="local_safe_26"><span class="LIDENT">safe</span></span> <span class="EQUAL">=</span> <span class="FALSE">false</span><span class="RPAREN">)</span> <span id="local_content_27"><span class="LIDENT">content</span></span> <span class="EQUAL">=</span> <a href="../../../cmarkit/src/cmarkit/cmarkit_html.ml.html#val-of_doc"><span class="UIDENT">Cmarkit_html</span><span class="DOT">.</span><span class="LIDENT">of_doc</span></a> <span class="TILDE">~</span><a href="#local_safe_26"><span class="LIDENT">safe</span></a> <a href="#local_content_27"><span class="LIDENT">content</span></a><span class="EOL">
+</span><span class="END">end</span></span><span class="EOL">
+</span><span class="EOL">
+</span><span class="LET">let</span> <span id="val-from_string_to_html"><span class="LIDENT">from_string_to_html</span></span> <span class="QUESTION">?</span><span id="local_strict_28"><span class="LIDENT">strict</span></span> <span class="QUESTION">?</span><span id="local_heading_auto_ids_29"><span class="LIDENT">heading_auto_ids</span></span> <span class="QUESTION">?</span><span id="local_highlight_30"><span class="LIDENT">highlight</span></span> <span class="QUESTION">?</span><span id="local_safe_31"><span class="LIDENT">safe</span></span> <span id="local_content_32"><span class="LIDENT">content</span></span> <span class="EQUAL">=</span><span class="EOL">
+</span>  <a href="#local_content_32"><span class="LIDENT">content</span></a> <span class="INFIXOP0">|&gt;</span> <span class="UIDENT">Doc</span><span class="DOT">.</span><span class="LIDENT">make</span> <span class="QUESTION">?</span><a href="#local_strict_28"><span class="LIDENT">strict</span></a> <span class="QUESTION">?</span><a href="#local_heading_auto_ids_29"><span class="LIDENT">heading_auto_ids</span></a> <span class="QUESTION">?</span><a href="#local_highlight_30"><span class="LIDENT">highlight</span></a> <span class="INFIXOP0">|&gt;</span> <span class="UIDENT">Doc</span><span class="DOT">.</span><span class="LIDENT">to_html</span> <span class="QUESTION">?</span><a href="#local_safe_31"><span class="LIDENT">safe</span></a><span class="EOL">
+</span><span class="EOL">
+</span><span id="module-Pipeline"><span class="MODULE">module</span> <span class="UIDENT">Pipeline</span> <span class="EQUAL">=</span> <span class="STRUCT">struct</span><span class="EOL">
+</span>  <span class="LET">let</span> <span id="module-Pipeline.val-mk"><span class="LIDENT">mk</span></span> <span id="local_f_33"><span class="LIDENT">f</span></span> <span class="EQUAL">=</span> <a href="../../../yocaml/src/yocaml/task.ml.html#val-lift"><span class="UIDENT">Yocaml</span><span class="DOT">.</span><span class="UIDENT">Task</span><span class="DOT">.</span><span class="LIDENT">lift</span></a> <span class="LABEL">~has_dynamic_dependencies:</span><span class="FALSE">false</span> <a href="#local_f_33"><span class="LIDENT">f</span></a><span class="EOL">
+</span><span class="EOL">
+</span>  <span class="LET">let</span> <span id="module-Pipeline.val-to_doc"><span class="LIDENT">to_doc</span></span> <span class="QUESTION">?</span><span id="local_strict_34"><span class="LIDENT">strict</span></span> <span class="QUESTION">?</span><span id="local_heading_auto_ids_35"><span class="LIDENT">heading_auto_ids</span></span> <span class="QUESTION">?</span><span id="local_highlight_36"><span class="LIDENT">highlight</span></span> <span class="LPAREN">(</span><span class="RPAREN">)</span> <span class="EQUAL">=</span><span class="EOL">
+</span>    <span class="LIDENT">mk</span> <span class="LPAREN">(</span><span class="UIDENT">Doc</span><span class="DOT">.</span><span class="LIDENT">make</span> <span class="QUESTION">?</span><a href="#local_strict_34"><span class="LIDENT">strict</span></a> <span class="QUESTION">?</span><a href="#local_heading_auto_ids_35"><span class="LIDENT">heading_auto_ids</span></a> <span class="QUESTION">?</span><a href="#local_highlight_36"><span class="LIDENT">highlight</span></a><span class="RPAREN">)</span><span class="EOL">
+</span><span class="EOL">
+</span>  <span class="LET">let</span> <span id="module-Pipeline.val-table_of_contents"><span class="LIDENT">table_of_contents</span></span> <span class="QUESTION">?</span><span id="local_traverse_table_37"><span class="LIDENT">traverse_table</span></span> <span class="LPAREN">(</span><span class="RPAREN">)</span> <span class="EQUAL">=</span><span class="EOL">
+</span>    <span class="LIDENT">mk</span> <span class="LPAREN">(</span><span class="FUN">fun</span> <span id="local_document_38"><span class="LIDENT">document</span></span> <span class="MINUSGREATER">-&gt;</span> <span class="UIDENT">Doc</span><span class="DOT">.</span><span class="LIDENT">table_of_contents</span> <span class="QUESTION">?</span><a href="#local_traverse_table_37"><span class="LIDENT">traverse_table</span></a> <a href="#local_document_38"><span class="LIDENT">document</span></a><span class="RPAREN">)</span><span class="EOL">
+</span><span class="EOL">
+</span>  <span class="LET">let</span> <span id="module-Pipeline.val-with_table_of_contents"><span class="LIDENT">with_table_of_contents</span></span> <span class="QUESTION">?</span><span id="local_traverse_table_39"><span class="LIDENT">traverse_table</span></span> <span class="LPAREN">(</span><span class="RPAREN">)</span> <span class="EQUAL">=</span><span class="EOL">
+</span>    <span class="LET">let</span> <span class="OPEN">open</span> <a href="../../../yocaml/src/yocaml/task.ml.html"><span class="UIDENT">Yocaml</span><span class="DOT">.</span><span class="UIDENT">Task</span></a> <span class="IN">in</span><span class="EOL">
+</span>    <a href="../../../yocaml/src/yocaml/task.ml.html#val-id"><span class="LIDENT">id</span></a> <a href="../../../yocaml/src/yocaml/task.ml.html#module-Infix.val-(&amp;&amp;&amp;)"><span class="INFIXOP0">&amp;&amp;&amp;</span></a> <span class="LIDENT">table_of_contents</span> <span class="QUESTION">?</span><a href="#local_traverse_table_39"><span class="LIDENT">traverse_table</span></a> <span class="LPAREN">(</span><span class="RPAREN">)</span> <a href="../../../yocaml/src/yocaml/task.ml.html#module-Infix.val-(&gt;&gt;|)"><span class="INFIXOP0">&gt;&gt;|</span></a> <span class="FUN">fun</span> <span class="LPAREN">(</span><span id="local_a_40"><span class="LIDENT">a</span></span><span class="COMMA">,</span> <span id="local_b_41"><span class="LIDENT">b</span></span><span class="RPAREN">)</span> <span class="MINUSGREATER">-&gt;</span> <span class="LPAREN">(</span><a href="#local_b_41"><span class="LIDENT">b</span></a><span class="COMMA">,</span> <a href="#local_a_40"><span class="LIDENT">a</span></a><span class="RPAREN">)</span><span class="EOL">
+</span><span class="EOL">
+</span>  <span class="LET">let</span> <span id="module-Pipeline.val-table_of_contents_metadata"><span class="LIDENT">table_of_contents_metadata</span></span> <span class="QUESTION">?</span><span id="local_traverse_table_42"><span class="LIDENT">traverse_table</span></span> <span class="LPAREN">(</span><span class="RPAREN">)</span> <span class="EQUAL">=</span><span class="EOL">
+</span>    <span class="LET">let</span> <span class="OPEN">open</span> <a href="../../../yocaml/src/yocaml/task.ml.html"><span class="UIDENT">Yocaml</span><span class="DOT">.</span><span class="UIDENT">Task</span></a> <span class="IN">in</span><span class="EOL">
+</span>    <a href="../../../yocaml/src/yocaml/task.ml.html#val-id"><span class="LIDENT">id</span></a><span class="EOL">
+</span>    <a href="../../../yocaml/src/yocaml/task.ml.html#module-Infix.val-(&gt;&gt;&gt;)"><span class="INFIXOP0">&gt;&gt;&gt;</span></a> <a href="../../../yocaml/src/yocaml/task.ml.html#val-second"><span class="LIDENT">second</span></a> <span class="LPAREN">(</span><span class="LIDENT">with_table_of_contents</span> <span class="QUESTION">?</span><a href="#local_traverse_table_42"><span class="LIDENT">traverse_table</span></a> <span class="LPAREN">(</span><span class="RPAREN">)</span><span class="RPAREN">)</span><span class="EOL">
+</span>    <a href="../../../yocaml/src/yocaml/task.ml.html#module-Infix.val-(&gt;&gt;&gt;)"><span class="INFIXOP0">&gt;&gt;&gt;</span></a> <span class="LIDENT">mk</span> <span class="LPAREN">(</span><span class="FUN">fun</span> <span class="LPAREN">(</span><span id="local_meta_43"><span class="LIDENT">meta</span></span><span class="COMMA">,</span> <span class="LPAREN">(</span><span id="local_toc_44"><span class="LIDENT">toc</span></span><span class="COMMA">,</span> <span id="local_content_45"><span class="LIDENT">content</span></span><span class="RPAREN">)</span><span class="RPAREN">)</span> <span class="MINUSGREATER">-&gt;</span> <span class="LPAREN">(</span><span class="LPAREN">(</span><a href="#local_meta_43"><span class="LIDENT">meta</span></a><span class="COMMA">,</span> <a href="#local_toc_44"><span class="LIDENT">toc</span></a><span class="RPAREN">)</span><span class="COMMA">,</span> <a href="#local_content_45"><span class="LIDENT">content</span></a><span class="RPAREN">)</span><span class="RPAREN">)</span><span class="EOL">
+</span><span class="EOL">
+</span>  <span class="LET">let</span> <span id="module-Pipeline.val-to_html"><span class="LIDENT">to_html</span></span> <span class="QUESTION">?</span><span id="local_safe_46"><span class="LIDENT">safe</span></span> <span class="LPAREN">(</span><span class="RPAREN">)</span> <span class="EQUAL">=</span> <span class="LIDENT">mk</span> <span class="LPAREN">(</span><span class="UIDENT">Doc</span><span class="DOT">.</span><span class="LIDENT">to_html</span> <span class="QUESTION">?</span><a href="#local_safe_46"><span class="LIDENT">safe</span></a><span class="RPAREN">)</span><span class="EOL">
+</span><span class="EOL">
+</span>  <span class="LET">let</span> <span id="module-Pipeline.val-make"><span class="LIDENT">make</span></span> <span class="QUESTION">?</span><span id="local_strict_47"><span class="LIDENT">strict</span></span> <span class="QUESTION">?</span><span id="local_heading_auto_ids_48"><span class="LIDENT">heading_auto_ids</span></span> <span class="QUESTION">?</span><span id="local_highlight_49"><span class="LIDENT">highlight</span></span> <span class="QUESTION">?</span><span id="local_safe_50"><span class="LIDENT">safe</span></span> <span class="LPAREN">(</span><span class="RPAREN">)</span> <span class="EQUAL">=</span><span class="EOL">
+</span>    <span class="LET">let</span> <span class="OPEN">open</span> <a href="../../../yocaml/src/yocaml/task.ml.html"><span class="UIDENT">Yocaml</span><span class="DOT">.</span><span class="UIDENT">Task</span></a> <span class="IN">in</span><span class="EOL">
+</span>    <span class="LIDENT">to_doc</span> <span class="QUESTION">?</span><a href="#local_strict_47"><span class="LIDENT">strict</span></a> <span class="QUESTION">?</span><a href="#local_heading_auto_ids_48"><span class="LIDENT">heading_auto_ids</span></a> <span class="QUESTION">?</span><a href="#local_highlight_49"><span class="LIDENT">highlight</span></a> <span class="LPAREN">(</span><span class="RPAREN">)</span> <a href="../../../yocaml/src/yocaml/task.ml.html#module-Infix.val-(&gt;&gt;&gt;)"><span class="INFIXOP0">&gt;&gt;&gt;</span></a> <span class="LIDENT">to_html</span> <span class="QUESTION">?</span><a href="#local_safe_50"><span class="LIDENT">safe</span></a> <span class="LPAREN">(</span><span class="RPAREN">)</span><span class="EOL">
+</span><span class="EOL">
+</span>  <span id="module-Pipeline.module-With_metadata"><span class="MODULE">module</span> <span class="UIDENT">With_metadata</span> <span class="EQUAL">=</span> <span class="STRUCT">struct</span><span class="EOL">
+</span>    <span class="LET">let</span> <span id="module-Pipeline.module-With_metadata.val-make"><span class="LIDENT">make</span></span> <span class="QUESTION">?</span><span id="local_strict_51"><span class="LIDENT">strict</span></span> <span class="QUESTION">?</span><span id="local_heading_auto_ids_52"><span class="LIDENT">heading_auto_ids</span></span> <span class="QUESTION">?</span><span id="local_highlight_53"><span class="LIDENT">highlight</span></span> <span class="QUESTION">?</span><span id="local_safe_54"><span class="LIDENT">safe</span></span> <span class="LPAREN">(</span><span class="RPAREN">)</span> <span class="EQUAL">=</span><span class="EOL">
+</span>      <a href="../../../yocaml/src/yocaml/task.ml.html#val-second"><span class="UIDENT">Yocaml</span><span class="DOT">.</span><span class="UIDENT">Task</span><span class="DOT">.</span><span class="LIDENT">second</span></a> <span class="LPAREN">(</span><span class="LIDENT">make</span> <span class="QUESTION">?</span><a href="#local_strict_51"><span class="LIDENT">strict</span></a> <span class="QUESTION">?</span><a href="#local_heading_auto_ids_52"><span class="LIDENT">heading_auto_ids</span></a> <span class="QUESTION">?</span><a href="#local_highlight_53"><span class="LIDENT">highlight</span></a> <span class="QUESTION">?</span><a href="#local_safe_54"><span class="LIDENT">safe</span></a> <span class="LPAREN">(</span><span class="RPAREN">)</span><span class="RPAREN">)</span><span class="EOL">
+</span><span class="EOL">
+</span>    <span class="LET">let</span> <span id="module-Pipeline.module-With_metadata.val-table_of_contents"><span class="LIDENT">table_of_contents</span></span> <span class="EQUAL">=</span> <span class="LIDENT">table_of_contents_metadata</span><span class="EOL">
+</span><span class="EOL">
+</span>    <span class="LET">let</span> <span id="module-Pipeline.module-With_metadata.val-to_doc"><span class="LIDENT">to_doc</span></span> <span class="QUESTION">?</span><span id="local_strict_55"><span class="LIDENT">strict</span></span> <span class="QUESTION">?</span><span id="local_heading_auto_ids_56"><span class="LIDENT">heading_auto_ids</span></span> <span class="QUESTION">?</span><span id="local_highlight_57"><span class="LIDENT">highlight</span></span> <span class="LPAREN">(</span><span class="RPAREN">)</span> <span class="EQUAL">=</span><span class="EOL">
+</span>      <a href="../../../yocaml/src/yocaml/task.ml.html#val-second"><span class="UIDENT">Yocaml</span><span class="DOT">.</span><span class="UIDENT">Task</span><span class="DOT">.</span><span class="LIDENT">second</span></a> <span class="LPAREN">(</span><span class="LIDENT">to_doc</span> <span class="QUESTION">?</span><a href="#local_strict_55"><span class="LIDENT">strict</span></a> <span class="QUESTION">?</span><a href="#local_heading_auto_ids_56"><span class="LIDENT">heading_auto_ids</span></a> <span class="QUESTION">?</span><a href="#local_highlight_57"><span class="LIDENT">highlight</span></a> <span class="LPAREN">(</span><span class="RPAREN">)</span><span class="RPAREN">)</span><span class="EOL">
+</span><span class="EOL">
+</span>    <span class="LET">let</span> <span id="module-Pipeline.module-With_metadata.val-with_table_of_contents"><span class="LIDENT">with_table_of_contents</span></span> <span class="QUESTION">?</span><span id="local_strict_58"><span class="LIDENT">strict</span></span> <span class="QUESTION">?</span><span id="local_heading_auto_ids_59"><span class="LIDENT">heading_auto_ids</span></span> <span class="QUESTION">?</span><span id="local_highlight_60"><span class="LIDENT">highlight</span></span><span class="EOL">
+</span>        <span class="QUESTION">?</span><span id="local_traverse_table_61"><span class="LIDENT">traverse_table</span></span> <span class="LPAREN">(</span><span class="RPAREN">)</span> <span class="EQUAL">=</span><span class="EOL">
+</span>      <span class="LET">let</span> <span class="OPEN">open</span> <a href="../../../yocaml/src/yocaml/task.ml.html"><span class="UIDENT">Yocaml</span><span class="DOT">.</span><span class="UIDENT">Task</span></a> <span class="IN">in</span><span class="EOL">
+</span>      <span class="LIDENT">to_doc</span> <span class="QUESTION">?</span><a href="#local_strict_58"><span class="LIDENT">strict</span></a> <span class="QUESTION">?</span><a href="#local_heading_auto_ids_59"><span class="LIDENT">heading_auto_ids</span></a> <span class="QUESTION">?</span><a href="#local_highlight_60"><span class="LIDENT">highlight</span></a> <span class="LPAREN">(</span><span class="RPAREN">)</span><span class="EOL">
+</span>      <a href="../../../yocaml/src/yocaml/task.ml.html#module-Infix.val-(&gt;&gt;&gt;)"><span class="INFIXOP0">&gt;&gt;&gt;</span></a> <span class="LIDENT">table_of_contents_metadata</span> <span class="QUESTION">?</span><a href="#local_traverse_table_61"><span class="LIDENT">traverse_table</span></a> <span class="LPAREN">(</span><span class="RPAREN">)</span><span class="EOL">
+</span><span class="EOL">
+</span>    <span class="LET">let</span> <span id="module-Pipeline.module-With_metadata.val-to_html"><span class="LIDENT">to_html</span></span> <span class="QUESTION">?</span><span id="local_safe_62"><span class="LIDENT">safe</span></span> <span class="LPAREN">(</span><span class="RPAREN">)</span> <span class="EQUAL">=</span> <a href="../../../yocaml/src/yocaml/task.ml.html#val-second"><span class="UIDENT">Yocaml</span><span class="DOT">.</span><span class="UIDENT">Task</span><span class="DOT">.</span><span class="LIDENT">second</span></a> <span class="LPAREN">(</span><span class="LIDENT">to_html</span> <span class="QUESTION">?</span><a href="#local_safe_62"><span class="LIDENT">safe</span></a> <span class="LPAREN">(</span><span class="RPAREN">)</span><span class="RPAREN">)</span><span class="EOL">
+</span><span class="EOL">
+</span>    <span class="LET">let</span> <span id="module-Pipeline.module-With_metadata.val-make_with_table_of_contents"><span class="LIDENT">make_with_table_of_contents</span></span> <span class="QUESTION">?</span><span id="local_strict_63"><span class="LIDENT">strict</span></span> <span class="QUESTION">?</span><span id="local_heading_auto_ids_64"><span class="LIDENT">heading_auto_ids</span></span> <span class="QUESTION">?</span><span id="local_highlight_65"><span class="LIDENT">highlight</span></span><span class="EOL">
+</span>        <span class="QUESTION">?</span><span id="local_traverse_table_66"><span class="LIDENT">traverse_table</span></span> <span class="QUESTION">?</span><span id="local_safe_67"><span class="LIDENT">safe</span></span> <span class="LPAREN">(</span><span class="RPAREN">)</span> <span class="EQUAL">=</span><span class="EOL">
+</span>      <span class="LET">let</span> <span class="OPEN">open</span> <a href="../../../yocaml/src/yocaml/task.ml.html"><span class="UIDENT">Yocaml</span><span class="DOT">.</span><span class="UIDENT">Task</span></a> <span class="IN">in</span><span class="EOL">
+</span>      <span class="LIDENT">with_table_of_contents</span> <span class="QUESTION">?</span><a href="#local_strict_63"><span class="LIDENT">strict</span></a> <span class="QUESTION">?</span><a href="#local_heading_auto_ids_64"><span class="LIDENT">heading_auto_ids</span></a> <span class="QUESTION">?</span><a href="#local_highlight_65"><span class="LIDENT">highlight</span></a><span class="EOL">
+</span>        <span class="QUESTION">?</span><a href="#local_traverse_table_66"><span class="LIDENT">traverse_table</span></a> <span class="LPAREN">(</span><span class="RPAREN">)</span><span class="EOL">
+</span>      <a href="../../../yocaml/src/yocaml/task.ml.html#module-Infix.val-(&gt;&gt;&gt;)"><span class="INFIXOP0">&gt;&gt;&gt;</span></a> <span class="LIDENT">to_html</span> <span class="QUESTION">?</span><a href="#local_safe_67"><span class="LIDENT">safe</span></a> <span class="LPAREN">(</span><span class="RPAREN">)</span><span class="EOL">
+</span>  <span class="END">end</span></span><span class="EOL">
+</span><span class="END">end</span></span><span class="EOL">
+</span></span></code></pre></body></html>
