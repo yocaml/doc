@@ -2,15 +2,15 @@
   "name": "yocaml_git",
   "version": "dev",
   "files": [
+    "src/yocaml_git/runtime.ml.html", "src/yocaml_git/yocaml_git.ml.html",
+    "src/yocaml_git/yocaml_git__.ml.html", "src/yocaml_git/ssh.ml.html",
+    "src/index.html",
     "yocaml_git/Yocaml_git/From_identity/argument-1-Source/index.html",
     "yocaml_git/Yocaml_git/From_identity/index.html",
     "yocaml_git/Yocaml_git/Required/module-type-SOURCE/index.html",
     "yocaml_git/Yocaml_git/Required/module-type-CONFIG/index.html",
     "yocaml_git/Yocaml_git/Required/index.html",
-    "yocaml_git/Yocaml_git/index.html", "yocaml_git/index.html",
-    "src/yocaml_git/yocaml_git__.ml.html",
-    "src/yocaml_git/yocaml_git.ml.html", "src/yocaml_git/runtime.ml.html",
-    "src/yocaml_git/ssh.ml.html", "src/index.html", "index.html"
+    "yocaml_git/Yocaml_git/index.html", "yocaml_git/index.html", "index.html"
   ],
   "failed": false,
   "redirections": []
