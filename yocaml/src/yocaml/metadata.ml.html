@@ -86,6 +86,37 @@
 <a id="L85" class="source_line" href="#L85">85</a>
 <a id="L86" class="source_line" href="#L86">86</a>
 <a id="L87" class="source_line" href="#L87">87</a>
+<a id="L88" class="source_line" href="#L88">88</a>
+<a id="L89" class="source_line" href="#L89">89</a>
+<a id="L90" class="source_line" href="#L90">90</a>
+<a id="L91" class="source_line" href="#L91">91</a>
+<a id="L92" class="source_line" href="#L92">92</a>
+<a id="L93" class="source_line" href="#L93">93</a>
+<a id="L94" class="source_line" href="#L94">94</a>
+<a id="L95" class="source_line" href="#L95">95</a>
+<a id="L96" class="source_line" href="#L96">96</a>
+<a id="L97" class="source_line" href="#L97">97</a>
+<a id="L98" class="source_line" href="#L98">98</a>
+<a id="L99" class="source_line" href="#L99">99</a>
+<a id="L100" class="source_line" href="#L100">100</a>
+<a id="L101" class="source_line" href="#L101">101</a>
+<a id="L102" class="source_line" href="#L102">102</a>
+<a id="L103" class="source_line" href="#L103">103</a>
+<a id="L104" class="source_line" href="#L104">104</a>
+<a id="L105" class="source_line" href="#L105">105</a>
+<a id="L106" class="source_line" href="#L106">106</a>
+<a id="L107" class="source_line" href="#L107">107</a>
+<a id="L108" class="source_line" href="#L108">108</a>
+<a id="L109" class="source_line" href="#L109">109</a>
+<a id="L110" class="source_line" href="#L110">110</a>
+<a id="L111" class="source_line" href="#L111">111</a>
+<a id="L112" class="source_line" href="#L112">112</a>
+<a id="L113" class="source_line" href="#L113">113</a>
+<a id="L114" class="source_line" href="#L114">114</a>
+<a id="L115" class="source_line" href="#L115">115</a>
+<a id="L116" class="source_line" href="#L116">116</a>
+<a id="L117" class="source_line" href="#L117">117</a>
+<a id="L118" class="source_line" href="#L118">118</a>
 </code><code class="source_code"><span><span class="COMMENT">(* YOCaml a static blog generator.
    Copyright (C) 2024 The Funkyworkers and The YOCaml's developers
 
@@ -173,4 +204,35 @@
 </span>                    <span class="UIDENT">Required</span><span class="DOT">.</span><span class="UIDENT">Validation_error</span> <span class="LBRACE">{</span> <span class="LIDENT">entity</span> <span class="EQUAL">=</span> <span class="UIDENT">R</span><span class="DOT">.</span><span class="LIDENT">entity_name</span><span class="SEMI">;</span> <a href="#local_error_31"><span class="LIDENT">error</span></a> <span class="RBRACE">}</span><span class="RPAREN">)</span><span class="RPAREN">)</span><span class="RPAREN">)</span><span class="EOL">
 </span><span class="EOL">
 </span><span class="LET">let</span> <span id="val-required"><span class="LIDENT">required</span></span> <span id="local_entity_32"><span class="LIDENT">entity</span></span> <span class="EQUAL">=</span> <span class="UIDENT">Error</span> <span class="LPAREN">(</span><span class="UIDENT">Required</span><span class="DOT">.</span><span class="UIDENT">Required_metadata</span> <span class="LBRACE">{</span> <a href="#local_entity_32"><span class="LIDENT">entity</span></a> <span class="RBRACE">}</span><span class="RPAREN">)</span><span class="EOL">
+</span><span class="EOL">
+</span><span id="module-Injectable"><span class="MODULE">module</span> <span class="UIDENT">Injectable</span> <span class="LPAREN">(</span><span class="UIDENT">D</span> <span class="COLON">:</span> <span class="UIDENT">Required</span><span class="DOT">.</span><span class="UIDENT">DATA_INJECTABLE</span><span class="RPAREN">)</span> <span class="COLON">:</span> <span class="SIG">sig</span><span class="EOL">
+</span>  <span class="INCLUDE">include</span> <a href="data.ml.html#module-type-S"><span class="UIDENT">Data</span><span class="DOT">.</span><span class="UIDENT">S</span></a> <span class="WITH">with</span> <span id="def_36"><span class="TYPE">type</span> <span class="LIDENT">t</span> <span class="EQUAL">=</span> <span class="UIDENT">D</span><span class="DOT">.</span><span class="LIDENT">t</span></span><span class="EOL">
+</span>  <span class="INCLUDE">include</span> <span class="UIDENT">Required</span><span class="DOT">.</span><span class="UIDENT">DATA_INJECTABLE</span> <span class="WITH">with</span> <span id="def_35"><span class="TYPE">type</span> <span class="LIDENT">t</span> <span class="COLONEQUAL">:=</span> <span class="LIDENT">t</span></span><span class="EOL">
+</span><span class="END">end</span> <span class="EQUAL">=</span> <span class="STRUCT">struct</span><span class="EOL">
+</span>  <span id="module-Injectable.type-t"><span class="TYPE">type</span> <span class="LIDENT">t</span> <span class="EQUAL">=</span> <span class="UIDENT">D</span><span class="DOT">.</span><span class="LIDENT">t</span></span><span class="EOL">
+</span><span class="EOL">
+</span>  <span class="LET">let</span> <span id="module-Injectable.val-to_data"><span class="LIDENT">to_data</span></span> <span id="local_x_33"><span class="LIDENT">x</span></span> <span class="EQUAL">=</span> <a href="data.ml.html#val-record"><span class="UIDENT">Data</span><span class="DOT">.</span><span class="LIDENT">record</span></a> <span class="LPAREN">(</span><span class="UIDENT">D</span><span class="DOT">.</span><span class="LIDENT">normalize</span> <a href="#local_x_33"><span class="LIDENT">x</span></a><span class="RPAREN">)</span><span class="EOL">
+</span>  <span class="LET">let</span> <span id="module-Injectable.val-normalize"><span class="LIDENT">normalize</span></span> <span class="EQUAL">=</span> <span class="UIDENT">D</span><span class="DOT">.</span><span class="LIDENT">normalize</span><span class="EOL">
+</span><span class="END">end</span></span><span class="EOL">
+</span><span class="EOL">
+</span><span id="module-Readable"><span class="MODULE">module</span> <span class="UIDENT">Readable</span><span class="EOL">
+</span>    <span class="LPAREN">(</span><span class="UIDENT">D</span> <span class="COLON">:</span> <a href="data.ml.html#module-Validation.module-type-S"><span class="UIDENT">Data</span><span class="DOT">.</span><span class="UIDENT">Validation</span><span class="DOT">.</span><span class="UIDENT">S</span></a><span class="RPAREN">)</span><span class="EOL">
+</span>    <span class="LPAREN">(</span><span class="UIDENT">V</span> <span class="COLON">:</span> <span class="SIG">sig</span><span class="EOL">
+</span>      <span id="module-Readable.argument-2-V.val-name"><span class="VAL">val</span> <span class="LIDENT">name</span> <span class="COLON">:</span> <span class="LIDENT">string</span></span><span class="EOL">
+</span>      <span id="module-Readable.argument-2-V.val-neutral"><span class="VAL">val</span> <span class="LIDENT">neutral</span> <span class="COLON">:</span> <span class="LBRACKET">[</span> <span class="BACKQUOTE">`</span><span class="UIDENT">Optional</span> <span class="OF">of</span> <span class="UIDENT">D</span><span class="DOT">.</span><span class="LIDENT">t</span> <span class="BAR">|</span> <span class="BACKQUOTE">`</span><span class="UIDENT">Required</span> <span class="RBRACKET">]</span></span><span class="EOL">
+</span>    <span class="END">end</span><span class="RPAREN">)</span> <span class="COLON">:</span> <span class="SIG">sig</span><span class="EOL">
+</span>  <span class="INCLUDE">include</span> <a href="data.ml.html#module-Validation.module-type-S"><span class="UIDENT">Data</span><span class="DOT">.</span><span class="UIDENT">Validation</span><span class="DOT">.</span><span class="UIDENT">S</span></a><span class="EOL">
+</span>  <span class="INCLUDE">include</span> <span class="UIDENT">Required</span><span class="DOT">.</span><span class="UIDENT">DATA_READABLE</span> <span class="WITH">with</span> <span id="def_37"><span class="TYPE">type</span> <span class="LIDENT">t</span> <span class="COLONEQUAL">:=</span> <span class="LIDENT">t</span></span><span class="EOL">
+</span><span class="END">end</span> <span class="EQUAL">=</span> <span class="STRUCT">struct</span><span class="EOL">
+</span>  <span class="INCLUDE">include</span> <span class="UIDENT">D</span><span class="EOL">
+</span><span class="EOL">
+</span>  <span class="LET">let</span> <span id="module-Readable.val-entity_name"><span class="LIDENT">entity_name</span></span> <span class="EQUAL">=</span> <span class="UIDENT">V</span><span class="DOT">.</span><span class="LIDENT">name</span><span class="EOL">
+</span><span class="EOL">
+</span>  <span class="LET">let</span> <span id="module-Readable.val-neutral"><span class="LIDENT">neutral</span></span> <span class="EQUAL">=</span><span class="EOL">
+</span>    <span class="MATCH">match</span> <span class="UIDENT">V</span><span class="DOT">.</span><span class="LIDENT">neutral</span> <span class="WITH">with</span><span class="EOL">
+</span>    <span class="BAR">|</span> <span class="BACKQUOTE">`</span><span class="UIDENT">Optional</span> <span id="local_x_34"><span class="LIDENT">x</span></span> <span class="MINUSGREATER">-&gt;</span> <span class="UIDENT">Ok</span> <a href="#local_x_34"><span class="LIDENT">x</span></a><span class="EOL">
+</span>    <span class="BAR">|</span> <span class="BACKQUOTE">`</span><span class="UIDENT">Required</span> <span class="MINUSGREATER">-&gt;</span> <span class="UIDENT">Error</span> <span class="LPAREN">(</span><span class="UIDENT">Required</span><span class="DOT">.</span><span class="UIDENT">Required_metadata</span> <span class="LBRACE">{</span> <span class="LIDENT">entity</span> <span class="EQUAL">=</span> <span class="LIDENT">entity_name</span> <span class="RBRACE">}</span><span class="RPAREN">)</span><span class="EOL">
+</span><span class="EOL">
+</span>  <span class="LET">let</span> <span id="module-Readable.val-validate"><span class="LIDENT">validate</span></span> <span class="EQUAL">=</span> <span class="UIDENT">D</span><span class="DOT">.</span><span class="LIDENT">from_data</span><span class="EOL">
+</span><span class="END">end</span></span><span class="EOL">
 </span></span></code></pre></body></html>
