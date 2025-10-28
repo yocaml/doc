@@ -320,9 +320,7 @@ Result.Error
       let+ _ =
         required fields &quot;username_confirmation&quot;
           (string
-             &amp; equal ~equal:String.equal
-                ~pp:Format.pp_print_string
-                validated_user.username)
+             &amp; V.String.equal validated_user.username)
       in ()
      ) user
   in Ok validated_user</code></pre><p>If our confirmation is correct, the validation process will run smoothly!</p><pre class="language-ocaml"><code># user_validation true D.(record [

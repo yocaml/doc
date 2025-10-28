@@ -43,6 +43,7 @@
     "yocaml/Yocaml/Data/Validation/module-type-S/index.html",
     "yocaml/Yocaml/Data/Validation/Syntax/index.html",
     "yocaml/Yocaml/Data/Validation/Infix/index.html",
+    "yocaml/Yocaml/Data/Validation/String/index.html",
     "yocaml/Yocaml/Data/Validation/index.html",
     "yocaml/Yocaml/Data/index.html", "yocaml/Yocaml/Task/Dynamic/index.html",
     "yocaml/Yocaml/Task/Syntax/index.html",
