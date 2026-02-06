@@ -114,12 +114,6 @@
 <a id="L113" class="source_line" href="#L113">113</a>
 <a id="L114" class="source_line" href="#L114">114</a>
 <a id="L115" class="source_line" href="#L115">115</a>
-<a id="L116" class="source_line" href="#L116">116</a>
-<a id="L117" class="source_line" href="#L117">117</a>
-<a id="L118" class="source_line" href="#L118">118</a>
-<a id="L119" class="source_line" href="#L119">119</a>
-<a id="L120" class="source_line" href="#L120">120</a>
-<a id="L121" class="source_line" href="#L121">121</a>
 </code><code class="source_code"><span><span class="COMMENT">(* YOCaml a static blog generator.
    Copyright (C) 2024 The Funkyworkers and The YOCaml's developers
 
@@ -219,7 +213,7 @@
 </span>    <span class="LET">let</span> <span id="local_listing_43"><span class="LIDENT">listing</span></span> <span class="EQUAL">=</span><span class="EOL">
 </span>      <a href="../../../ocaml-compiler/src/stdlib/list.ml.html#val-map"><span class="UIDENT">List</span><span class="DOT">.</span><span class="LIDENT">map</span></a><span class="EOL">
 </span>        <span class="LPAREN">(</span><span class="FUN">fun</span> <span id="local_x_44"><span class="LIDENT">x</span></span> <span class="MINUSGREATER">-&gt;</span><span class="EOL">
-</span>          <span class="LET">let</span> <span id="def_55"><span id="local_char_45"><span class="LIDENT">char</span></span><span class="COMMA">,</span> <span id="local_value_46"><span class="LIDENT">value</span></span></span> <span class="EQUAL">=</span><span class="EOL">
+</span>          <span class="LET">let</span> <span id="def_54"><span id="local_char_45"><span class="LIDENT">char</span></span><span class="COMMA">,</span> <span id="local_value_46"><span class="LIDENT">value</span></span></span> <span class="EQUAL">=</span><span class="EOL">
 </span>            <span class="MATCH">match</span> <a href="#local_x_44"><span class="LIDENT">x</span></a> <span class="WITH">with</span> <span class="UIDENT">Kind</span><span class="DOT">.</span><span class="UIDENT">Directory</span> <span id="local_x_47"><span class="LIDENT">x</span></span> <span class="MINUSGREATER">-&gt;</span> <span class="LPAREN">(</span><span class="STRING">&quot;📁&quot;</span><span class="COMMA">,</span> <a href="#local_x_47"><span class="LIDENT">x</span></a><span class="RPAREN">)</span> <span class="BAR">|</span> <span class="UIDENT">File</span> <span id="local_x_48"><span class="LIDENT">x</span></span> <span class="MINUSGREATER">-&gt;</span> <span class="LPAREN">(</span><span class="STRING">&quot;🖹&quot;</span><span class="COMMA">,</span> <a href="#local_x_48"><span class="LIDENT">x</span></a><span class="RPAREN">)</span><span class="EOL">
 </span>          <span class="IN">in</span><span class="EOL">
 </span>          <a href="../../../ocaml-compiler/src/stdlib/format.ml.html#val-asprintf"><span class="UIDENT">Format</span><span class="DOT">.</span><span class="LIDENT">asprintf</span></a> <span class="STRING">{|&lt;li&gt;%s &lt;a href=&quot;%s&quot;&gt;%s&lt;/a&gt;&lt;/li&gt;|}</span> <a href="#local_char_45"><span class="LIDENT">char</span></a><span class="EOL">
@@ -229,16 +223,10 @@
 </span>      <span class="INFIXOP0">|&gt;</span> <a href="../../../ocaml-compiler/src/stdlib/string.ml.html#val-concat"><span class="UIDENT">String</span><span class="DOT">.</span><span class="LIDENT">concat</span></a> <span class="STRING">&quot;&quot;</span><span class="EOL">
 </span>    <span class="IN">in</span><span class="EOL">
 </span>    <a href="../../../ocaml-compiler/src/stdlib/format.ml.html#val-asprintf"><span class="UIDENT">Format</span><span class="DOT">.</span><span class="LIDENT">asprintf</span></a> <span class="STRING">&quot;&lt;nav&gt;&lt;h1&gt;%s&lt;/h1&gt;&lt;/nav&gt;&lt;ul&gt;%s&lt;/ul&gt;&quot;</span> <a href="#local_top_33"><span class="LIDENT">top</span></a> <a href="#local_listing_43"><span class="LIDENT">listing</span></a><span class="EOL">
-</span><span class="EOL">
-</span>  <span class="LET">let</span> <span id="module-Pages.val-error500"><span class="LIDENT">error500</span></span> <span id="local_msg_49"><span class="LIDENT">msg</span></span> <span class="EQUAL">=</span><span class="EOL">
-</span>    <a href="../../../ocaml-compiler/src/stdlib/format.ml.html#val-asprintf"><span class="UIDENT">Format</span><span class="DOT">.</span><span class="LIDENT">asprintf</span></a><span class="EOL">
-</span>      <span class="STRING">&quot;&lt;h1&gt;500 Internal server error&lt;/h1&gt;&lt;hr /&gt;&lt;p&gt;The build failed while \
-       refreshing the site.&lt;/p&gt;&lt;pre&gt;%s&lt;/pre&gt;&quot;</span><span class="EOL">
-</span>      <a href="#local_msg_49"><span class="LIDENT">msg</span></a><span class="EOL">
 </span><span class="END">end</span></span><span class="EOL">
 </span><span class="EOL">
-</span><span class="LET">let</span> <span id="val-prompt"><span class="LIDENT">prompt</span></span> <span id="local_port_50"><span class="LIDENT">port</span></span> <span class="EQUAL">=</span><span class="EOL">
-</span>  <a href="../../../logs/src/logs/logs.ml.html#val-info"><span class="UIDENT">Logs</span><span class="DOT">.</span><span class="LIDENT">info</span></a> <span class="LPAREN">(</span><span class="FUN">fun</span> <span id="local_f_51"><span class="LIDENT">f</span></span> <span class="MINUSGREATER">-&gt;</span> <a href="#local_f_51"><span class="LIDENT">f</span></a> <span class="STRING">&quot;Launching server &lt;http://localhost:%04d&gt;&quot;</span> <a href="#local_port_50"><span class="LIDENT">port</span></a><span class="RPAREN">)</span><span class="EOL">
+</span><span class="LET">let</span> <span id="val-prompt"><span class="LIDENT">prompt</span></span> <span id="local_port_49"><span class="LIDENT">port</span></span> <span class="EQUAL">=</span><span class="EOL">
+</span>  <a href="../../../logs/src/logs/logs.ml.html#val-info"><span class="UIDENT">Logs</span><span class="DOT">.</span><span class="LIDENT">info</span></a> <span class="LPAREN">(</span><span class="FUN">fun</span> <span id="local_f_50"><span class="LIDENT">f</span></span> <span class="MINUSGREATER">-&gt;</span> <a href="#local_f_50"><span class="LIDENT">f</span></a> <span class="STRING">&quot;Launching server &lt;http://localhost:%04d&gt;&quot;</span> <a href="#local_port_49"><span class="LIDENT">port</span></a><span class="RPAREN">)</span><span class="EOL">
 </span><span class="EOL">
-</span><span class="LET">let</span> <span id="val-exn_handler"><span class="LIDENT">exn_handler</span></span> <span id="local_pp_52"><span class="LIDENT">pp</span></span> <span id="local_exn_53"><span class="LIDENT">exn</span></span> <span class="EQUAL">=</span> <a href="../../../logs/src/logs/logs.ml.html#val-warn"><span class="UIDENT">Logs</span><span class="DOT">.</span><span class="LIDENT">warn</span></a> <span class="LPAREN">(</span><span class="FUN">fun</span> <span id="local_fmt_54"><span class="LIDENT">fmt</span></span> <span class="MINUSGREATER">-&gt;</span> <a href="#local_fmt_54"><span class="LIDENT">fmt</span></a> <span class="STRING">&quot;%a&quot;</span> <a href="#local_pp_52"><span class="LIDENT">pp</span></a> <a href="#local_exn_53"><span class="LIDENT">exn</span></a><span class="RPAREN">)</span><span class="EOL">
+</span><span class="LET">let</span> <span id="val-exn_handler"><span class="LIDENT">exn_handler</span></span> <span id="local_pp_51"><span class="LIDENT">pp</span></span> <span id="local_exn_52"><span class="LIDENT">exn</span></span> <span class="EQUAL">=</span> <a href="../../../logs/src/logs/logs.ml.html#val-warn"><span class="UIDENT">Logs</span><span class="DOT">.</span><span class="LIDENT">warn</span></a> <span class="LPAREN">(</span><span class="FUN">fun</span> <span id="local_fmt_53"><span class="LIDENT">fmt</span></span> <span class="MINUSGREATER">-&gt;</span> <a href="#local_fmt_53"><span class="LIDENT">fmt</span></a> <span class="STRING">&quot;%a&quot;</span> <a href="#local_pp_51"><span class="LIDENT">pp</span></a> <a href="#local_exn_52"><span class="LIDENT">exn</span></a><span class="RPAREN">)</span><span class="EOL">
 </span></span></code></pre></body></html>
